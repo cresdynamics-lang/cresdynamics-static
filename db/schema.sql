@@ -132,6 +132,8 @@ CREATE TABLE IF NOT EXISTS speaker_applications (
   audience_why TEXT NOT NULL,
   bio_pdf_filename TEXT NOT NULL,
   image_filename TEXT NOT NULL,
+  bio_pdf_path TEXT,
+  image_path TEXT,
   created_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 CREATE INDEX IF NOT EXISTS idx_speaker_applications_created_at ON speaker_applications (created_at DESC);

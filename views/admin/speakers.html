@@ -30,12 +30,13 @@
             <th>Phone</th>
             <th>Company</th>
             <th>Topic</th>
+            <th>Attachments</th>
             <th>Date</th>
           </tr>
         </thead>
         <tbody id="speakers-table">
           <tr>
-            <td colspan="6" class="loading">Loading...</td>
+            <td colspan="7" class="loading">Loading...</td>
           </tr>
         </tbody>
       </table>
@@ -68,17 +69,32 @@
       const tbody = document.getElementById('speakers-table');
       
       if (speakers.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="6" class="empty">No speaker applications found</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="7" class="empty">No speaker applications found</td></tr>';
         return;
       }
-      
+
+      function attachmentCell(s) {
+        const parts = [];
+        if (s.imageUrl) {
+          parts.push(`<a href="${s.imageUrl}" target="_blank" rel="noopener" title="${(s.imageName||'profile image').replace(/"/g,'&quot;')}" style="display:inline-flex;align-items:center;gap:6px;margin-right:10px;">
+            <img src="${s.imageUrl}" alt="profile" style="width:42px;height:42px;object-fit:cover;border-radius:50%;border:1px solid rgba(47,166,179,0.5);">${s.imageName ? `<span style="max-width:120px;font-size:11px;color:#2FA6B3;">${s.imageName}</span>` : ''}
+            </a>`);
+        }
+        if (s.bioPdfUrl) {
+          parts.push(`<a href="${s.bioPdfUrl}" target="_blank" rel="noopener" title="Open PDF" style="display:inline-flex;align-items:center;gap:5px;color:#F39C24;font-size:12px;text-decoration:none;">
+            <span style="font-size:14px;">📄</span>${s.bioPdfName ? s.bioPdfName : 'PDF'}</a>`);
+        }
+        return parts.length ? parts.join('') : '<span style="color:#888;font-size:12px;">—</span>';
+      }
+
       tbody.innerHTML = speakers.map(s => `
         <tr>
-          <td>${s.name}</td>
+          <td>${s.name}<br><small style="color:#777">${s.topic || ''}</small></td>
           <td>${s.email}</td>
           <td>${s.phone}</td>
           <td>${s.company}</td>
           <td>${s.topic}</td>
+          <td>${attachmentCell(s)}</td>
           <td>${new Date(s.createdAt).toLocaleDateString()}</td>
         </tr>
       `).join('');

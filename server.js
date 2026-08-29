@@ -16,9 +16,19 @@ app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
-const upload = multer({ dest: path.join(__dirname, 'uploads') });
+const uploadStorage = multer.diskStorage({
+  destination: (req, file, cb) => cb(null, path.join(__dirname, 'uploads')),
+  filename: (req, file, cb) => {
+    const original = Buffer.from(file.originalname, 'latin1').toString('utf8') || file.originalname || 'file';
+    const ext = (path.extname(original) || '').toLowerCase().slice(0, 12);
+    const base = (path.basename(original, ext).replace(/[^a-z0-9]+/gi, '-').replace(/^-+|-+$/g, '') || 'file').slice(0, 60);
+    cb(null, `${base}-${Date.now()}${ext}`);
+  }
+});
+const upload = multer({ storage: uploadStorage, limits: { fileSize: 20 * 1024 * 1024 } });
 
 app.use(express.static(path.join(__dirname, 'public')));
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 app.set('trust proxy', true);
 
 // ─── Site analytics (traffic capture for Director dashboard in CRM) ───
@@ -412,13 +422,18 @@ app.post('/api/events/speakers/apply', upload.fields([{ name: 'bioPdf' }, { name
     if (!fullName || !email || !phone || !topic || !audienceWhy) {
       return res.status(400).json({ error: 'Missing required fields' });
     }
-    const bioPdfFilename = req.files?.bioPdf?.[0]?.originalname || '';
-    const imageFilename = req.files?.image?.[0]?.originalname || '';
+    const bioPdfFile = req.files?.bioPdf?.[0];
+    const imageFile = req.files?.image?.[0];
+    const bioPdfFilename = bioPdfFile?.originalname || '';
+    const imageFilename = imageFile?.originalname || '';
+    const bioPdfPath = bioPdfFile ? `/uploads/${encodeURIComponent(bioPdfFile.filename)}` : null;
+    const imagePath = imageFile ? `/uploads/${encodeURIComponent(imageFile.filename)}` : null;
     await db.query(
-      'INSERT INTO speaker_applications (full_name, email, phone, company, topic, linkedin, audience_why, bio_pdf_filename, image_filename) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9)',
-      [fullName, email, phone, company || null, topic, linkedin || null, audienceWhy, bioPdfFilename, imageFilename]
+      'INSERT INTO speaker_applications (full_name, email, phone, company, topic, linkedin, audience_why, bio_pdf_filename, image_filename, bio_pdf_path, image_path) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11)',
+      [fullName, email, phone, company || null, topic, linkedin || null, audienceWhy, bioPdfFilename, imageFilename, bioPdfPath, imagePath]
     );
 
+    const baseUrl = (process.env.PUBLIC_BASE_URL || '').replace(/\/$/, '');
     if (hasResendConfigured()) {
       sendEmail({
         from: `CRES Events <${SENDER}>`,
@@ -432,8 +447,8 @@ app.post('/api/events/speakers/apply', upload.fields([{ name: 'bioPdf' }, { name
           <p><strong>Topic:</strong> ${escapeHtml(topic)}</p>
           <p><strong>LinkedIn:</strong> ${escapeHtml(linkedin || 'N/A')}</p>
           <p><strong>Why this audience:</strong><br>${nlToBr(escapeHtml(audienceWhy))}</p>
-          ${bioPdfFilename ? `<p><strong>Bio PDF:</strong> ${escapeHtml(bioPdfFilename)}</p>` : ''}
-          ${imageFilename ? `<p><strong>Image:</strong> ${escapeHtml(imageFilename)}</p>` : ''}`,
+          ${bioPdfFilename ? `<p><strong>Bio PDF:</strong> ${escapeHtml(bioPdfFilename)}${bioPdfPath && baseUrl ? ` — <a href="${baseUrl}${escapeHtml(bioPdfPath)}">View file</a>` : ''}</p>` : ''}
+          ${imageFilename ? `<p><strong>Image:</strong> ${escapeHtml(imageFilename)}${imagePath && baseUrl ? ` — <a href="${baseUrl}${escapeHtml(imagePath)}">View file</a>` : ''}</p>` : ''}`,
         replyTo: email,
       }).catch(e => console.error('Email send failed:', e.message));
     }
@@ -786,6 +801,12 @@ app.get('/api/admin/speakers', adminAuth, async (req, res) => {
       phone: s.phone,
       company: s.company,
       topic: s.topic,
+      linkedin: s.linkedin,
+      audienceWhy: s.audience_why,
+      bioPdfName: s.bio_pdf_filename || '',
+      bioPdfUrl: s.bio_pdf_path || '',
+      imageName: s.image_filename || '',
+      imageUrl: s.image_path || '',
       createdAt: s.created_at
     })));
   } catch (err) {
