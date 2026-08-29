@@ -1,0 +1,72 @@
+<section class="section-light">
+  <div class="container">
+    <div class="section-header">
+      <span class="eyebrow">CRES Dynamics</span>
+      <h1>Blog</h1>
+    </div>
+    <div id="blog-grid" class="blog-grid"></div>
+  </div>
+</section>
+
+<script>
+  const posts = JSON.parse('{{posts}}');
+  const grid = document.getElementById('blog-grid');
+  
+  posts.forEach(post => {
+    const card = document.createElement('div');
+    card.className = 'blog-card';
+    card.innerHTML = `
+      <a href="/blog/${post.slug}">
+        <span class="blog-card-category">${post.category}</span>
+        <h3 class="blog-card-title">${post.title}</h3>
+        <p class="blog-card-excerpt">${post.excerpt}</p>
+        <span class="blog-card-date">${post.published_at}</span>
+      </a>
+    `;
+    grid.appendChild(card);
+  });
+</script>
+
+<style>
+  .blog-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 2rem;
+  }
+  .blog-card {
+    background: var(--bg-card);
+    border-radius: 12px;
+    overflow: hidden;
+    transition: transform 0.3s;
+  }
+  .blog-card:hover {
+    transform: translateY(-4px);
+  }
+  .blog-card a {
+    display: block;
+    padding: 1.5rem;
+    text-decoration: none;
+    color: inherit;
+  }
+  .blog-card-category {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    color: var(--color-primary);
+    font-weight: 600;
+  }
+  .blog-card-title {
+    margin: 0.5rem 0;
+    font-size: 1.25rem;
+  }
+  .blog-card-excerpt {
+    color: var(--text-muted);
+    font-size: 0.9rem;
+    line-height: 1.6;
+  }
+  .blog-card-date {
+    display: block;
+    margin-top: 1rem;
+    font-size: 0.8rem;
+    color: var(--text-muted);
+  }
+</style>

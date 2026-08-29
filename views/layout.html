@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{{title}}</title>
+  <meta name="description" content="{{description}}">
+  <meta name="theme-color" content="#1A2433">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/styles.css">
+  <link rel="icon" href="/images/favicon-circular.png" type="image/png">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "LocalBusiness",
+    "name": "CRES Dynamics",
+    "url": "https://cresdynamics.com",
+    "logo": "https://cresdynamics.com/logo.png",
+    "description": "Custom ERP systems, business automation, web development and AI-powered software for businesses in Nairobi, Kenya.",
+    "telephone": "+254708805496",
+    "email": "info@cresdynamics.com",
+    "address": { "@type": "PostalAddress", "streetAddress": "Kivuli Tower, 3rd Floor, Westlands", "addressLocality": "Nairobi", "addressCountry": "KE" },
+    "areaServed": ["Nairobi", "Kenya"],
+    "serviceType": ["Custom ERP Development", "Web Development", "AI Automation", "Business Systems", "Finance Platforms", "M-Pesa Integration"],
+    "priceRange": "$$",
+    "openingHours": "Mo-Fr 08:00-18:00"
+  }
+  </script>
+</head>
+<body>
+  <!-- HEADER -->
+  <header id="main-header" class="nav-glass" style="position:fixed;top:0;width:100%;z-index:50;">
+    <nav style="max-width:1280px;margin:0 auto;padding:8px 16px;display:flex;align-items:center;justify-content:space-between;">
+      <a href="/" style="display:flex;align-items:center;gap:10px;text-decoration:none;flex-shrink:0;">
+        <img src="/images/logo.png" alt="CRES Dynamics" style="width:36px;height:36px;border-radius:50%;object-fit:cover;">
+        <span style="color:var(--navy-dark);font-weight:700;font-size:15px;text-transform:uppercase;letter-spacing:0.04em;"><span style="font-weight:900">CRES</span> Dynamics</span>
+      </a>
+
+      <!-- Desktop nav -->
+      <ul id="desktop-nav" style="list-style:none;display:flex;align-items:center;gap:4px;flex:1;justify-content:center;margin:0;">
+        <li class="nav-item" data-dropdown="who-we-are"><button class="nav-link-glass" type="button">Who We Are <svg style="width:14px;height:14px" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg></button></li>
+        <li><a href="/cresos" class="nav-link-glass">CresOS</a></li>
+        <li class="nav-item" data-dropdown="systems"><button class="nav-link-glass" type="button">Systems <svg style="width:14px;height:14px" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg></button></li>
+        <li class="nav-item" data-dropdown="services"><button class="nav-link-glass" type="button">Services <svg style="width:14px;height:14px" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg></button></li>
+        <li><a href="/case-studies" class="nav-link-glass">Case Proof</a></li>
+        <li><a href="/projects" class="nav-link-glass">Projects</a></li>
+        <li><a href="/events" class="nav-link-glass">Events</a></li>
+      </ul>
+
+      <a href="https://wa.me/254708805496?text=Hi%2C%20I%27d%20like%20to%20book%20a%20strategy%20session%20with%20CRES%20Dynamics." target="_blank" rel="noopener noreferrer" class="nav-cta-glass" style="flex-shrink:0;">Book Session</a>
+
+      <!-- Mobile hamburger -->
+      <button id="mobile-menu-btn" style="display:none;background:none;border:none;color:var(--navy-dark);padding:8px;cursor:pointer;" aria-label="Menu">
+        <svg style="width:24px;height:24px" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
+      </button>
+    </nav>
+
+    <!-- WHO WE ARE dropdown -->
+    <div id="dropdown-who-we-are" class="nav-dropdown" style="min-height:280px;">
+      <div style="max-width:1152px;margin:0 auto;padding:40px 24px;">
+        <div class="grid-6">
+          <a href="/about" class="dropdown-item"><img src="/images/wh0-we-wre.jpg" alt="" class="dropdown-img"><div class="dropdown-title">Who We Are</div><div class="dropdown-desc">Our story and mission</div></a>
+          <a href="/why-us" class="dropdown-item"><img src="/images/why-us-us.jpg" alt="" class="dropdown-img"><div class="dropdown-title">Why Us</div><div class="dropdown-desc">Why serious businesses choose us</div></a>
+          <a href="/how-we-work" class="dropdown-item"><img src="/images/how-we-work.jpg" alt="" class="dropdown-img"><div class="dropdown-title">How We Work</div><div class="dropdown-desc">Discovery to go-live</div></a>
+          <a href="/how-we-build" class="dropdown-item"><img src="/images/how-we-build.jpg" alt="" class="dropdown-img"><div class="dropdown-title">How We Build</div><div class="dropdown-desc">Our system engineering framework</div></a>
+          <a href="/events" class="dropdown-item"><img src="/images/events-westlands.jpg" alt="" class="dropdown-img"><div class="dropdown-title">Events</div><div class="dropdown-desc">Upcoming events</div></a>
+          <a href="/contact" class="dropdown-item"><img src="/images/contact-us.jpg" alt="" class="dropdown-img"><div class="dropdown-title">Contact</div><div class="dropdown-desc">Book a discovery session</div></a>
+        </div>
+      </div>
+    </div>
+
+    <!-- SYSTEMS dropdown -->
+    <div id="dropdown-systems" class="nav-dropdown" style="min-height:280px;">
+      <div style="max-width:1152px;margin:0 auto;padding:24px;">
+        <div class="grid-5" style="display:grid;grid-template-columns:repeat(5,1fr);gap:16px;">
+          <a href="/cresos" class="dropdown-item"><img src="/images/business-operating system.jpg" alt="" class="dropdown-img"><div class="dropdown-title">CresOS</div><div class="dropdown-desc">Business operating system</div></a>
+          <a href="/finance-platforms" class="dropdown-item"><img src="/images/finance-plartforms.jpg" alt="" class="dropdown-img"><div class="dropdown-title">Finance Platforms</div><div class="dropdown-desc">Revenue, invoices, dashboards</div></a>
+          <a href="/operations-workflow" class="dropdown-item"><img src="/images/streamline-your-workflow.jpg" alt="" class="dropdown-img"><div class="dropdown-title">Operations & Workflow</div><div class="dropdown-desc">Projects, approvals, reporting</div></a>
+          <a href="/ai-automation" class="dropdown-item"><img src="/images/workflow-automation.jpg" alt="" class="dropdown-img"><div class="dropdown-title">AI & Automation</div><div class="dropdown-desc">Workflows, triggers, intelligence</div></a>
+          <a href="/erp" class="dropdown-item"><img src="/images/modern-erp.jpg" alt="" class="dropdown-img"><div class="dropdown-title">Custom ERP</div><div class="dropdown-desc">Modular ERP & governance</div></a>
+          <a href="/services/business-operating-system" class="dropdown-item"><img src="/images/business-operating system.jpg" alt="" class="dropdown-img"><div class="dropdown-title">BOS</div><div class="dropdown-desc">AI-powered business operating system</div></a>
+        </div>
+      </div>
+    </div>
+
+    <!-- SERVICES dropdown -->
+    <div id="dropdown-services" class="nav-dropdown" style="min-height:260px;">
+      <div style="max-width:1152px;margin:0 auto;padding:24px;">
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px;">
+          <a href="/websites" class="dropdown-item"><img src="/images/websites.jpg" alt="" class="dropdown-img"><div class="dropdown-title">Websites</div><div class="dropdown-desc">Professional websites that convert</div></a>
+          <a href="/e-commerce" class="dropdown-item"><img src="/images/e-commerce.jpg" alt="" class="dropdown-img"><div class="dropdown-title">E-Commerce</div><div class="dropdown-desc">Online stores for Kenyan businesses</div></a>
+          <a href="/services/business-operating-system" class="dropdown-item"><img src="/images/business-operating system.jpg" alt="" class="dropdown-img"><div class="dropdown-title">BOS</div><div class="dropdown-desc">AI-powered business operating system</div></a>
+          <a href="/finance-platforms" class="dropdown-item"><img src="/images/finance.jpg" alt="" class="dropdown-img"><div class="dropdown-title">Finance</div><div class="dropdown-desc">Revenue, invoices, and dashboards</div></a>
+          <a href="/ai-automation" class="dropdown-item"><img src="/images/time-automation.jpg" alt="" class="dropdown-img"><div class="dropdown-title">AI & Automation</div><div class="dropdown-desc">Automation and intelligence</div></a>
+          <a href="/software" class="dropdown-item"><img src="/images/custome-software.jpg" alt="" class="dropdown-img"><div class="dropdown-title">Custom Software</div><div class="dropdown-desc">Portals, dashboards, booking tools</div></a>
+          <a href="/operations-workflow" class="dropdown-item"><img src="/images/streamline-your-workflow.jpg" alt="" class="dropdown-img"><div class="dropdown-title">Operations & Workflow</div><div class="dropdown-desc">Projects, approvals, and reporting</div></a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Mobile menu -->
+    <div id="mobile-menu" class="mobile-menu">
+      <div>
+        <button class="mobile-dropdown-btn" type="button" data-mobile="who-we-are">Who We Are ▾</button>
+        <div id="mobile-who-we-are" class="mobile-submenu" style="display:none">
+          <a href="/about">Who We Are</a>
+          <a href="/why-us">Why Us</a>
+          <a href="/how-we-work">How We Work</a>
+          <a href="/how-we-build">How We Build</a>
+          <a href="/events">Events</a>
+          <a href="/contact">Contact</a>
+        </div>
+      </div>
+      <a href="/cresos">CresOS</a>
+      <div>
+        <button class="mobile-dropdown-btn" type="button" data-mobile="services">Services ▾</button>
+        <div id="mobile-services" class="mobile-submenu" style="display:none">
+          <a href="/websites">Websites</a>
+          <a href="/e-commerce">E-Commerce</a>
+          <a href="/services/business-operating-system">BOS</a>
+          <a href="/software">Custom Software</a>
+          <a href="/finance-platforms">Finance</a>
+          <a href="/operations-workflow">Operations & Workflow</a>
+          <a href="/ai-automation">AI & Automation</a>
+        </div>
+      </div>
+      <div>
+        <button class="mobile-dropdown-btn" type="button" data-mobile="systems">Systems ▾</button>
+        <div id="mobile-systems" class="mobile-submenu" style="display:none">
+          <a href="/cresos">CresOS</a>
+          <a href="/finance-platforms">Finance & Revenue</a>
+          <a href="/operations-workflow">Operations & Workflow</a>
+          <a href="/ai-automation">AI & Automation</a>
+          <a href="/erp">ERP</a>
+          <a href="/services/business-operating-system">BOS</a>
+        </div>
+      </div>
+      <a href="/case-studies">Case Proof</a>
+      <a href="/projects">Projects</a>
+      <a href="/events">Events</a>
+    </div>
+  </header>
+
+  <!-- MAIN CONTENT -->
+  <main>
+    {{content}}
+  </main>
+
+  <!-- FOOTER -->
+  <footer>
+    <div style="max-width:1280px;margin:0 auto;padding:32px 16px 48px;">
+      <div class="grid-6" style="gap:32px;">
+        <div>
+          <div style="font-size:20px;font-weight:900;color:#fff;margin-bottom:12px;">CRES<span style="color:var(--teal-accent)"> Dynamics</span></div>
+          <p style="color:#fff;font-weight:600;font-size:14px;margin-bottom:8px;">Systems businesses run on.</p>
+          <p style="color:rgba(255,255,255,0.8);font-size:12px;">Custom ERP Kenya, business software Nairobi, M-Pesa integration, and e-commerce systems built for how you operate.</p>
+        </div>
+        <div>
+          <h3 class="footer-heading">Get Started</h3>
+          <a href="/pricing" class="footer-link">Pricing</a>
+          <a href="https://wa.me/254708805496" target="_blank" class="footer-link">Book Strategy Call</a>
+          <a href="tel:+254708805496" class="footer-link">Call 0708 805 496</a>
+          <a href="/contact" class="footer-link">Start the conversation</a>
+          <a href="/how-we-work" class="footer-link">How We Work</a>
+          <a href="/how-we-build" class="footer-link">How We Build</a>
+        </div>
+        <div>
+          <h3 class="footer-heading">Services</h3>
+          <a href="/websites" class="footer-link">Websites</a>
+          <a href="/erp" class="footer-link">Custom ERP</a>
+          <a href="/cresos" class="footer-link">Cres OS</a>
+          <a href="/services/business-operating-system" class="footer-link">BOS</a>
+          <a href="/e-commerce" class="footer-link">E-commerce Systems</a>
+          <a href="/finance-platforms" class="footer-link">Finance Platforms</a>
+          <a href="/ai-automation" class="footer-link">AI &amp; Automation</a>
+          <a href="/operations-workflow" class="footer-link">Operations &amp; Workflow</a>
+        </div>
+        <div>
+          <h3 class="footer-heading">Company</h3>
+          <a href="/about" class="footer-link">About Us</a>
+          <a href="/why-us" class="footer-link">Why Us</a>
+          <a href="/careers" class="footer-link">Careers</a>
+          <a href="/partners" class="footer-link">Partners</a>
+        </div>
+        <div>
+          <h3 class="footer-heading">Resources</h3>
+          <a href="/events" class="footer-link">Events</a>
+          <a href="/projects" class="footer-link">Projects</a>
+          <a href="/blog" class="footer-link">Blog</a>
+          <a href="/insights" class="footer-link">Insights</a>
+          <a href="/case-studies" class="footer-link">Case Studies</a>
+          <a href="/growth-guides" class="footer-link">Growth Guides</a>
+        </div>
+        <div>
+          <h3 class="footer-heading">Reach us</h3>
+          <p style="color:rgba(255,255,255,0.7);font-size:12px;margin-bottom:12px;">We respond within 2 hours during working hours.</p>
+          <a href="tel:+254708805496" class="footer-link">+254 708 805 496</a>
+          <a href="tel:+254743869564" class="footer-link">+254 743 869 564</a>
+          <a href="mailto:info@cresdynamics.com" class="footer-link">info@cresdynamics.com</a>
+          <span style="color:rgba(255,255,255,0.7);font-size:12px;display:block;margin-top:4px;">Kivuli Tower, 3rd Floor Westlands, Nairobi</span>
+          <div style="margin-top:12px;display:flex;gap:12px;">
+            <a href="https://x.com/cresdynamics" target="_blank" style="color:rgba(255,255,255,0.85);" aria-label="X"><svg style="width:20px;height:20px" fill="currentColor" viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg></a>
+            <a href="https://www.instagram.com/cresdynamics" target="_blank" style="color:rgba(255,255,255,0.85);" aria-label="Instagram"><svg style="width:20px;height:20px" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg></a>
+          </div>
+          <h3 class="footer-heading" style="margin-top:16px;">Legal</h3>
+          <a href="/privacy" class="footer-link">Privacy Policy</a>
+          <a href="/terms" class="footer-link">Terms</a>
+          <a href="/data-security" class="footer-link">Data &amp; Security</a>
+        </div>
+      </div>
+    </div>
+    <div style="border-top:1px solid rgba(255,255,255,0.1);padding:12px 16px;">
+      <div style="max-width:1280px;margin:0 auto;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">
+        <p style="color:rgba(255,255,255,0.7);font-size:12px;">&copy; 2026 CRES Dynamics. All rights reserved.</p>
+        <p style="color:var(--teal-accent);font-size:12px;font-weight:500;">Systems businesses run on.</p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Chat Widget -->
+  <div id="chat-widget"></div>
+
+  <script src="/js/main.js"></script>
+</body>
+</html>

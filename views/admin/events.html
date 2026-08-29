@@ -1,0 +1,144 @@
+<div class="admin-layout">
+  <aside class="admin-sidebar">
+    <div class="sidebar-header">
+      <h2>CRES Admin</h2>
+    </div>
+    <nav class="sidebar-nav">
+      <a href="/admin" class="sidebar-link">Dashboard</a>
+      <a href="/admin/events" class="sidebar-link active">Events</a>
+      <a href="/admin/blog" class="sidebar-link">Blog</a>
+      <a href="/admin/applications" class="sidebar-link">Applications</a>
+      <a href="/admin/speakers" class="sidebar-link">Speakers</a>
+      <a href="/admin/sponsors" class="sidebar-link">Sponsors</a>
+      <a href="/admin/messages" class="sidebar-link">Messages</a>
+      <a href="/admin/payments" class="sidebar-link">Payments</a>
+    </nav>
+    <button class="sidebar-logout" onclick="logout()">Logout</button>
+  </aside>
+  
+  <main class="admin-main">
+    <div class="admin-header">
+      <h1>Event Reservations</h1>
+    </div>
+    
+    <div class="table-container">
+      <table class="admin-table">
+        <thead>
+          <tr>
+            <th>Ticket #</th>
+            <th>Name</th>
+            <th>Company</th>
+            <th>Email</th>
+            <th>Phone</th>
+            <th>Ticket Type</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="reservations-table">
+          <tr>
+            <td colspan="8" class="loading">Loading...</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </main>
+</div>
+
+<script>
+  async function checkAuth() {
+    try {
+      const response = await fetch('/api/admin/me');
+      if (!response.ok) {
+        window.location.href = '/admin/login';
+        return false;
+      }
+      return true;
+    } catch {
+      window.location.href = '/admin/login';
+      return false;
+    }
+  }
+  
+  async function loadReservations() {
+    if (!await checkAuth()) return;
+    
+    try {
+      const response = await fetch('/api/admin/events/reservations');
+      const reservations = await response.json();
+      
+      const tbody = document.getElementById('reservations-table');
+      
+      if (reservations.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="8" class="empty">No reservations found</td></tr>';
+        return;
+      }
+      
+      tbody.innerHTML = reservations.map(r => `
+        <tr>
+          <td>${r.ticketNumber}</td>
+          <td>${r.name}</td>
+          <td>${r.company}</td>
+          <td>${r.email}</td>
+          <td>${r.phone}</td>
+          <td>${r.ticketType}</td>
+          <td><span class="status-badge ${r.bookingStatus === 'paid' ? 'paid' : r.bookingStatus === 'cancelled' ? 'cancelled' : 'unpaid'}">${r.bookingStatus === 'paid' ? 'Paid' : r.bookingStatus === 'cancelled' ? 'Cancelled' : 'Pending'}</span></td>
+          <td class="actions">
+            ${!r.paid ? `<button onclick="markPaid(${r.id})" class="action-btn success">Mark Paid</button>` : ''}
+            <button onclick="cancelReservation(${r.id})" class="action-btn warning">Cancel</button>
+            <button onclick="deleteReservation(${r.id})" class="action-btn danger">Delete</button>
+            <a href="https://wa.me/${r.phone}" target="_blank" class="action-btn">WhatsApp</a>
+          </td>
+        </tr>
+      `).join('');
+    } catch (err) {
+      console.error('Failed to load reservations:', err);
+    }
+  }
+  
+  async function markPaid(id) {
+    try {
+      await fetch(`/api/admin/events/reservations/${id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ bookingStatus: 'paid' })
+      });
+      loadReservations();
+    } catch (err) {
+      console.error('Failed to mark as paid:', err);
+    }
+  }
+  
+  async function cancelReservation(id) {
+    if (!confirm('Are you sure you want to cancel this reservation?')) return;
+    
+    try {
+      await fetch(`/api/admin/events/reservations/${id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ bookingStatus: 'cancelled' })
+      });
+      loadReservations();
+    } catch (err) {
+      console.error('Failed to cancel reservation:', err);
+    }
+  }
+  
+  async function deleteReservation(id) {
+    if (!confirm('Are you sure you want to delete this reservation?')) return;
+    
+    try {
+      await fetch(`/api/admin/events/reservations/${id}`, { method: 'DELETE' });
+      loadReservations();
+    } catch (err) {
+      console.error('Failed to delete reservation:', err);
+    }
+  }
+  
+  function logout() {
+    fetch('/api/admin/logout', { method: 'POST' });
+    window.location.href = '/admin/login';
+  }
+  
+  loadReservations();
+</script>

@@ -1,0 +1,235 @@
+<div class="admin-layout">
+  <aside class="admin-sidebar">
+    <div class="sidebar-header">
+      <h2>CRES Admin</h2>
+    </div>
+    <nav class="sidebar-nav">
+      <a href="/admin" class="sidebar-link">Dashboard</a>
+      <a href="/admin/events" class="sidebar-link">Events</a>
+      <a href="/admin/blog" class="sidebar-link active">Blog</a>
+      <a href="/admin/applications" class="sidebar-link">Applications</a>
+      <a href="/admin/speakers" class="sidebar-link">Speakers</a>
+      <a href="/admin/sponsors" class="sidebar-link">Sponsors</a>
+      <a href="/admin/messages" class="sidebar-link">Messages</a>
+      <a href="/admin/payments" class="sidebar-link">Payments</a>
+    </nav>
+    <button class="sidebar-logout" onclick="logout()">Logout</button>
+  </aside>
+  
+  <main class="admin-main">
+    <div class="admin-header">
+      <h1 id="editor-title">New Blog Post</h1>
+    </div>
+    
+    <form id="postForm" class="editor-form">
+      <div class="form-row">
+        <div class="form-group">
+          <label for="title">Title</label>
+          <input type="text" id="title" name="title" required>
+        </div>
+        <div class="form-group">
+          <label for="slug">Slug</label>
+          <input type="text" id="slug" name="slug" required>
+        </div>
+      </div>
+      
+      <div class="form-row">
+        <div class="form-group">
+          <label for="category">Category</label>
+          <input type="text" id="category" name="category">
+        </div>
+        <div class="form-group">
+          <label for="author">Author</label>
+          <input type="text" id="author" name="author">
+        </div>
+      </div>
+      
+      <div class="form-group">
+        <label for="excerpt">Excerpt</label>
+        <textarea id="excerpt" name="excerpt" rows="3"></textarea>
+      </div>
+      
+      <div class="form-group">
+        <label for="body">Body (HTML)</label>
+        <textarea id="body" name="body" rows="15"></textarea>
+      </div>
+      
+      <div class="form-row">
+        <div class="form-group">
+          <label for="status">Status</label>
+          <select id="status" name="status">
+            <option value="draft">Draft</option>
+            <option value="published">Published</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="metaTitle">Meta Title</label>
+          <input type="text" id="metaTitle" name="metaTitle">
+        </div>
+      </div>
+      
+      <div class="form-group">
+        <label for="metaDescription">Meta Description</label>
+        <textarea id="metaDescription" name="metaDescription" rows="2"></textarea>
+      </div>
+      
+      <div class="form-actions">
+        <button type="submit" class="btn btn-primary" id="saveBtn">Save</button>
+        <button type="button" class="btn btn-secondary" id="publishBtn">Publish</button>
+        <button type="button" class="btn btn-danger" id="deleteBtn">Delete</button>
+        <a href="/admin/blog" class="btn btn-secondary">Cancel</a>
+      </div>
+      <p id="editor-msg" class="editor-msg" role="status"></p>
+    </form>
+  </main>
+</div>
+
+<script>
+  let postId = null;
+  
+  async function checkAuth() {
+    try {
+      const response = await fetch('/api/admin/me');
+      if (!response.ok) {
+        window.location.href = '/admin/login';
+        return false;
+      }
+      return true;
+    } catch {
+      window.location.href = '/admin/login';
+      return false;
+    }
+  }
+  
+  async function loadPost() {
+    if (!await checkAuth()) return;
+    
+    const params = new URLSearchParams(window.location.search);
+    postId = params.get('id');
+    
+    if (postId) {
+      document.getElementById('editor-title').textContent = 'Edit Blog Post';
+      
+      try {
+        const response = await fetch(`/api/admin/blog/${postId}`);
+        const post = await response.json();
+        
+        document.getElementById('title').value = post.title || '';
+        document.getElementById('slug').value = post.slug || '';
+        document.getElementById('category').value = post.category || '';
+        document.getElementById('author').value = post.author || '';
+        document.getElementById('excerpt').value = post.excerpt || '';
+        document.getElementById('body').value = post.body || '';
+        document.getElementById('status').value = post.published ? 'published' : 'draft';
+        document.getElementById('metaTitle').value = post.metaTitle || '';
+        document.getElementById('metaDescription').value = post.metaDescription || '';
+      } catch (err) {
+        console.error('Failed to load post:', err);
+      }
+    }
+  }
+  
+  document.getElementById('title').addEventListener('input', (e) => {
+    if (!postId) {
+      const slug = e.target.value
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, '-')
+        .replace(/(^-|-$)/g, '');
+      document.getElementById('slug').value = slug;
+    }
+  });
+  
+  document.getElementById('postForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    await savePost();
+  });
+  
+  document.getElementById('publishBtn').addEventListener('click', async () => {
+    document.getElementById('status').value = 'published';
+    await savePost();
+  });
+  
+  document.getElementById('deleteBtn').addEventListener('click', async () => {
+    if (!postId || !confirm('Are you sure you want to delete this post?')) return;
+
+    try {
+      const response = await fetch(`/api/admin/blog/${postId}`, { method: 'DELETE' });
+      if (!response.ok) {
+        const data = await response.json();
+        return showMsg(data.error || 'Failed to delete post', 'error');
+      }
+      window.location.href = '/admin/blog';
+    } catch (err) {
+      console.error('Failed to delete post:', err);
+      showMsg('Failed to delete post', 'error');
+    }
+  });
+
+  function showMsg(text, type) {
+    const el = document.getElementById('editor-msg');
+    el.textContent = text;
+    el.className = 'editor-msg ' + (type === 'error' ? 'msg-error' : 'msg-success');
+    el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }
+
+  async function savePost() {
+    const formData = {
+      title: document.getElementById('title').value.trim(),
+      slug: document.getElementById('slug').value.trim(),
+      category: document.getElementById('category').value.trim(),
+      author: document.getElementById('author').value.trim(),
+      excerpt: document.getElementById('excerpt').value.trim(),
+      body: document.getElementById('body').value,
+      status: document.getElementById('status').value,
+      metaTitle: document.getElementById('metaTitle').value.trim(),
+      metaDescription: document.getElementById('metaDescription').value.trim()
+    };
+
+    if (!formData.title) return showMsg('Title is required', 'error');
+    if (!formData.slug) return showMsg('Slug is required', 'error');
+    if (!formData.body) return showMsg('Body is required', 'error');
+
+    const saveBtn = document.getElementById('saveBtn');
+    const publishBtn = document.getElementById('publishBtn');
+
+    try {
+      const url = postId ? `/api/admin/blog/${postId}` : '/api/admin/blog';
+      const method = postId ? 'PATCH' : 'POST';
+
+      saveBtn.disabled = true;
+      publishBtn.disabled = true;
+
+      const response = await fetch(url, {
+        method,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData)
+      });
+
+      if (!response.ok) {
+        let message = 'Failed to save post';
+        try {
+          const data = await response.json();
+          if (data && data.error) message = data.error;
+        } catch {}
+        showMsg(message, 'error');
+        return;
+      }
+
+      showMsg(formData.status === 'published' ? 'Post published successfully' : 'Post saved successfully', 'success');
+      setTimeout(() => { window.location.href = '/admin/blog'; }, 400);
+    } catch (err) {
+      console.error('Failed to save post:', err);
+      showMsg('Network error. Your changes were not saved.', 'error');
+    } finally {
+      saveBtn.disabled = false;
+      publishBtn.disabled = false;
+    }
+  }
+  
+  function logout() {
+    fetch('/api/admin/logout', { method: 'POST' });
+    window.location.href = '/admin/login';
+  }
+  
+  loadPost();
+</script>

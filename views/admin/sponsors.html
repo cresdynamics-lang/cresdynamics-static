@@ -1,0 +1,118 @@
+<div class="admin-layout">
+  <aside class="admin-sidebar">
+    <div class="sidebar-header">
+      <h2>CRES Admin</h2>
+    </div>
+    <nav class="sidebar-nav">
+      <a href="/admin" class="sidebar-link">Dashboard</a>
+      <a href="/admin/events" class="sidebar-link">Events</a>
+      <a href="/admin/blog" class="sidebar-link">Blog</a>
+      <a href="/admin/applications" class="sidebar-link">Applications</a>
+      <a href="/admin/speakers" class="sidebar-link">Speakers</a>
+      <a href="/admin/sponsors" class="sidebar-link active">Sponsors</a>
+      <a href="/admin/messages" class="sidebar-link">Messages</a>
+      <a href="/admin/payments" class="sidebar-link">Payments</a>
+    </nav>
+    <button class="sidebar-logout" onclick="logout()">Logout</button>
+  </aside>
+  
+  <main class="admin-main">
+    <div class="admin-header">
+      <h1>Sponsor Applications</h1>
+    </div>
+    
+    <div class="table-container">
+      <table class="admin-table">
+        <thead>
+          <tr>
+            <th>Company</th>
+            <th>Contact</th>
+            <th>Email</th>
+            <th>Package</th>
+            <th>Status</th>
+            <th>Date</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="sponsors-table">
+          <tr>
+            <td colspan="7" class="loading">Loading...</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </main>
+</div>
+
+<script>
+  async function checkAuth() {
+    try {
+      const response = await fetch('/api/admin/me');
+      if (!response.ok) {
+        window.location.href = '/admin/login';
+        return false;
+      }
+      return true;
+    } catch {
+      window.location.href = '/admin/login';
+      return false;
+    }
+  }
+  
+  async function loadSponsors() {
+    if (!await checkAuth()) return;
+    
+    try {
+      const response = await fetch('/api/admin/sponsors');
+      const sponsors = await response.json();
+      
+      const tbody = document.getElementById('sponsors-table');
+      
+      if (sponsors.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="7" class="empty">No sponsor applications found</td></tr>';
+        return;
+      }
+      
+      tbody.innerHTML = sponsors.map(s => `
+        <tr>
+          <td>${s.company}</td>
+          <td>${s.contactName}</td>
+          <td>${s.email}</td>
+          <td>${s.package}</td>
+          <td><span class="status-badge status-${(s.status || 'new').toLowerCase()}">${s.status}</span></td>
+          <td>${new Date(s.createdAt).toLocaleDateString()}</td>
+          <td class="actions">
+            <select onchange="updateStatus(${s.id}, this.value)" class="status-select">
+              <option value="pending" ${s.status === 'pending' ? 'selected' : ''}>Pending</option>
+              <option value="approved" ${s.status === 'approved' ? 'selected' : ''}>Approved</option>
+              <option value="rejected" ${s.status === 'rejected' ? 'selected' : ''}>Rejected</option>
+              <option value="contacted" ${s.status === 'contacted' ? 'selected' : ''}>Contacted</option>
+            </select>
+          </td>
+        </tr>
+      `).join('');
+    } catch (err) {
+      console.error('Failed to load sponsors:', err);
+    }
+  }
+  
+  async function updateStatus(id, status) {
+    try {
+      await fetch(`/api/admin/sponsors/${id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status })
+      });
+      loadSponsors();
+    } catch (err) {
+      console.error('Failed to update status:', err);
+    }
+  }
+  
+  function logout() {
+    fetch('/api/admin/logout', { method: 'POST' });
+    window.location.href = '/admin/login';
+  }
+  
+  loadSponsors();
+</script>

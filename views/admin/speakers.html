@@ -1,0 +1,96 @@
+<div class="admin-layout">
+  <aside class="admin-sidebar">
+    <div class="sidebar-header">
+      <h2>CRES Admin</h2>
+    </div>
+    <nav class="sidebar-nav">
+      <a href="/admin" class="sidebar-link">Dashboard</a>
+      <a href="/admin/events" class="sidebar-link">Events</a>
+      <a href="/admin/blog" class="sidebar-link">Blog</a>
+      <a href="/admin/applications" class="sidebar-link">Applications</a>
+      <a href="/admin/speakers" class="sidebar-link active">Speakers</a>
+      <a href="/admin/sponsors" class="sidebar-link">Sponsors</a>
+      <a href="/admin/messages" class="sidebar-link">Messages</a>
+      <a href="/admin/payments" class="sidebar-link">Payments</a>
+    </nav>
+    <button class="sidebar-logout" onclick="logout()">Logout</button>
+  </aside>
+  
+  <main class="admin-main">
+    <div class="admin-header">
+      <h1>Speaker Applications</h1>
+    </div>
+    
+    <div class="table-container">
+      <table class="admin-table">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Phone</th>
+            <th>Company</th>
+            <th>Topic</th>
+            <th>Date</th>
+          </tr>
+        </thead>
+        <tbody id="speakers-table">
+          <tr>
+            <td colspan="6" class="loading">Loading...</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </main>
+</div>
+
+<script>
+  async function checkAuth() {
+    try {
+      const response = await fetch('/api/admin/me');
+      if (!response.ok) {
+        window.location.href = '/admin/login';
+        return false;
+      }
+      return true;
+    } catch {
+      window.location.href = '/admin/login';
+      return false;
+    }
+  }
+  
+  async function loadSpeakers() {
+    if (!await checkAuth()) return;
+    
+    try {
+      const response = await fetch('/api/admin/speakers');
+      const speakers = await response.json();
+      
+      const tbody = document.getElementById('speakers-table');
+      
+      if (speakers.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="6" class="empty">No speaker applications found</td></tr>';
+        return;
+      }
+      
+      tbody.innerHTML = speakers.map(s => `
+        <tr>
+          <td>${s.name}</td>
+          <td>${s.email}</td>
+          <td>${s.phone}</td>
+          <td>${s.company}</td>
+          <td>${s.topic}</td>
+          <td>${new Date(s.createdAt).toLocaleDateString()}</td>
+        </tr>
+      `).join('');
+    } catch (err) {
+      console.error('Failed to load speakers:', err);
+    }
+  }
+  
+  function logout() {
+    fetch('/api/admin/logout', { method: 'POST' });
+    window.location.href = '/admin/login';
+  }
+  
+  loadSpeakers();
+</script>

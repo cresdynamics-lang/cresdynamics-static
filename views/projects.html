@@ -1,0 +1,505 @@
+<section class="hero-section" style="min-height:70vh;">
+  <div class="hero-content animate-fade-in" style="text-align:center;max-width:800px;margin:0 auto;">
+    <span class="eyebrow">Our Projects</span>
+    <h1 class="hero-title">Systems in <span class="hero-title-underline">production.</span></h1>
+    <p class="hero-subtitle" style="margin:0 auto;">We don't count mockups or wireframes. Every project here is live software used by real businesses every day.</p>
+  </div>
+</section>
+
+<section class="section-dark scroll-reveal">
+  <div class="section-container">
+    <div class="grid-3" style="text-align:center;">
+      <div class="stat-card">
+        <div class="stat-number">20+</div>
+        <div class="stat-label">Projects Delivered</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number">15,000+</div>
+        <div class="stat-label">Daily Active Users</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number">8</div>
+        <div class="stat-label">Industry Verticals</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section-light" style="padding-top:4rem;">
+  <div class="section-container">
+    <span class="eyebrow" style="color:var(--teal-accent);">Live in Production</span>
+    <h2 class="section-title" style="color:var(--navy-dark);">What we've built.</h2>
+    <p class="section-subtitle" style="margin-bottom:2rem;">Systems we shipped. Businesses they run.</p>
+
+    <div id="project-filters" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:2rem;">
+      <button type="button" onclick="filterProjects('all')" class="filter-btn active" data-filter="all">All</button>
+      <button type="button" onclick="filterProjects('websites')" class="filter-btn" data-filter="websites">Websites</button>
+      <button type="button" onclick="filterProjects('ecommerce')" class="filter-btn" data-filter="ecommerce">E-Commerce</button>
+      <button type="button" onclick="filterProjects('erp')" class="filter-btn" data-filter="erp">ERP</button>
+      <button type="button" onclick="filterProjects('hospitality')" class="filter-btn" data-filter="hospitality">Hospitality</button>
+      <button type="button" onclick="filterProjects('retail')" class="filter-btn" data-filter="retail">Retail</button>
+      <button type="button" onclick="filterProjects('infrastructure')" class="filter-btn" data-filter="infrastructure">Infrastructure</button>
+    </div>
+    <style>
+      .filter-btn { padding:6px 14px; border-radius:9999px; border:1px solid #E0E4EA; background:#fff; font-size:11px; font-weight:600; text-transform:uppercase; letter-spacing:0.05em; color:rgba(47,59,82,0.8); cursor:pointer; transition:all 0.3s; }
+      .filter-btn.active { background:var(--navy-primary); color:#fff; border-color:var(--navy-primary); }
+      .filter-btn:hover { border-color:rgba(47,59,82,0.3); }
+      .project-card[data-category] { transition:opacity 0.3s, transform 0.3s; }
+      .project-card.hidden { display:none; }
+      .project-expand { grid-template-rows:0fr; transition:grid-template-rows 0.3s ease-out; }
+      .project-expand.open { grid-template-rows:1fr; }
+      .project-expand > div { overflow:hidden; min-height:0; }
+    </style>
+
+    <div id="projects-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;">
+
+      <article class="project-card" data-category="websites" style="border-radius:10px;border:1px solid #E0E4EA;background:#fff;padding:1.5rem;">
+        <div style="display:flex;flex-wrap:wrap;align-items:flex-start;justify-content:space-between;gap:0.75rem;margin-bottom:1rem;">
+          <span style="display:inline-block;border-radius:9999px;background:rgba(47,166,179,0.1);padding:4px 12px;font-size:11px;font-weight:600;color:var(--teal-accent);">Recruitment / HR Tech · Web Platform</span>
+          <span style="display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:600;color:#22c55e;"><span style="width:8px;height:8px;border-radius:50%;background:#22c55e;"></span> Live</span>
+        </div>
+        <h3 style="font-weight:700;font-size:16px;color:var(--navy-primary);margin-bottom:0.25rem;">Applicare</h3>
+        <p style="font-size:13px;color:rgba(47,59,82,0.7);line-height:1.6;margin-bottom:1rem;border-bottom:1px solid #E0E4EA;padding-bottom:1rem;">Recruitment / HR tech, employers and job seekers in one digital flow.</p>
+        <div style="display:flex;flex-direction:column;gap:0.75rem;margin-bottom:1rem;">
+          <div><p style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.1em;color:rgba(47,59,82,0.45);margin-bottom:2px;">Problem</p><p style="font-size:12px;color:rgba(47,59,82,0.85);line-height:1.5;">Applicants and employers had no shared digital space, coordination happened over email and WhatsApp with no tracking.</p></div>
+          <div><p style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.1em;color:rgba(47,59,82,0.45);margin-bottom:2px;">Solution</p><p style="font-size:12px;color:rgba(47,59,82,0.85);line-height:1.5;">A recruitment platform connecting employers and job seekers, with structured application flows and status tracking.</p></div>
+          <div><p style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.1em;color:rgba(47,59,82,0.45);margin-bottom:2px;">Outcome</p><p style="font-size:12px;color:rgba(47,59,82,0.85);line-height:1.5;">Centralised hiring pipeline replacing fragmented manual coordination.</p></div>
+        </div>
+        <div style="display:flex;gap:0.75rem;">
+          <a href="https://applicare.co.ke" target="_blank" rel="noopener noreferrer" style="flex:1;min-width:8rem;display:inline-flex;align-items:center;justify-content:center;gap:6px;border-radius:6px;border:1px solid rgba(47,59,82,0.4);padding:6px 10px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;color:var(--navy-primary);text-decoration:none;">Visit Live Site ↗</a>
+          <button type="button" onclick="toggleProject(this)" class="toggle-project-btn" style="flex:1;min-width:8rem;display:inline-flex;align-items:center;justify-content:center;gap:6px;border-radius:6px;background:var(--navy-primary);padding:6px 10px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;color:#fff;border:none;cursor:pointer;">View Case Study ▾</button>
+        </div>
+        <div class="project-expand" style="display:grid;transition:grid-template-rows 0.3s ease-out;">
+          <div style="overflow:hidden;min-height:0;">
+            <div style="padding-top:1.5rem;margin-top:1rem;border-top:1px dashed rgba(47,59,82,0.15);display:flex;flex-direction:column;gap:1rem;">
+              <div><p style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.1em;color:rgba(47,59,82,0.45);margin-bottom:2px;">Business context</p><p style="font-size:12px;color:rgba(47,59,82,0.85);line-height:1.5;">Kenyan recruitment market where most SME hiring still runs through social media posts and manual shortlisting.</p></div>
+              <div><p style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.1em;color:rgba(47,59,82,0.45);margin-bottom:2px;">The real constraint</p><p style="font-size:12px;color:rgba(47,59,82,0.85);line-height:1.5;">No system of record for applications, every hire started from scratch with no history.</p></div>
+              <div><p style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.1em;color:rgba(47,59,82,0.45);margin-bottom:2px;">What we built</p><p style="font-size:12px;color:rgba(47,59,82,0.85);line-height:1.5;">Web-based applicant tracking system with employer dashboard, candidate profiles, and application status management.</p></div>
+              <div><p style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.1em;color:rgba(47,59,82,0.45);margin-bottom:2px;">What made it hard</p><p style="font-size:12px;color:rgba(47,59,82,0.85);line-height:1.5;">Designing for two distinct user types (employer and applicant) with different needs in a single cohesive interface.</p></div>
+              <div><p style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.1em;color:rgba(47,59,82,0.45);margin-bottom:2px;">Stack</p><div style="display:flex;flex-wrap:wrap;gap:6px;"><span style="padding:3px 8px;border-radius:9999px;background:rgba(47,59,82,0.1);font-size:11px;color:var(--navy-primary);font-weight:600;">Web platform</span><span style="padding:3px 8px;border-radius:9999px;background:rgba(47,59,82,0.1);font-size:11px;color:var(--navy-primary);font-weight:600;">Structured application flows</span><span style="padding:3px 8px;border-radius:9999px;background:rgba(47,59,82,0.1);font-size:11px;color:var(--navy-primary);font-weight:600;">Dashboard</span></div></div>
+            </div>
+          </div>
+        </div>
+      </article>
+
+      <article class="project-card" data-category="websites retail" style="border-radius:10px;border:1px solid #E0E4EA;background:#fff;padding:1.5rem;">
+        <div style="display:flex;flex-wrap:wrap;align-items:flex-start;justify-content:space-between;gap:0.75rem;margin-bottom:1rem;">
+          <span style="display:inline-block;border-radius:9999px;background:rgba(47,166,179,0.1);padding:4px 12px;font-size:11px;font-weight:600;color:var(--teal-accent);">Lighting Retail · Website + SEO</span>
+          <span style="display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:600;color:#22c55e;"><span style="width:8px;height:8px;border-radius:50%;background:#22c55e;"></span> Live</span>
+        </div>
+        <h3 style="font-weight:700;font-size:16px;color:var(--navy-primary);margin-bottom:0.25rem;">Spark Lights 254</h3>
+        <p style="font-size:13px;color:rgba(47,59,82,0.7);line-height:1.6;margin-bottom:1rem;border-bottom:1px solid #E0E4EA;padding-bottom:1rem;">Large lighting showroom in Nyamakima; strong stock, no Google visibility for Nairobi buyers.</p>
+        <div style="display:flex;flex-direction:column;gap:0.75rem;margin-bottom:1rem;">
+          <div><p style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.1em;color:rgba(47,59,82,0.45);margin-bottom:2px;">Problem</p><p style="font-size:12px;color:rgba(47,59,82,0.85);line-height:1.5;">Large lighting showroom in Nyamakima with no Google visibility for Nairobi buyers searching by room or product category.</p></div>
+          <div><p style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.1em;color:rgba(47,59,82,0.45);margin-bottom:2px;">Solution</p><p style="font-size:12px;color:rgba(47,59,82,0.85);line-height:1.5;">SEO-first website structured around 7 product categories with local search targeting, a lighting guide blog, and WhatsApp ordering flow.</p></div>
+          <div><p style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.1em;color:rgba(47,59,82,0.45);margin-bottom:2px;">Outcome</p><p style="font-size:12px;color:rgba(47,59,82,0.85);line-height:1.5;">Organic search presence for lighting category terms across Nairobi. Same-day delivery capability now discoverable without advertising.</p></div>
+        </div>
+        <div style="display:flex;gap:0.75rem;">
+          <a href="https://sparklights.co.ke" target="_blank" rel="noopener noreferrer" style="flex:1;min-width:8rem;display:inline-flex;align-items:center;justify-content:center;gap:6px;border-radius:6px;border:1px solid rgba(47,59,82,0.4);padding:6px 10px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;color:var(--navy-primary);text-decoration:none;">Visit Live Site ↗</a>
+          <button type="button" onclick="toggleProject(this)" class="toggle-project-btn" style="flex:1;min-width:8rem;display:inline-flex;align-items:center;justify-content:center;gap:6px;border-radius:6px;background:var(--navy-primary);padding:6px 10px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;color:#fff;border:none;cursor:pointer;">View Case Study ▾</button>
+        </div>
+        <div class="project-expand" style="display:grid;transition:grid-template-rows 0.3s ease-out;">
+          <div style="overflow:hidden;min-height:0;">
+            <div style="padding-top:1.5rem;margin-top:1rem;border-top:1px dashed rgba(47,59,82,0.15);display:flex;flex-direction:column;gap:1rem;">
+              <div><p style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.1em;color:rgba(47,59,82,0.45);margin-bottom:2px;">Business context</p><p style="font-size:12px;color:rgba(47,59,82,0.85);line-height:1.5;">Physical showroom at Nyamakima, Duruma Road, strong stock, no digital discoverability. Buyers searching "chandeliers Nairobi" were finding competitors with inferior stock.</p></div>
+              <div><p style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.1em;color:rgba(47,59,82,0.45);margin-bottom:2px;">The real constraint</p><p style="font-size:12px;color:rgba(47,59,82,0.85);line-height:1.5;">Zero indexed pages for product-specific searches. The business existed only in physical space and word of mouth.</p></div>
+              <div><p style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.1em;color:rgba(47,59,82,0.45);margin-bottom:2px;">What we built</p><p style="font-size:12px;color:rgba(47,59,82,0.85);line-height:1.5;">Multi-page SEO architecture with dedicated landing pages per product category, a lighting guide content section, structured WhatsApp CTA flow, and mobile-first layout.</p></div>
+              <div><p style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.1em;color:rgba(47,59,82,0.45);margin-bottom:2px;">What made it hard</p><p style="font-size:12px;color:rgba(47,59,82,0.85);line-height:1.5;">Product photography had to be done from existing stock in a showroom environment, no studio conditions.</p></div>
+              <div><p style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.1em;color:rgba(47,59,82,0.45);margin-bottom:2px;">Stack</p><div style="display:flex;flex-wrap:wrap;gap:6px;"><span style="padding:3px 8px;border-radius:9999px;background:rgba(47,59,82,0.1);font-size:11px;color:var(--navy-primary);font-weight:600;">HTML/CSS</span><span style="padding:3px 8px;border-radius:9999px;background:rgba(47,59,82,0.1);font-size:11px;color:var(--navy-primary);font-weight:600;">SEO architecture</span><span style="padding:3px 8px;border-radius:9999px;background:rgba(47,59,82,0.1);font-size:11px;color:var(--navy-primary);font-weight:600;">WhatsApp conversion flow</span><span style="padding:3px 8px;border-radius:9999px;background:rgba(47,59,82,0.1);font-size:11px;color:var(--navy-primary);font-weight:600;">Lighting Guide blog</span></div></div>
+            </div>
+          </div>
+        </div>
+      </article>
+
+      <article class="project-card" data-category="ecommerce retail" style="border-radius:10px;border:1px solid #E0E4EA;background:#fff;padding:1.5rem;">
+        <div style="display:flex;flex-wrap:wrap;align-items:flex-start;justify-content:space-between;gap:0.75rem;margin-bottom:1rem;">
+          <span style="display:inline-block;border-radius:9999px;background:rgba(243,156,36,0.1);padding:4px 12px;font-size:11px;font-weight:600;color:var(--orange-energy);">Footwear Retail · E-Commerce</span>
+          <span style="display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:600;color:#22c55e;"><span style="width:8px;height:8px;border-radius:50%;background:#22c55e;"></span> Live</span>
+        </div>
+        <h3 style="font-weight:700;font-size:16px;color:var(--navy-primary);margin-bottom:0.25rem;">Trendy Fashion Zone</h3>
+        <p style="font-size:13px;color:rgba(47,59,82,0.7);line-height:1.6;margin-bottom:1rem;border-bottom:1px solid #E0E4EA;padding-bottom:1rem;">Branded footwear (Nike, Jordan, Clarks, Vans, Timberland) from Moi Avenue CBD, foot traffic only, no online reach.</p>
+        <div style="display:flex;flex-direction:column;gap:0.75rem;margin-bottom:1rem;">
+          <div><p style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.1em;color:rgba(47,59,82,0.45);margin-bottom:2px;">Problem</p><p style="font-size:12px;color:rgba(47,59,82,0.85);line-height:1.5;">Quality branded footwear sold from Moi Avenue CBD but no online presence to reach buyers outside foot traffic range.</p></div>
+          <div><p style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.1em;color:rgba(47,59,82,0.45);margin-bottom:2px;">Solution</p><p style="font-size:12px;color:rgba(47,59,82,0.85);line-height:1.5;">Full e-commerce website with product collections by category, WhatsApp ordering integration, free Nairobi delivery positioning.</p></div>
+          <div><p style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.1em;color:rgba(47,59,82,0.45);margin-bottom:2px;">Outcome</p><p style="font-size:12px;color:rgba(47,59,82,0.85);line-height:1.5;">Online storefront enabling buyers across Nairobi to browse and purchase without visiting CBD.</p></div>
+        </div>
+        <div style="display:flex;gap:0.75rem;">
+          <a href="https://trendyfashionzone.co.ke" target="_blank" rel="noopener noreferrer" style="flex:1;min-width:8rem;display:inline-flex;align-items:center;justify-content:center;gap:6px;border-radius:6px;border:1px solid rgba(47,59,82,0.4);padding:6px 10px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;color:var(--navy-primary);text-decoration:none;">Visit Live Site ↗</a>
+          <button type="button" onclick="toggleProject(this)" class="toggle-project-btn" style="flex:1;min-width:8rem;display:inline-flex;align-items:center;justify-content:center;gap:6px;border-radius:6px;background:var(--navy-primary);padding:6px 10px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;color:#fff;border:none;cursor:pointer;">View Case Study ▾</button>
+        </div>
+        <div class="project-expand" style="display:grid;transition:grid-template-rows 0.3s ease-out;">
+          <div style="overflow:hidden;min-height:0;">
+            <div style="padding-top:1.5rem;margin-top:1rem;border-top:1px dashed rgba(47,59,82,0.15);display:flex;flex-direction:column;gap:1rem;">
+              <div><p style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.1em;color:rgba(47,59,82,0.45);margin-bottom:2px;">Business context</p><p style="font-size:12px;color:rgba(47,59,82,0.85);line-height:1.5;">Physical retail in Nairobi CBD, high footfall but geographically constrained. No ability to serve Westlands, Karen, or Kilimani buyers.</p></div>
+              <div><p style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.1em;color:rgba(47,59,82,0.45);margin-bottom:2px;">The real constraint</p><p style="font-size:12px;color:rgba(47,59,82,0.85);line-height:1.5;">Inventory was strong but invisible to anyone outside walking distance.</p></div>
+              <div><p style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.1em;color:rgba(47,59,82,0.45);margin-bottom:2px;">What we built</p><p style="font-size:12px;color:rgba(47,59,82,0.85);line-height:1.5;">Node.js e-commerce site with Supabase image storage, collection pages per shoe category, WhatsApp checkout flow.</p></div>
+              <div><p style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.1em;color:rgba(47,59,82,0.45);margin-bottom:2px;">What made it hard</p><p style="font-size:12px;color:rgba(47,59,82,0.85);line-height:1.5;">Consistent product photography at scale. Each shoe required individual images in multiple angles.</p></div>
+              <div><p style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.1em;color:rgba(47,59,82,0.45);margin-bottom:2px;">Stack</p><div style="display:flex;flex-wrap:wrap;gap:6px;"><span style="padding:3px 8px;border-radius:9999px;background:rgba(47,59,82,0.1);font-size:11px;color:var(--navy-primary);font-weight:600;">Node.js</span><span style="padding:3px 8px;border-radius:9999px;background:rgba(47,59,82,0.1);font-size:11px;color:var(--navy-primary);font-weight:600;">Supabase storage</span><span style="padding:3px 8px;border-radius:9999px;background:rgba(47,59,82,0.1);font-size:11px;color:var(--navy-primary);font-weight:600;">WhatsApp integration</span></div></div>
+            </div>
+          </div>
+        </div>
+      </article>
+
+      <article class="project-card" data-category="ecommerce retail" style="border-radius:10px;border:1px solid #E0E4EA;background:#fff;padding:1.5rem;">
+        <div style="display:flex;flex-wrap:wrap;align-items:flex-start;justify-content:space-between;gap:0.75rem;margin-bottom:1rem;">
+          <span style="display:inline-block;border-radius:9999px;background:rgba(243,156,36,0.1);padding:4px 12px;font-size:11px;font-weight:600;color:var(--orange-energy);">Florist / Gift · E-Commerce + Delivery</span>
+          <span style="display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:600;color:#22c55e;"><span style="width:8px;height:8px;border-radius:50%;background:#22c55e;"></span> Live</span>
+        </div>
+        <h3 style="font-weight:700;font-size:16px;color:var(--navy-primary);margin-bottom:0.25rem;">Floral Whispers Gifts</h3>
+        <p style="font-size:13px;color:rgba(47,59,82,0.7);line-height:1.6;margin-bottom:1rem;border-bottom:1px solid #E0E4EA;padding-bottom:1rem;">Florist in Nairobi, orders via word of mouth and Instagram DMs; same-day delivery not systematised on the web.</p>
+        <div style="display:flex;flex-direction:column;gap:0.75rem;margin-bottom:1rem;">
+          <div><p style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.1em;color:rgba(47,59,82,0.45);margin-bottom:2px;">Problem</p><p style="font-size:12px;color:rgba(47,59,82,0.85);line-height:1.5;">Florist operating in Nairobi with no way to capture orders outside word of mouth and Instagram DMs.</p></div>
+          <div><p style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.1em;color:rgba(47,59,82,0.45);margin-bottom:2px;">Solution</p><p style="font-size:12px;color:rgba(47,59,82,0.85);line-height:1.5;">E-commerce site with product collections across flowers, teddy bears, gift hampers, cards, and cakes, with same-day delivery positioning.</p></div>
+          <div><p style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.1em;color:rgba(47,59,82,0.45);margin-bottom:2px;">Outcome</p><p style="font-size:12px;color:rgba(47,59,82,0.85);line-height:1.5;">Buyers across Nairobi can now browse, select, and order without requiring a phone call or DM thread.</p></div>
+        </div>
+        <div style="display:flex;gap:0.75rem;">
+          <a href="https://floralwhispersgifts.co.ke" target="_blank" rel="noopener noreferrer" style="flex:1;min-width:8rem;display:inline-flex;align-items:center;justify-content:center;gap:6px;border-radius:6px;border:1px solid rgba(47,59,82,0.4);padding:6px 10px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;color:var(--navy-primary);text-decoration:none;">Visit Live Site ↗</a>
+          <button type="button" onclick="toggleProject(this)" class="toggle-project-btn" style="flex:1;min-width:8rem;display:inline-flex;align-items:center;justify-content:center;gap:6px;border-radius:6px;background:var(--navy-primary);padding:6px 10px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;color:#fff;border:none;cursor:pointer;">View Case Study ▾</button>
+        </div>
+        <div class="project-expand" style="display:grid;transition:grid-template-rows 0.3s ease-out;">
+          <div style="overflow:hidden;min-height:0;">
+            <div style="padding-top:1.5rem;margin-top:1rem;border-top:1px dashed rgba(47,59,82,0.15);display:flex;flex-direction:column;gap:1rem;">
+              <div><p style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.1em;color:rgba(47,59,82,0.45);margin-bottom:2px;">Business context</p><p style="font-size:12px;color:rgba(47,59,82,0.85);line-height:1.5;">Gift and flower delivery market in Nairobi, highly competitive, heavily dependent on Instagram presence and referrals.</p></div>
+              <div><p style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.1em;color:rgba(47,59,82,0.45);margin-bottom:2px;">The real constraint</p><p style="font-size:12px;color:rgba(47,59,82,0.85);line-height:1.5;">Orders came through DMs with no structure, no product photos with prices, no confirmation system, no delivery address capture.</p></div>
+              <div><p style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.1em;color:rgba(47,59,82,0.45);margin-bottom:2px;">What we built</p><p style="font-size:12px;color:rgba(47,59,82,0.85);line-height:1.5;">Node.js e-commerce site with product collection pages, image-led browsing, WhatsApp-integrated order flow.</p></div>
+              <div><p style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.1em;color:rgba(47,59,82,0.45);margin-bottom:2px;">What made it hard</p><p style="font-size:12px;color:rgba(47,59,82,0.85);line-height:1.5;">Perishable inventory means pricing and availability change frequently. The system needed to be manageable by the owner without developer support.</p></div>
+              <div><p style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.1em;color:rgba(47,59,82,0.45);margin-bottom:2px;">Stack</p><div style="display:flex;flex-wrap:wrap;gap:6px;"><span style="padding:3px 8px;border-radius:9999px;background:rgba(47,59,82,0.1);font-size:11px;color:var(--navy-primary);font-weight:600;">Node.js</span><span style="padding:3px 8px;border-radius:9999px;background:rgba(47,59,82,0.1);font-size:11px;color:var(--navy-primary);font-weight:600;">WhatsApp order flow</span><span style="padding:3px 8px;border-radius:9999px;background:rgba(47,59,82,0.1);font-size:11px;color:var(--navy-primary);font-weight:600;">Delivery zone positioning</span></div></div>
+            </div>
+          </div>
+        </div>
+      </article>
+
+      <article class="project-card" data-category="websites erp" style="border-radius:10px;border:1px solid #E0E4EA;background:#fff;padding:1.5rem;">
+        <div style="display:flex;flex-wrap:wrap;align-items:flex-start;justify-content:space-between;gap:0.75rem;margin-bottom:1rem;">
+          <span style="display:inline-block;border-radius:9999px;background:rgba(47,166,179,0.1);padding:4px 12px;font-size:11px;font-weight:600;color:var(--teal-accent);">Cybersecurity / Talent · Multi-role Platform</span>
+          <span style="display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:600;color:#22c55e;"><span style="width:8px;height:8px;border-radius:50%;background:#22c55e;"></span> Live</span>
+        </div>
+        <h3 style="font-weight:700;font-size:16px;color:var(--navy-primary);margin-bottom:0.25rem;">Ongoza Cyber Hub</h3>
+        <p style="font-size:13px;color:rgba(47,59,82,0.7);line-height:1.6;margin-bottom:1rem;border-bottom:1px solid #E0E4EA;padding-bottom:1rem;">Africa-wide cybersecurity talent platform, 10,000+ users, 20+ mentors, 10+ countries.</p>
+        <div style="display:flex;flex-direction:column;gap:0.75rem;margin-bottom:1rem;">
+          <div><p style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.1em;color:rgba(47,59,82,0.45);margin-bottom:2px;">Problem</p><p style="font-size:12px;color:rgba(47,59,82,0.85);line-height:1.5;">Cybersecurity talent, mentors, and opportunities across Africa were fragmented, no single place to profile skills, match mentors, issue certificates, or collect payments.</p></div>
+          <div><p style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.1em;color:rgba(47,59,82,0.45);margin-bottom:2px;">Solution</p><p style="font-size:12px;color:rgba(47,59,82,0.85);line-height:1.5;">Built a multi-role OCH platform with AI-powered profiling, mentor matching, certificate generation, community tools, and M-Pesa billing.</p></div>
+          <div><p style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.1em;color:rgba(47,59,82,0.45);margin-bottom:2px;">Outcome</p><p style="font-size:12px;color:rgba(47,59,82,0.85);line-height:1.5;">More than 10,000 users, 20+ mentors, and presence in 10+ African countries.</p></div>
+        </div>
+        <div style="display:flex;gap:0.75rem;">
+          <a href="https://och-waitlist.cresdynamics.com" target="_blank" rel="noopener noreferrer" style="flex:1;min-width:8rem;display:inline-flex;align-items:center;justify-content:center;gap:6px;border-radius:6px;border:1px solid rgba(47,59,82,0.4);padding:6px 10px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;color:var(--navy-primary);text-decoration:none;">Visit Live Site ↗</a>
+          <button type="button" onclick="toggleProject(this)" class="toggle-project-btn" style="flex:1;min-width:8rem;display:inline-flex;align-items:center;justify-content:center;gap:6px;border-radius:6px;background:var(--navy-primary);padding:6px 10px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;color:#fff;border:none;cursor:pointer;">View Case Study ▾</button>
+        </div>
+        <div class="project-expand" style="display:grid;transition:grid-template-rows 0.3s ease-out;">
+          <div style="overflow:hidden;min-height:0;">
+            <div style="padding-top:1.5rem;margin-top:1rem;border-top:1px dashed rgba(47,59,82,0.15);display:flex;flex-direction:column;gap:1rem;">
+              <div><p style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.1em;color:rgba(47,59,82,0.45);margin-bottom:2px;">Business context</p><p style="font-size:12px;color:rgba(47,59,82,0.85);line-height:1.5;">OCH needed a production-grade platform to connect cybersecurity learners, mentors, and programmes across Africa.</p></div>
+              <div><p style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.1em;color:rgba(47,59,82,0.45);margin-bottom:2px;">The real constraint</p><p style="font-size:12px;color:rgba(47,59,82,0.85);line-height:1.5;">Multi-country scale, role-based access, payments, certificates, and AI-assisted profiling had to work together from day one.</p></div>
+              <div><p style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.1em;color:rgba(47,59,82,0.45);margin-bottom:2px;">What we built</p><p style="font-size:12px;color:rgba(47,59,82,0.85);line-height:1.5;">Full OCH platform: AI-powered talent profiling, mentor network, certificate generation, community messaging, M-Pesa billing, and admin controls.</p></div>
+              <div><p style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.1em;color:rgba(47,59,82,0.45);margin-bottom:2px;">What made it hard</p><p style="font-size:12px;color:rgba(47,59,82,0.85);line-height:1.5;">Balancing multi-role permissions, African payment realities (M-Pesa), and AI profiling quality while keeping the product usable on everyday devices.</p></div>
+              <div><p style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.1em;color:rgba(47,59,82,0.45);margin-bottom:2px;">Stack</p><div style="display:flex;flex-wrap:wrap;gap:6px;"><span style="padding:3px 8px;border-radius:9999px;background:rgba(47,59,82,0.1);font-size:11px;color:var(--navy-primary);font-weight:600;">AI profiling</span><span style="padding:3px 8px;border-radius:9999px;background:rgba(47,59,82,0.1);font-size:11px;color:var(--navy-primary);font-weight:600;">M-Pesa billing</span><span style="padding:3px 8px;border-radius:9999px;background:rgba(47,59,82,0.1);font-size:11px;color:var(--navy-primary);font-weight:600;">Multi-country RBAC</span><span style="padding:3px 8px;border-radius:9999px;background:rgba(47,59,82,0.1);font-size:11px;color:var(--navy-primary);font-weight:600;">Certificate generation</span></div></div>
+            </div>
+          </div>
+        </div>
+      </article>
+
+      <article class="project-card" data-category="infrastructure" style="border-radius:10px;border:1px solid #E0E4EA;background:#fff;padding:1.5rem;">
+        <div style="display:flex;flex-wrap:wrap;align-items:flex-start;justify-content:space-between;gap:0.75rem;margin-bottom:1rem;">
+          <span style="display:inline-block;border-radius:9999px;background:rgba(47,59,82,0.1);padding:4px 12px;font-size:11px;font-weight:600;color:var(--navy-primary);">Infrastructure · Server Deployment</span>
+          <span style="display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:600;color:#22c55e;"><span style="width:8px;height:8px;border-radius:50%;background:#22c55e;"></span> Live</span>
+        </div>
+        <h3 style="font-weight:700;font-size:16px;color:var(--navy-primary);margin-bottom:0.25rem;">IP Server Project</h3>
+        <p style="font-size:13px;color:rgba(47,59,82,0.7);line-height:1.6;margin-bottom:1rem;border-bottom:1px solid #E0E4EA;padding-bottom:1rem;">Dedicated production server at 165.22.128.141, outside shared hosting.</p>
+        <div style="display:flex;flex-direction:column;gap:0.75rem;margin-bottom:1rem;">
+          <div><p style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.1em;color:rgba(47,59,82,0.45);margin-bottom:2px;">Problem</p><p style="font-size:12px;color:rgba(47,59,82,0.85);line-height:1.5;">Client required a dedicated production server environment outside shared hosting, with control over configuration, security, and deployment.</p></div>
+          <div><p style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.1em;color:rgba(47,59,82,0.45);margin-bottom:2px;">Solution</p><p style="font-size:12px;color:rgba(47,59,82,0.85);line-height:1.5;">Configured and deployed a live production server with direct IP access, managed under CRES infrastructure standards.</p></div>
+          <div><p style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.1em;color:rgba(47,59,82,0.45);margin-bottom:2px;">Outcome</p><p style="font-size:12px;color:rgba(47,59,82,0.85);line-height:1.5;">Live production environment running at dedicated IP. Client has full control over deployment without shared hosting constraints.</p></div>
+        </div>
+        <div style="display:flex;gap:0.75rem;">
+          <a href="http://165.22.128.141" target="_blank" rel="noopener noreferrer" style="flex:1;min-width:8rem;display:inline-flex;align-items:center;justify-content:center;gap:6px;border-radius:6px;border:1px solid rgba(47,59,82,0.4);padding:6px 10px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;color:var(--navy-primary);text-decoration:none;">Visit Live Site ↗</a>
+          <button type="button" onclick="toggleProject(this)" class="toggle-project-btn" style="flex:1;min-width:8rem;display:inline-flex;align-items:center;justify-content:center;gap:6px;border-radius:6px;background:var(--navy-primary);padding:6px 10px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;color:#fff;border:none;cursor:pointer;">View Case Study ▾</button>
+        </div>
+        <div class="project-expand" style="display:grid;transition:grid-template-rows 0.3s ease-out;">
+          <div style="overflow:hidden;min-height:0;">
+            <div style="padding-top:1.5rem;margin-top:1rem;border-top:1px dashed rgba(47,59,82,0.15);display:flex;flex-direction:column;gap:1rem;">
+              <div><p style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.1em;color:rgba(47,59,82,0.45);margin-bottom:2px;">Business context</p><p style="font-size:12px;color:rgba(47,59,82,0.85);line-height:1.5;">Business that had outgrown shared hosting, performance issues, no control over server configuration.</p></div>
+              <div><p style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.1em;color:rgba(47,59,82,0.45);margin-bottom:2px;">What we built</p><p style="font-size:12px;color:rgba(47,59,82,0.85);line-height:1.5;">Dedicated server provisioned, configured, and deployed, managed production environment with direct access.</p></div>
+              <div><p style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.1em;color:rgba(47,59,82,0.45);margin-bottom:2px;">What made it hard</p><p style="font-size:12px;color:rgba(47,59,82,0.85);line-height:1.5;">Migration from existing setup without downtime.</p></div>
+              <div><p style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.1em;color:rgba(47,59,82,0.45);margin-bottom:2px;">Stack</p><div style="display:flex;flex-wrap:wrap;gap:6px;"><span style="padding:3px 8px;border-radius:9999px;background:rgba(47,59,82,0.1);font-size:11px;color:var(--navy-primary);font-weight:600;">Linux server</span><span style="padding:3px 8px;border-radius:9999px;background:rgba(47,59,82,0.1);font-size:11px;color:var(--navy-primary);font-weight:600;">CRES infrastructure</span><span style="padding:3px 8px;border-radius:9999px;background:rgba(47,59,82,0.1);font-size:11px;color:var(--navy-primary);font-weight:600;">Production deployment</span></div></div>
+            </div>
+          </div>
+        </div>
+      </article>
+
+      <article class="project-card" data-category="ecommerce retail" style="border-radius:10px;border:1px solid #E0E4EA;background:#fff;padding:1.5rem;">
+        <div style="display:flex;flex-wrap:wrap;align-items:flex-start;justify-content:space-between;gap:0.75rem;margin-bottom:1rem;">
+          <span style="display:inline-block;border-radius:9999px;background:rgba(243,156,36,0.1);padding:4px 12px;font-size:11px;font-weight:600;color:var(--orange-energy);">Footwear Retail · E-Commerce + AI Chat</span>
+          <span style="display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:600;color:#22c55e;"><span style="width:8px;height:8px;border-radius:50%;background:#22c55e;"></span> Live</span>
+        </div>
+        <h3 style="font-weight:700;font-size:16px;color:var(--navy-primary);margin-bottom:0.25rem;">Frank Labels Store</h3>
+        <p style="font-size:13px;color:rgba(47,59,82,0.7);line-height:1.6;margin-bottom:1rem;border-bottom:1px solid #E0E4EA;padding-bottom:1rem;">Sneaker retailer (Air Force 1, Jordans, Air Max, Clarks, Timberland), sales only in WhatsApp, no catalogue.</p>
+        <div style="display:flex;flex-direction:column;gap:0.75rem;margin-bottom:1rem;">
+          <div><p style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.1em;color:rgba(47,59,82,0.45);margin-bottom:2px;">Problem</p><p style="font-size:12px;color:rgba(47,59,82,0.85);line-height:1.5;">Sneaker retailer with no structured online catalogue, sales driven entirely through WhatsApp conversations.</p></div>
+          <div><p style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.1em;color:rgba(47,59,82,0.45);margin-bottom:2px;">Solution</p><p style="font-size:12px;color:rgba(47,59,82,0.85);line-height:1.5;">E-commerce site with AI chat assistant ("Dee") for product recommendations, full collection catalogue, WhatsApp integration, and nationwide delivery system.</p></div>
+          <div><p style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.1em;color:rgba(47,59,82,0.45);margin-bottom:2px;">Outcome</p><p style="font-size:12px;color:rgba(47,59,82,0.85);line-height:1.5;">Buyers can browse full catalogue and get product recommendations via AI chat without requiring human availability.</p></div>
+        </div>
+        <div style="display:flex;gap:0.75rem;">
+          <a href="https://franklabels.store" target="_blank" rel="noopener noreferrer" style="flex:1;min-width:8rem;display:inline-flex;align-items:center;justify-content:center;gap:6px;border-radius:6px;border:1px solid rgba(47,59,82,0.4);padding:6px 10px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;color:var(--navy-primary);text-decoration:none;">Visit Live Site ↗</a>
+          <button type="button" onclick="toggleProject(this)" class="toggle-project-btn" style="flex:1;min-width:8rem;display:inline-flex;align-items:center;justify-content:center;gap:6px;border-radius:6px;background:var(--navy-primary);padding:6px 10px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;color:#fff;border:none;cursor:pointer;">View Case Study ▾</button>
+        </div>
+        <div class="project-expand" style="display:grid;transition:grid-template-rows 0.3s ease-out;">
+          <div style="overflow:hidden;min-height:0;">
+            <div style="padding-top:1.5rem;margin-top:1rem;border-top:1px dashed rgba(47,59,82,0.15);display:flex;flex-direction:column;gap:1rem;">
+              <div><p style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.1em;color:rgba(47,59,82,0.45);margin-bottom:2px;">Business context</p><p style="font-size:12px;color:rgba(47,59,82,0.85);line-height:1.5;">Kenyan sneaker retail, high-demand products with a buyer base that researches online before purchasing. Competitor sites exist; this client had none.</p></div>
+              <div><p style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.1em;color:rgba(47,59,82,0.45);margin-bottom:2px;">The real constraint</p><p style="font-size:12px;color:rgba(47,59,82,0.85);line-height:1.5;">All selling happened in WhatsApp threads, no product photos with prices, no self-serve browsing, owner spending hours on repetitive product queries.</p></div>
+              <div><p style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.1em;color:rgba(47,59,82,0.45);margin-bottom:2px;">What we built</p><p style="font-size:12px;color:rgba(47,59,82,0.85);line-height:1.5;">HTML/CSS e-commerce site with product grid, category pages, WhatsApp checkout integration, and an AI chat layer ("Dee") handling product fit and recommendation queries.</p></div>
+              <div><p style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.1em;color:rgba(47,59,82,0.45);margin-bottom:2px;">What made it hard</p><p style="font-size:12px;color:rgba(47,59,82,0.85);line-height:1.5;">Training the AI assistant to answer footwear-specific questions (sizing, style matching, availability) accurately without hallucinating stock.</p></div>
+              <div><p style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.1em;color:rgba(47,59,82,0.45);margin-bottom:2px;">Stack</p><div style="display:flex;flex-wrap:wrap;gap:6px;"><span style="padding:3px 8px;border-radius:9999px;background:rgba(47,59,82,0.1);font-size:11px;color:var(--navy-primary);font-weight:600;">HTML/CSS</span><span style="padding:3px 8px;border-radius:9999px;background:rgba(47,59,82,0.1);font-size:11px;color:var(--navy-primary);font-weight:600;">AI chat assistant</span><span style="padding:3px 8px;border-radius:9999px;background:rgba(47,59,82,0.1);font-size:11px;color:var(--navy-primary);font-weight:600;">WhatsApp integration</span><span style="padding:3px 8px;border-radius:9999px;background:rgba(47,59,82,0.1);font-size:11px;color:var(--navy-primary);font-weight:600;">Product catalogue</span></div></div>
+            </div>
+          </div>
+        </div>
+      </article>
+
+      <article class="project-card" data-category="websites hospitality" style="border-radius:10px;border:1px solid #E0E4EA;background:#fff;padding:1.5rem;">
+        <div style="display:flex;flex-wrap:wrap;align-items:flex-start;justify-content:space-between;gap:0.75rem;margin-bottom:1rem;">
+          <span style="display:inline-block;border-radius:9999px;background:rgba(30,124,136,0.1);padding:4px 12px;font-size:11px;font-weight:600;color:var(--teal-deep);">Fine Dining / Hospitality · Website + Reservations</span>
+          <span style="display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:600;color:#22c55e;"><span style="width:8px;height:8px;border-radius:50%;background:#22c55e;"></span> Live</span>
+        </div>
+        <h3 style="font-weight:700;font-size:16px;color:var(--navy-primary);margin-bottom:0.25rem;">TAVO Restaurant</h3>
+        <p style="font-size:13px;color:rgba(47,59,82,0.7);line-height:1.6;margin-bottom:1rem;border-bottom:1px solid #E0E4EA;padding-bottom:1rem;">Fine dining at Rosslyn Square, Nairobi, Bolt Food only, no brand-owned web experience.</p>
+        <div style="display:flex;flex-direction:column;gap:0.75rem;margin-bottom:1rem;">
+          <div><p style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.1em;color:rgba(47,59,82,0.45);margin-bottom:2px;">Problem</p><p style="font-size:12px;color:rgba(47,59,82,0.85);line-height:1.5;">Fine dining restaurant with no digital presence matching its premium positioning, Bolt Food listing existed but no brand-owned web experience.</p></div>
+          <div><p style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.1em;color:rgba(47,59,82,0.45);margin-bottom:2px;">Solution</p><p style="font-size:12px;color:rgba(47,59,82,0.85);line-height:1.5;">Full restaurant website with home, about, menu, gallery, events, contact, and table reservation pages. Integrated with Bolt Food for delivery.</p></div>
+          <div><p style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.1em;color:rgba(47,59,82,0.45);margin-bottom:2px;">Outcome</p><p style="font-size:12px;color:rgba(47,59,82,0.85);line-height:1.5;">Restaurant now has a brand-owned digital touchpoint. Table reservations bookable directly. Premium positioning communicated before guests arrive.</p></div>
+        </div>
+        <div style="display:flex;gap:0.75rem;">
+          <a href="https://tavo-mu.vercel.app" target="_blank" rel="noopener noreferrer" style="flex:1;min-width:8rem;display:inline-flex;align-items:center;justify-content:center;gap:6px;border-radius:6px;border:1px solid rgba(47,59,82,0.4);padding:6px 10px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;color:var(--navy-primary);text-decoration:none;">Visit Live Site ↗</a>
+          <button type="button" onclick="toggleProject(this)" class="toggle-project-btn" style="flex:1;min-width:8rem;display:inline-flex;align-items:center;justify-content:center;gap:6px;border-radius:6px;background:var(--navy-primary);padding:6px 10px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;color:#fff;border:none;cursor:pointer;">View Case Study ▾</button>
+        </div>
+        <div class="project-expand" style="display:grid;transition:grid-template-rows 0.3s ease-out;">
+          <div style="overflow:hidden;min-height:0;">
+            <div style="padding-top:1.5rem;margin-top:1rem;border-top:1px dashed rgba(47,59,82,0.15);display:flex;flex-direction:column;gap:1rem;">
+              <div><p style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.1em;color:rgba(47,59,82,0.45);margin-bottom:2px;">Business context</p><p style="font-size:12px;color:rgba(47,59,82,0.85);line-height:1.5;">Premium dining in Rosslyn Square, a location associated with Nairobi's upper-market dining scene. Guests research before booking.</p></div>
+              <div><p style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.1em;color:rgba(47,59,82,0.45);margin-bottom:2px;">What we built</p><p style="font-size:12px;color:rgba(47,59,82,0.85);line-height:1.5;">Node.js restaurant site with menu pages, gallery, events calendar, contact, and a reservations flow. Bolt Food integration. Google Maps integration.</p></div>
+              <div><p style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.1em;color:rgba(47,59,82,0.45);margin-bottom:2px;">What made it hard</p><p style="font-size:12px;color:rgba(47,59,82,0.85);line-height:1.5;">Fine dining photography and copy standards are high, the site had to feel as premium as the in-restaurant experience.</p></div>
+              <div><p style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.1em;color:rgba(47,59,82,0.45);margin-bottom:2px;">Stack</p><div style="display:flex;flex-wrap:wrap;gap:6px;"><span style="padding:3px 8px;border-radius:9999px;background:rgba(47,59,82,0.1);font-size:11px;color:var(--navy-primary);font-weight:600;">Node.js</span><span style="padding:3px 8px;border-radius:9999px;background:rgba(47,59,82,0.1);font-size:11px;color:var(--navy-primary);font-weight:600;">Bolt Food integration</span><span style="padding:3px 8px;border-radius:9999px;background:rgba(47,59,82,0.1);font-size:11px;color:var(--navy-primary);font-weight:600;">Reservation flow</span></div></div>
+            </div>
+          </div>
+        </div>
+      </article>
+
+      <article class="project-card" data-category="websites hospitality" style="border-radius:10px;border:1px solid #E0E4EA;background:#fff;padding:1.5rem;">
+        <div style="display:flex;flex-wrap:wrap;align-items:flex-start;justify-content:space-between;gap:0.75rem;margin-bottom:1rem;">
+          <span style="display:inline-block;border-radius:9999px;background:rgba(30,124,136,0.1);padding:4px 12px;font-size:11px;font-weight:600;color:var(--teal-deep);">Hospitality / Accommodation · Website</span>
+          <span style="display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:600;color:#22c55e;"><span style="width:8px;height:8px;border-radius:50%;background:#22c55e;"></span> Live</span>
+        </div>
+        <h3 style="font-weight:700;font-size:16px;color:var(--navy-primary);margin-bottom:0.25rem;">Green Cottage Hotel</h3>
+        <p style="font-size:13px;color:rgba(47,59,82,0.7);line-height:1.6;margin-bottom:1rem;border-bottom:1px solid #E0E4EA;padding-bottom:1rem;">Hotel in Ugenya, Siaya County, local reputation, no digital reach for out-of-county visitors.</p>
+        <div style="display:flex;flex-direction:column;gap:0.75rem;margin-bottom:1rem;">
+          <div><p style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.1em;color:rgba(47,59,82,0.45);margin-bottom:2px;">Problem</p><p style="font-size:12px;color:rgba(47,59,82,0.85);line-height:1.5;">Hotel in Siaya County, strong local reputation but no digital presence to reach visitors travelling from outside the county.</p></div>
+          <div><p style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.1em;color:rgba(47,59,82,0.45);margin-bottom:2px;">Solution</p><p style="font-size:12px;color:rgba(47,59,82,0.85);line-height:1.5;">Full hospitality website with home, about, services, menu, accommodation, and contact sections. Positioned as "The Pride of Siaya".</p></div>
+          <div><p style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.1em;color:rgba(47,59,82,0.45);margin-bottom:2px;">Outcome</p><p style="font-size:12px;color:rgba(47,59,82,0.85);line-height:1.5;">Hotel discoverable online for visitors researching accommodation in Siaya County before travelling.</p></div>
+        </div>
+        <div style="display:flex;gap:0.75rem;">
+          <a href="https://nelsonfranklinwere.github.io/GreeCottage/" target="_blank" rel="noopener noreferrer" style="flex:1;min-width:8rem;display:inline-flex;align-items:center;justify-content:center;gap:6px;border-radius:6px;border:1px solid rgba(47,59,82,0.4);padding:6px 10px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;color:var(--navy-primary);text-decoration:none;">Visit Live Site ↗</a>
+          <button type="button" onclick="toggleProject(this)" class="toggle-project-btn" style="flex:1;min-width:8rem;display:inline-flex;align-items:center;justify-content:center;gap:6px;border-radius:6px;background:var(--navy-primary);padding:6px 10px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;color:#fff;border:none;cursor:pointer;">View Case Study ▾</button>
+        </div>
+        <div class="project-expand" style="display:grid;transition:grid-template-rows 0.3s ease-out;">
+          <div style="overflow:hidden;min-height:0;">
+            <div style="padding-top:1.5rem;margin-top:1rem;border-top:1px dashed rgba(47,59,82,0.15);display:flex;flex-direction:column;gap:1rem;">
+              <div><p style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.1em;color:rgba(47,59,82,0.45);margin-bottom:2px;">Business context</p><p style="font-size:12px;color:rgba(47,59,82,0.85);line-height:1.5;">County-level hospitality in Ugenya Subcounty. Strong word of mouth locally; zero digital footprint for visitors from Nairobi or other counties.</p></div>
+              <div><p style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.1em;color:rgba(47,59,82,0.45);margin-bottom:2px;">What we built</p><p style="font-size:12px;color:rgba(47,59,82,0.85);line-height:1.5;">Static hospitality site with services overview, menu section, accommodation page, and contact/booking section.</p></div>
+              <div><p style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.1em;color:rgba(47,59,82,0.45);margin-bottom:2px;">What made it hard</p><p style="font-size:12px;color:rgba(47,59,82,0.85);line-height:1.5;">Photography and content had to convey warmth and quality using available assets, no professional photography budget.</p></div>
+              <div><p style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.1em;color:rgba(47,59,82,0.45);margin-bottom:2px;">Stack</p><div style="display:flex;flex-wrap:wrap;gap:6px;"><span style="padding:3px 8px;border-radius:9999px;background:rgba(47,59,82,0.1);font-size:11px;color:var(--navy-primary);font-weight:600;">HTML/CSS</span><span style="padding:3px 8px;border-radius:9999px;background:rgba(47,59,82,0.1);font-size:11px;color:var(--navy-primary);font-weight:600;">GitHub Pages</span><span style="padding:3px 8px;border-radius:9999px;background:rgba(47,59,82,0.1);font-size:11px;color:var(--navy-primary);font-weight:600;">Accommodation sections</span></div></div>
+            </div>
+          </div>
+        </div>
+      </article>
+
+      <article class="project-card" data-category="websites hospitality" style="border-radius:10px;border:1px solid #E0E4EA;background:#fff;padding:1.5rem;">
+        <div style="display:flex;flex-wrap:wrap;align-items:flex-start;justify-content:space-between;gap:0.75rem;margin-bottom:1rem;">
+          <span style="display:inline-block;border-radius:9999px;background:rgba(30,124,136,0.1);padding:4px 12px;font-size:11px;font-weight:600;color:var(--teal-deep);">Food & Beverage · Website + WhatsApp Ordering</span>
+          <span style="display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:600;color:#22c55e;"><span style="width:8px;height:8px;border-radius:50%;background:#22c55e;"></span> Live</span>
+        </div>
+        <h3 style="font-weight:700;font-size:16px;color:var(--navy-primary);margin-bottom:0.25rem;">Abila Kitengela</h3>
+        <p style="font-size:13px;color:rgba(47,59,82,0.7);line-height:1.6;margin-bottom:1rem;border-bottom:1px solid #E0E4EA;padding-bottom:1rem;">Luo cuisine restaurant and pub in Kitengela, Gwassi fish, Ohangla nights; no web presence outside the neighbourhood.</p>
+        <div style="display:flex;flex-direction:column;gap:0.75rem;margin-bottom:1rem;">
+          <div><p style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.1em;color:rgba(47,59,82,0.45);margin-bottom:2px;">Problem</p><p style="font-size:12px;color:rgba(47,59,82,0.85);line-height:1.5;">Authentic Luo cuisine restaurant and pub in Kitengela with no web presence, a culturally distinctive offering invisible outside its immediate neighbourhood.</p></div>
+          <div><p style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.1em;color:rgba(47,59,82,0.45);margin-bottom:2px;">Solution</p><p style="font-size:12px;color:rgba(47,59,82,0.85);line-height:1.5;">Website with video hero, full menu, cultural storytelling section, and WhatsApp + SMS ordering. Positioned around the "Gwassi Fish" signature dish.</p></div>
+          <div><p style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.1em;color:rgba(47,59,82,0.45);margin-bottom:2px;">Outcome</p><p style="font-size:12px;color:rgba(47,59,82,0.85);line-height:1.5;">Cultural dining identity established digitally. Ordering available via WhatsApp and SMS directly from the site.</p></div>
+        </div>
+        <div style="display:flex;gap:0.75rem;">
+          <a href="https://nelsonfranklinwere.github.io/Lounge/" target="_blank" rel="noopener noreferrer" style="flex:1;min-width:8rem;display:inline-flex;align-items:center;justify-content:center;gap:6px;border-radius:6px;border:1px solid rgba(47,59,82,0.4);padding:6px 10px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;color:var(--navy-primary);text-decoration:none;">Visit Live Site ↗</a>
+          <button type="button" onclick="toggleProject(this)" class="toggle-project-btn" style="flex:1;min-width:8rem;display:inline-flex;align-items:center;justify-content:center;gap:6px;border-radius:6px;background:var(--navy-primary);padding:6px 10px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;color:#fff;border:none;cursor:pointer;">View Case Study ▾</button>
+        </div>
+        <div class="project-expand" style="display:grid;transition:grid-template-rows 0.3s ease-out;">
+          <div style="overflow:hidden;min-height:0;">
+            <div style="padding-top:1.5rem;margin-top:1rem;border-top:1px dashed rgba(47,59,82,0.15);display:flex;flex-direction:column;gap:1rem;">
+              <div><p style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.1em;color:rgba(47,59,82,0.45);margin-bottom:2px;">Business context</p><p style="font-size:12px;color:rgba(47,59,82,0.85);line-height:1.5;">Kitengela food scene is competitive. Most establishments are generic. Abila's differentiation, authentic Luo cuisine, Lake Victoria tilapia, was known only to regulars.</p></div>
+              <div><p style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.1em;color:rgba(47,59,82,0.45);margin-bottom:2px;">What we built</p><p style="font-size:12px;color:rgba(47,59,82,0.85);line-height:1.5;">HTML/CSS site with video hero background, categorised menu, cultural section on Ohangla nights and Luo heritage, WhatsApp + SMS ordering integration.</p></div>
+              <div><p style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.1em;color:rgba(47,59,82,0.45);margin-bottom:2px;">What made it hard</p><p style="font-size:12px;color:rgba(47,59,82,0.85);line-height:1.5;">Video background without degrading mobile performance required careful compression and fallback handling.</p></div>
+              <div><p style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.1em;color:rgba(47,59,82,0.45);margin-bottom:2px;">Stack</p><div style="display:flex;flex-wrap:wrap;gap:6px;"><span style="padding:3px 8px;border-radius:9999px;background:rgba(47,59,82,0.1);font-size:11px;color:var(--navy-primary);font-weight:600;">HTML/CSS</span><span style="padding:3px 8px;border-radius:9999px;background:rgba(47,59,82,0.1);font-size:11px;color:var(--navy-primary);font-weight:600;">Video hero</span><span style="padding:3px 8px;border-radius:9999px;background:rgba(47,59,82,0.1);font-size:11px;color:var(--navy-primary);font-weight:600;">WhatsApp + SMS ordering</span></div></div>
+            </div>
+          </div>
+        </div>
+      </article>
+
+      <article class="project-card" data-category="websites" style="border-radius:10px;border:1px solid #E0E4EA;background:#fff;padding:1.5rem;">
+        <div style="display:flex;flex-wrap:wrap;align-items:flex-start;justify-content:space-between;gap:0.75rem;margin-bottom:1rem;">
+          <span style="display:inline-block;border-radius:9999px;background:rgba(47,166,179,0.1);padding:4px 12px;font-size:11px;font-weight:600;color:var(--teal-accent);">Construction / Civil Engineering · Corporate Website</span>
+          <span style="display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:600;color:#22c55e;"><span style="width:8px;height:8px;border-radius:50%;background:#22c55e;"></span> Live</span>
+        </div>
+        <h3 style="font-weight:700;font-size:16px;color:var(--navy-primary);margin-bottom:0.25rem;">Frame Constructors</h3>
+        <p style="font-size:13px;color:rgba(47,59,82,0.7);line-height:1.6;margin-bottom:1rem;border-bottom:1px solid #E0E4EA;padding-bottom:1rem;">35+ years, 150+ projects, NCA and ISO, referrals only, no digital acquisition.</p>
+        <div style="display:flex;flex-direction:column;gap:0.75rem;margin-bottom:1rem;">
+          <div><p style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.1em;color:rgba(47,59,82,0.45);margin-bottom:2px;">Problem</p><p style="font-size:12px;color:rgba(47,59,82,0.85);line-height:1.5;">35-year-old construction company with 150+ completed projects, but no digital presence to reach developers and homeowners searching online.</p></div>
+          <div><p style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.1em;color:rgba(47,59,82,0.45);margin-bottom:2px;">Solution</p><p style="font-size:12px;color:rgba(47,59,82,0.85);line-height:1.5;">Corporate website with full services overview, project portfolio, testimonials, certifications showcase, insights/blog section, and quote request flow.</p></div>
+          <div><p style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.1em;color:rgba(47,59,82,0.45);margin-bottom:2px;">Outcome</p><p style="font-size:12px;color:rgba(47,59,82,0.85);line-height:1.5;">Company's 35 years of credibility now visible online. Certifications and project history accessible to developers and homeowners.</p></div>
+        </div>
+        <div style="display:flex;gap:0.75rem;">
+          <a href="https://nelsonfranklinwere.github.io/Construction/" target="_blank" rel="noopener noreferrer" style="flex:1;min-width:8rem;display:inline-flex;align-items:center;justify-content:center;gap:6px;border-radius:6px;border:1px solid rgba(47,59,82,0.4);padding:6px 10px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;color:var(--navy-primary);text-decoration:none;">Visit Live Site ↗</a>
+          <button type="button" onclick="toggleProject(this)" class="toggle-project-btn" style="flex:1;min-width:8rem;display:inline-flex;align-items:center;justify-content:center;gap:6px;border-radius:6px;background:var(--navy-primary);padding:6px 10px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;color:#fff;border:none;cursor:pointer;">View Case Study ▾</button>
+        </div>
+        <div class="project-expand" style="display:grid;transition:grid-template-rows 0.3s ease-out;">
+          <div style="overflow:hidden;min-height:0;">
+            <div style="padding-top:1.5rem;margin-top:1rem;border-top:1px dashed rgba(47,59,82,0.15);display:flex;flex-direction:column;gap:1rem;">
+              <div><p style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.1em;color:rgba(47,59,82,0.45);margin-bottom:2px;">Business context</p><p style="font-size:12px;color:rgba(47,59,82,0.85);line-height:1.5;">Established construction firm active across Kitengela and Nairobi, residential and commercial. 35+ years, 150+ projects. All business through referral; zero digital acquisition.</p></div>
+              <div><p style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.1em;color:rgba(47,59,82,0.45);margin-bottom:2px;">What we built</p><p style="font-size:12px;color:rgba(47,59,82,0.85);line-height:1.5;">Corporate site with hero slider, services section, project portfolio, testimonials, certifications gallery (NCA, ISO, KMFB, AAK), blog/insights section, and contact/quote form.</p></div>
+              <div><p style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.1em;color:rgba(47,59,82,0.45);margin-bottom:2px;">What made it hard</p><p style="font-size:12px;color:rgba(47,59,82,0.85);line-height:1.5;">35 years of work with minimal digital documentation, no project photos, no case study records. Site had to convey credibility through structure and certification proof rather than imagery.</p></div>
+              <div><p style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.1em;color:rgba(47,59,82,0.45);margin-bottom:2px;">Stack</p><div style="display:flex;flex-wrap:wrap;gap:6px;"><span style="padding:3px 8px;border-radius:9999px;background:rgba(47,59,82,0.1);font-size:11px;color:var(--navy-primary);font-weight:600;">HTML/CSS</span><span style="padding:3px 8px;border-radius:9999px;background:rgba(47,59,82,0.1);font-size:11px;color:var(--navy-primary);font-weight:600;">GitHub Pages</span><span style="padding:3px 8px;border-radius:9999px;background:rgba(47,59,82,0.1);font-size:11px;color:var(--navy-primary);font-weight:600;">Project portfolio</span><span style="padding:3px 8px;border-radius:9999px;background:rgba(47,59,82,0.1);font-size:11px;color:var(--navy-primary);font-weight:600;">Certifications showcase</span></div></div>
+            </div>
+          </div>
+        </div>
+      </article>
+
+      <article class="project-card" data-category="websites" style="border-radius:10px;border:1px solid #E0E4EA;background:#fff;padding:1.5rem;">
+        <div style="display:flex;flex-wrap:wrap;align-items:flex-start;justify-content:space-between;gap:0.75rem;margin-bottom:1rem;">
+          <span style="display:inline-block;border-radius:9999px;background:rgba(47,166,179,0.1);padding:4px 12px;font-size:11px;font-weight:600;color:var(--teal-accent);">Branding / Corporate · Website</span>
+          <span style="display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:600;color:#22c55e;"><span style="width:8px;height:8px;border-radius:50%;background:#22c55e;"></span> Live</span>
+        </div>
+        <h3 style="font-weight:700;font-size:16px;color:var(--navy-primary);margin-bottom:0.25rem;">Kalou Brands</h3>
+        <p style="font-size:13px;color:rgba(47,59,82,0.7);line-height:1.6;margin-bottom:1rem;border-bottom:1px solid #E0E4EA;padding-bottom:1rem;">Branding company in River Road, Nairobi. Strong portfolio, no digital presence to attract new clients.</p>
+        <div style="display:flex;flex-direction:column;gap:0.75rem;margin-bottom:1rem;">
+          <div><p style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.1em;color:rgba(47,59,82,0.45);margin-bottom:2px;">Problem</p><p style="font-size:12px;color:rgba(47,59,82,0.85);line-height:1.5;">Branding company in River Road with a strong portfolio but no online presence to showcase work and attract new clients searching for branding services.</p></div>
+          <div><p style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.1em;color:rgba(47,59,82,0.45);margin-bottom:2px;">Solution</p><p style="font-size:12px;color:rgba(47,59,82,0.85);line-height:1.5;">Professional corporate website showcasing branding services, portfolio, and contact flow positioned for River Road and Nairobi businesses.</p></div>
+          <div><p style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.1em;color:rgba(47,59,82,0.45);margin-bottom:2px;">Outcome</p><p style="font-size:12px;color:rgba(47,59,82,0.85);line-height:1.5;">Branding portfolio now visible online. Clients can discover and evaluate services before reaching out.</p></div>
+        </div>
+        <div style="display:flex;gap:0.75rem;">
+          <a href="https://kaloubrand.com" target="_blank" rel="noopener noreferrer" style="flex:1;min-width:8rem;display:inline-flex;align-items:center;justify-content:center;gap:6px;border-radius:6px;border:1px solid rgba(47,59,82,0.4);padding:6px 10px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;color:var(--navy-primary);text-decoration:none;">Visit Live Site ↗</a>
+        </div>
+      </article>
+
+      <article class="project-card" data-category="websites retail" style="border-radius:10px;border:1px solid #E0E4EA;background:#fff;padding:1.5rem;">
+        <div style="display:flex;flex-wrap:wrap;align-items:flex-start;justify-content:space-between;gap:0.75rem;margin-bottom:1rem;">
+          <span style="display:inline-block;border-radius:9999px;background:rgba(243,156,36,0.1);padding:4px 12px;font-size:11px;font-weight:600;color:var(--orange-energy);">Fashion / Retail · Website</span>
+          <span style="display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:600;color:#22c55e;"><span style="width:8px;height:8px;border-radius:50%;background:#22c55e;"></span> Live</span>
+        </div>
+        <h3 style="font-weight:700;font-size:16px;color:var(--navy-primary);margin-bottom:0.25rem;">Prince Esquire</h3>
+        <p style="font-size:13px;color:rgba(47,59,82,0.7);line-height:1.6;margin-bottom:1rem;border-bottom:1px solid #E0E4EA;padding-bottom:1rem;">Luxurious men's clothing on Vera Street, Nairobi. Premium apparel, no online catalogue.</p>
+        <div style="display:flex;flex-direction:column;gap:0.75rem;margin-bottom:1rem;">
+          <div><p style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.1em;color:rgba(47,59,82,0.45);margin-bottom:2px;">Problem</p><p style="font-size:12px;color:rgba(47,59,82,0.85);line-height:1.5;">Luxurious men's clothing and apparel on Vera Street, Nairobi, with no digital catalogue for clients to browse before visiting.</p></div>
+          <div><p style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.1em;color:rgba(47,59,82,0.45);margin-bottom:2px;">Solution</p><p style="font-size:12px;color:rgba(47,59,82,0.85);line-height:1.5;">Elegant website showcasing men's luxury apparel collections, lookbook-style gallery, and WhatsApp ordering flow.</p></div>
+          <div><p style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.1em;color:rgba(47,59,82,0.45);margin-bottom:2px;">Outcome</p><p style="font-size:12px;color:rgba(47,59,82,0.85);line-height:1.5;">Premium positioning communicated online. Clients browse collections and reach out directly via WhatsApp.</p></div>
+        </div>
+        <div style="display:flex;gap:0.75rem;">
+          <a href="https://prince-esquire.co.ke" target="_blank" rel="noopener noreferrer" style="flex:1;min-width:8rem;display:inline-flex;align-items:center;justify-content:center;gap:6px;border-radius:6px;border:1px solid rgba(47,59,82,0.4);padding:6px 10px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;color:var(--navy-primary);text-decoration:none;">Visit Live Site ↗</a>
+        </div>
+      </article>
+
+      <article class="project-card" data-category="websites retail" style="border-radius:10px;border:1px solid #E0E4EA;background:#fff;padding:1.5rem;">
+        <div style="display:flex;flex-wrap:wrap;align-items:flex-start;justify-content:space-between;gap:0.75rem;margin-bottom:1rem;">
+          <span style="display:inline-block;border-radius:9999px;background:rgba(243,156,36,0.1);padding:4px 12px;font-size:11px;font-weight:600;color:var(--orange-energy);">Fashion / Retail · Website</span>
+          <span style="display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:600;color:#22c55e;"><span style="width:8px;height:8px;border-radius:50%;background:#22c55e;"></span> Live</span>
+        </div>
+        <h3 style="font-weight:700;font-size:16px;color:var(--navy-primary);margin-bottom:0.25rem;">Elijays Men's Wear</h3>
+        <p style="font-size:13px;color:rgba(47,59,82,0.7);line-height:1.6;margin-bottom:1rem;border-bottom:1px solid #E0E4EA;padding-bottom:1rem;">Men's clothing brand on Bidiogo Street, Nairobi. Mature men's apparel, no online reach.</p>
+        <div style="display:flex;flex-direction:column;gap:0.75rem;margin-bottom:1rem;">
+          <div><p style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.1em;color:rgba(47,59,82,0.45);margin-bottom:2px;">Problem</p><p style="font-size:12px;color:rgba(47,59,82,0.85);line-height:1.5;">Clothing brand on Bidiogo Street selling to mature men, strong in-store offering but no digital presence to reach buyers outside foot traffic.</p></div>
+          <div><p style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.1em;color:rgba(47,59,82,0.45);margin-bottom:2px;">Solution</p><p style="font-size:12px;color:rgba(47,59,82,0.85);line-height:1.5;">Professional website showcasing men's apparel collections, product categories, and WhatsApp ordering for delivery.</p></div>
+          <div><p style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.1em;color:rgba(47,59,82,0.45);margin-bottom:2px;">Outcome</p><p style="font-size:12px;color:rgba(47,59,82,0.85);line-height:1.5;">Men's clothing brand now discoverable online. Clients browse and order without visiting the physical store.</p></div>
+        </div>
+        <div style="display:flex;gap:0.75rem;">
+          <a href="https://elijays-mens-wear.co.ke" target="_blank" rel="noopener noreferrer" style="flex:1;min-width:8rem;display:inline-flex;align-items:center;justify-content:center;gap:6px;border-radius:6px;border:1px solid rgba(47,59,82,0.4);padding:6px 10px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;color:var(--navy-primary);text-decoration:none;">Visit Live Site ↗</a>
+        </div>
+      </article>
+
+      <article class="project-card" data-category="websites retail" style="border-radius:10px;border:1px solid #E0E4EA;background:#fff;padding:1.5rem;">
+        <div style="display:flex;flex-wrap:wrap;align-items:flex-start;justify-content:space-between;gap:0.75rem;margin-bottom:1rem;">
+          <span style="display:inline-block;border-radius:9999px;background:rgba(47,166,179,0.1);padding:4px 12px;font-size:11px;font-weight:600;color:var(--teal-accent);">Footwear Retail · Website + SEO</span>
+          <span style="display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:600;color:#22c55e;"><span style="width:8px;height:8px;border-radius:50%;background:#22c55e;"></span> Live</span>
+        </div>
+        <h3 style="font-weight:700;font-size:16px;color:var(--navy-primary);margin-bottom:0.25rem;">White Light Store</h3>
+        <p style="font-size:13px;color:rgba(47,59,82,0.7);line-height:1.6;margin-bottom:1rem;border-bottom:1px solid #E0E4EA;padding-bottom:1rem;">Shoe shop in Rhoda Building, Lilia Avenue. Gym and running shoes, no Google visibility.</p>
+        <div style="display:flex;flex-direction:column;gap:0.75rem;margin-bottom:1rem;">
+          <div><p style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.1em;color:rgba(47,59,82,0.45);margin-bottom:2px;">Problem</p><p style="font-size:12px;color:rgba(47,59,82,0.85);line-height:1.5;">Shoe shop in Rhoda Building, Lilia Avenue, selling gym and running shoes, with no online discoverability for athletes and fitness buyers.</p></div>
+          <div><p style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.1em;color:rgba(47,59,82,0.45);margin-bottom:2px;">Solution</p><p style="font-size:12px;color:rgba(47,59,82,0.85);line-height:1.5;">SEO-optimised website showcasing gym and running shoe categories, product listings, and WhatsApp ordering.</p></div>
+          <div><p style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.1em;color:rgba(47,59,82,0.45);margin-bottom:2px;">Outcome</p><p style="font-size:12px;color:rgba(47,59,82,0.85);line-height:1.5;">Gym and running shoe inventory now discoverable via search. Clients find the shop online before visiting.</p></div>
+        </div>
+        <div style="display:flex;gap:0.75rem;">
+          <a href="https://whitelightstore.co.ke" target="_blank" rel="noopener noreferrer" style="flex:1;min-width:8rem;display:inline-flex;align-items:center;justify-content:center;gap:6px;border-radius:6px;border:1px solid rgba(47,59,82,0.4);padding:6px 10px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;color:var(--navy-primary);text-decoration:none;">Visit Live Site ↗</a>
+        </div>
+      </article>
+
+      <article class="project-card" data-category="websites retail" style="border-radius:10px;border:1px solid #E0E4EA;background:#fff;padding:1.5rem;">
+        <div style="display:flex;flex-wrap:wrap;align-items:flex-start;justify-content:space-between;gap:0.75rem;margin-bottom:1rem;">
+          <span style="display:inline-block;border-radius:9999px;background:rgba(47,166,179,0.1);padding:4px 12px;font-size:11px;font-weight:600;color:var(--teal-accent);">Home Décor / Retail · Website</span>
+          <span style="display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:600;color:#22c55e;"><span style="width:8px;height:8px;border-radius:50%;background:#22c55e;"></span> Live</span>
+        </div>
+        <h3 style="font-weight:700;font-size:16px;color:var(--navy-primary);margin-bottom:0.25rem;">Mohaa Finest Curtains</h3>
+        <p style="font-size:13px;color:rgba(47,59,82,0.7);line-height:1.6;margin-bottom:1rem;border-bottom:1px solid #E0E4EA;padding-bottom:1rem;">Curtain shop in Molili Mall, Shop S26. Quality curtains, no online catalogue.</p>
+        <div style="display:flex;flex-direction:column;gap:0.75rem;margin-bottom:1rem;">
+          <div><p style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.1em;color:rgba(47,59,82,0.45);margin-bottom:2px;">Problem</p><p style="font-size:12px;color:rgba(47,59,82,0.85);line-height:1.5;">Curtain shop in Molili Mall with quality products but no online presence for clients browsing home décor before visiting.</p></div>
+          <div><p style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.1em;color:rgba(47,59,82,0.45);margin-bottom:2px;">Solution</p><p style="font-size:12px;color:rgba(47,59,82,0.85);line-height:1.5;">Website showcasing curtain collections, styles, and pricing with WhatsApp ordering and delivery information.</p></div>
+          <div><p style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.1em;color:rgba(47,59,82,0.45);margin-bottom:2px;">Outcome</p><p style="font-size:12px;color:rgba(47,59,82,0.85);line-height:1.5;">Curtain collections now browsable online. Clients view products and reach out before visiting the mall.</p></div>
+        </div>
+        <div style="display:flex;gap:0.75rem;">
+          <a href="https://mohaafinestcurtains.co.ke" target="_blank" rel="noopener noreferrer" style="flex:1;min-width:8rem;display:inline-flex;align-items:center;justify-content:center;gap:6px;border-radius:6px;border:1px solid rgba(47,59,82,0.4);padding:6px 10px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;color:var(--navy-primary);text-decoration:none;">Visit Live Site ↗</a>
+        </div>
+      </article>
+
+      <article class="project-card" data-category="websites retail" style="border-radius:10px;border:1px solid #E0E4EA;background:#fff;padding:1.5rem;">
+        <div style="display:flex;flex-wrap:wrap;align-items:flex-start;justify-content:space-between;gap:0.75rem;margin-bottom:1rem;">
+          <span style="display:inline-block;border-radius:9999px;background:rgba(47,166,179,0.1);padding:4px 12px;font-size:11px;font-weight:600;color:var(--teal-accent);">Home Décor / Retail · Website</span>
+          <span style="display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:600;color:#22c55e;"><span style="width:8px;height:8px;border-radius:50%;background:#22c55e;"></span> Live</span>
+        </div>
+        <h3 style="font-weight:700;font-size:16px;color:var(--navy-primary);margin-bottom:0.25rem;">Abdii Finest Curtains</h3>
+        <p style="font-size:13px;color:rgba(47,59,82,0.7);line-height:1.6;margin-bottom:1rem;border-bottom:1px solid #E0E4EA;padding-bottom:1rem;">Curtain shop in Molili Mall, Shop S26, 2nd Floor. Quality curtains, no digital presence.</p>
+        <div style="display:flex;flex-direction:column;gap:0.75rem;margin-bottom:1rem;">
+          <div><p style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.1em;color:rgba(47,59,82,0.45);margin-bottom:2px;">Problem</p><p style="font-size:12px;color:rgba(47,59,82,0.85);line-height:1.5;">Curtain shop on the second floor of Molili Mall, strong products but invisible to online shoppers researching home décor.</p></div>
+          <div><p style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.1em;color:rgba(47,59,82,0.45);margin-bottom:2px;">Solution</p><p style="font-size:12px;color:rgba(47,59,82,0.85);line-height:1.5;">Website with curtain catalogue, style galleries, pricing information, and WhatsApp ordering with delivery options.</p></div>
+          <div><p style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.1em;color:rgba(47,59,82,0.45);margin-bottom:2px;">Outcome</p><p style="font-size:12px;color:rgba(47,59,82,0.85);line-height:1.5;">Online catalogue attracting clients who browse before visiting. WhatsApp orders coming in from the website.</p></div>
+        </div>
+        <div style="display:flex;gap:0.75rem;">
+          <a href="https://abdiifinestcurtains.co.ke" target="_blank" rel="noopener noreferrer" style="flex:1;min-width:8rem;display:inline-flex;align-items:center;justify-content:center;gap:6px;border-radius:6px;border:1px solid rgba(47,59,82,0.4);padding:6px 10px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;color:var(--navy-primary);text-decoration:none;">Visit Live Site ↗</a>
+        </div>
+      </article>
+
+    </div>
+  </div>
+</section>
+
+<section class="section-dark scroll-reveal" style="text-align:center;">
+  <div class="section-container">
+    <span class="eyebrow">See the Results</span>
+    <h2 class="section-title">Want to see the numbers?</h2>
+    <p class="section-subtitle" style="margin:0 auto 2rem;text-align:center;">We publish case studies with real metrics, revenue impact, cost savings, efficiency gains. No vanity screenshots.</p>
+    <div style="display:flex;gap:16px;justify-content:center;flex-wrap:wrap;">
+      <a href="/case-studies" class="hero-btn-primary">View Case Studies →</a>
+      <a href="https://wa.me/254708805496?text=Hi%2C%20I%27d%20like%20to%20book%20a%20strategy%20session%20with%20CRES%20Dynamics." target="_blank" rel="noopener noreferrer" class="hero-btn-glass">Book Strategy Session</a>
+    </div>
+  </div>
+</section>
+
+<script>
+function filterProjects(filter) {
+  var cards = document.querySelectorAll('.project-card');
+  var btns = document.querySelectorAll('.filter-btn');
+  btns.forEach(function(b) { b.classList.remove('active'); });
+  document.querySelector('[data-filter="'+filter+'"]').classList.add('active');
+  cards.forEach(function(c) {
+    if (filter === 'all') { c.classList.remove('hidden'); }
+    else { c.classList.toggle('hidden', !c.dataset.category.includes(filter)); }
+  });
+}
+function toggleProject(btn) {
+  var expand = btn.closest('article').querySelector('.project-expand');
+  var isOpen = expand.style.gridTemplateRows === '1fr';
+  expand.style.gridTemplateRows = isOpen ? '0fr' : '1fr';
+  btn.textContent = isOpen ? 'View Case Study ▾' : 'Close ▴';
+}
+</script>
