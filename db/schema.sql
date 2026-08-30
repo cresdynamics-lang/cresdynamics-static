@@ -73,6 +73,8 @@ CREATE TABLE IF NOT EXISTS event_reservations (
   payment_due_at TIMESTAMPTZ,
   payment_reminder_sent_at TIMESTAMPTZ,
   registration_step TEXT,
+  payment_choice TEXT,
+  poster_image_path TEXT,
   reschedule_email_sent_at TIMESTAMPTZ,
   UNIQUE (event_title, event_date, email)
 );

@@ -25,12 +25,13 @@
       <table class="admin-table">
         <thead>
           <tr>
-            <th>Ticket #</th>
             <th>Name</th>
-            <th>Company</th>
             <th>Email</th>
             <th>Phone</th>
-            <th>Ticket Type</th>
+            <th>Ticket</th>
+            <th>Lanyard</th>
+            <th>Payment</th>
+            <th>Poster</th>
             <th>Status</th>
             <th>Actions</th>
           </tr>
@@ -70,27 +71,33 @@
       const tbody = document.getElementById('reservations-table');
       
       if (reservations.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="8" class="empty">No reservations found</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="9" class="empty">No reservations found</td></tr>';
         return;
       }
       
-      tbody.innerHTML = reservations.map(r => `
-        <tr>
-          <td>${r.ticketNumber}</td>
-          <td>${r.name}</td>
-          <td>${r.company}</td>
-          <td>${r.email}</td>
-          <td>${r.phone}</td>
-          <td>${r.ticketType}</td>
-          <td><span class="status-badge ${r.bookingStatus === 'paid' ? 'paid' : r.bookingStatus === 'cancelled' ? 'cancelled' : 'unpaid'}">${r.bookingStatus === 'paid' ? 'Paid' : r.bookingStatus === 'cancelled' ? 'Cancelled' : 'Pending'}</span></td>
-          <td class="actions">
-            ${!r.paid ? `<button onclick="markPaid(${r.id})" class="action-btn success">Mark Paid</button>` : ''}
-            <button onclick="cancelReservation(${r.id})" class="action-btn warning">Cancel</button>
-            <button onclick="deleteReservation(${r.id})" class="action-btn danger">Delete</button>
-            <a href="https://wa.me/${r.phone}" target="_blank" class="action-btn">WhatsApp</a>
-          </td>
-        </tr>
-      `).join('');
+      var LANYARD_COLORS = { developer:'#2FA6B3', founder:'#F39C24', hiring:'#10B981', jobSeeker:'#3B82F6', speaker:'#EC4899' };
+      var LANYARD_LABELS = { developer:'Developer', founder:'Business Owner', hiring:'Hiring', jobSeeker:'Job Seeker', speaker:'Speaker' };
+      
+      tbody.innerHTML = reservations.map(r => {
+        var lColor = LANYARD_COLORS[r.lanyardCategory] || '#888';
+        var lLabel = LANYARD_LABELS[r.lanyardCategory] || r.lanyardCategory || '-';
+        var payLabel = r.paymentChoice === 'pay_now' ? 'Pay Now' : r.paymentChoice === 'pay_later' ? 'Pay Later' : '-';
+        var posterCell = r.posterImagePath ? '<a href="'+r.posterImagePath+'" target="_blank" style="color:#2FA6B3;font-size:12px;">View poster</a>' : '<span style="color:#555;font-size:12px;">—</span>';
+        return '<tr>' +
+          '<td>' + r.name + '</td>' +
+          '<td>' + r.email + '</td>' +
+          '<td>' + r.phone + '</td>' +
+          '<td>' + r.ticketType + '</td>' +
+          '<td><span style="color:'+lColor+';font-weight:600;">'+lLabel+'</span></td>' +
+          '<td>' + payLabel + '</td>' +
+          '<td>' + posterCell + '</td>' +
+          '<td><span class="status-badge '+(r.bookingStatus === 'paid' ? 'paid' : r.bookingStatus === 'cancelled' ? 'cancelled' : 'unpaid')+'">'+(r.bookingStatus === 'paid' ? 'Paid' : r.bookingStatus === 'cancelled' ? 'Cancelled' : 'Pending')+'</span></td>' +
+          '<td class="actions">' +
+          (!r.paid ? '<button onclick="markPaid('+r.id+')" class="action-btn success">Mark Paid</button> ' : '') +
+          '<button onclick="deleteReservation('+r.id+')" class="action-btn danger">Delete</button>' +
+          (r.phone ? ' <a href="https://wa.me/'+r.phone.replace(/[^0-9]/g,'')+'" target="_blank" class="action-btn">WhatsApp</a>' : '') +
+          '</td></tr>';
+      }).join('');
     } catch (err) {
       console.error('Failed to load reservations:', err);
     }

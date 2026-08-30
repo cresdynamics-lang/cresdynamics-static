@@ -208,20 +208,21 @@ app.post('/api/careers/apply', upload.single('cv'), async (req, res) => {
 // Event registration
 app.post('/api/events/register', async (req, res) => {
   try {
-    const { eventTitle, eventDate, firstName, lastName, email, phone, company, ticketType, attendanceType, lanyardCategory, additionalAttendees } = req.body;
+    const { eventTitle, eventDate, firstName, lastName, email, phone, company, ticketType, lanyardCategory, paymentChoice } = req.body;
     if (!firstName || !email) {
       return res.status(400).json({ error: 'Missing required fields' });
     }
     const result = await db.query(
-      `INSERT INTO event_reservations (event_title, event_date, first_name, last_name, email, phone, company, ticket_type, attendance_type, lanyard_category, additional_attendees)
+      `INSERT INTO event_reservations (event_title, event_date, first_name, last_name, email, phone, company, ticket_type, lanyard_category, payment_choice, booking_status)
        VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11)
        ON CONFLICT (event_title, event_date, email) DO UPDATE SET
          first_name = EXCLUDED.first_name, last_name = EXCLUDED.last_name,
          phone = EXCLUDED.phone, company = EXCLUDED.company,
          ticket_type = EXCLUDED.ticket_type, lanyard_category = EXCLUDED.lanyard_category,
-         additional_attendees = EXCLUDED.additional_attendees, updated_at = now()
+         payment_choice = COALESCE(NULLIF(EXCLUDED.payment_choice,''), event_reservations.payment_choice),
+         updated_at = now()
        RETURNING id`,
-       [eventTitle || 'The Future of AI in Business', eventDate || '31 October 2026', firstName, lastName || null, email, phone || null, company || null, ticketType || 'standard', attendanceType || null, lanyardCategory || null, additionalAttendees || 0]
+       [eventTitle || 'The Future of AI in Business', eventDate || '31 October 2026', firstName, lastName || null, email, phone || null, company || null, ticketType || 'standard', lanyardCategory || null, paymentChoice || null, paymentChoice === 'pay_now' ? 'pending' : 'pending']
     );
 
     if (hasResendConfigured()) {
@@ -241,9 +242,7 @@ app.post('/api/events/register', async (req, res) => {
           <p><strong>Phone:</strong> ${escapeHtml(phone || '')}</p>
           <p><strong>Company:</strong> ${escapeHtml(company || '')}</p>
           <p><strong>Ticket:</strong> ${escapeHtml(ticketLabel)}</p>
-          <p><strong>Lanyard:</strong> ${escapeHtml(lanyardLabel)}</p>
-          <p><strong>Attendance:</strong> ${escapeHtml(attendanceType || 'in-person')}</p>
-          <p><strong>Additional attendees:</strong> ${additionalAttendees || 0}</p>`,
+          <p><strong>Lanyard:</strong> ${escapeHtml(lanyardLabel)}</p>`,
         replyTo: email,
       }).catch(e => console.error('Email send failed:', e.message));
 
@@ -286,7 +285,7 @@ app.post('/api/events/register', async (req, res) => {
           <td style="padding:6px 0;color:#4a5568;font-size:14px;">1:30 PM – 7:00 PM EAT</td>
         </tr><tr>
           <td style="padding:6px 0;color:#4a5568;font-size:14px;vertical-align:top;">🎫</td>
-          <td style="padding:6px 0;color:#4a5568;font-size:14px;"><strong>${escapeHtml(ticketLabel)} Ticket</strong> · ${escapeHtml(attendanceType || 'In-Person')}</td>
+          <td style="padding:6px 0;color:#4a5568;font-size:14px;"><strong>${escapeHtml(ticketLabel)} Ticket</strong></td>
         </tr></table>
       </td></tr>
     </table>
@@ -329,7 +328,7 @@ app.post('/api/events/register', async (req, res) => {
             <table width="100%" cellpadding="0" cellspacing="0">
               <tr><td style="padding:3px 0;color:#6b7280;font-size:13px;">Bank: KCB Bank</td></tr>
               <tr><td style="padding:3px 0;color:#1a202c;font-size:13px;font-weight:600;">Account: CRES Dynamics Ltd</td></tr>
-              <tr><td style="padding:3px 0;color:#1a202c;font-size:13px;font-weight:600;">Account Number: 1234567890</td></tr>
+              <tr><td style="padding:3px 0;color:#1a202c;font-size:13px;font-weight:600;">Account Number: 01209982836350</td></tr>
               <tr><td style="padding:3px 0;color:#6b7280;font-size:13px;">Reference: ${escapeHtml(accountRef)}-${escapeHtml(firstName.substring(0,4).toUpperCase())}</td></tr>
             </table>
           </td></tr>
@@ -372,25 +371,24 @@ app.post('/api/events/register', async (req, res) => {
 // Auto-save event registration draft
 app.post('/api/events/register-draft', async (req, res) => {
   try {
-    const { eventTitle, eventDate, firstName, lastName, email, phone, company, ticketType, attendanceType, lanyardCategory, additionalAttendees } = req.body;
+    const { eventTitle, eventDate, firstName, lastName, email, phone, company, ticketType, lanyardCategory, paymentChoice } = req.body;
     if (!email) return res.json({ ok: true, mode: 'skip' });
     const eTitle = eventTitle || 'The Future of AI in Business';
     const eDate = eventDate || '31 October 2026';
     if (db.pool) {
       await db.query(
-        `INSERT INTO event_reservations (event_title, event_date, first_name, last_name, email, phone, company, ticket_type, attendance_type, lanyard_category, additional_attendees)
-         VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11)
+        `INSERT INTO event_reservations (event_title, event_date, first_name, last_name, email, phone, company, ticket_type, lanyard_category, payment_choice)
+         VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10)
          ON CONFLICT (event_title, event_date, email) DO UPDATE SET
            first_name = COALESCE(NULLIF(EXCLUDED.first_name,''), event_reservations.first_name),
            last_name = COALESCE(NULLIF(EXCLUDED.last_name,''), event_reservations.last_name),
            phone = COALESCE(NULLIF(EXCLUDED.phone,''), event_reservations.phone),
            company = COALESCE(NULLIF(EXCLUDED.company,''), event_reservations.company),
            ticket_type = EXCLUDED.ticket_type,
-           attendance_type = COALESCE(NULLIF(EXCLUDED.attendance_type,''), event_reservations.attendance_type),
            lanyard_category = COALESCE(NULLIF(EXCLUDED.lanyard_category,''), event_reservations.lanyard_category),
-           additional_attendees = EXCLUDED.additional_attendees,
+           payment_choice = COALESCE(NULLIF(EXCLUDED.payment_choice,''), event_reservations.payment_choice),
            updated_at = now()`,
-        [eTitle, eDate, firstName || null, lastName || null, email, phone || null, company || null, ticketType || 'standard', attendanceType || null, lanyardCategory || null, additionalAttendees || 0]
+        [eTitle, eDate, firstName || null, lastName || null, email, phone || null, company || null, ticketType || 'standard', lanyardCategory || null, paymentChoice || null]
       );
     } else {
       if (!global._draftRegistrations) global._draftRegistrations = new Map();
@@ -402,9 +400,8 @@ app.post('/api/events/register-draft', async (req, res) => {
         email, phone: phone || existing.phone || null,
         company: company || existing.company || null,
         ticket_type: ticketType || existing.ticket_type || 'standard',
-        attendance_type: attendanceType || existing.attendance_type || null,
         lanyard_category: lanyardCategory || existing.lanyard_category || null,
-        additional_attendees: additionalAttendees || existing.additional_attendees || 0,
+        payment_choice: paymentChoice || existing.payment_choice || null,
         updated_at: new Date().toISOString(),
       });
     }
@@ -412,6 +409,32 @@ app.post('/api/events/register-draft', async (req, res) => {
   } catch (err) {
     console.error('Draft save error:', err.message);
     res.json({ ok: true });
+  }
+});
+
+// Save attendee poster image (base64 PNG from canvas)
+app.post('/api/events/register/save-image', async (req, res) => {
+  try {
+    const { email, imageData } = req.body;
+    if (!email || !imageData) return res.status(400).json({ error: 'Missing email or image data' });
+    const base64 = imageData.replace(/^data:image\/\w+;base64,/, '');
+    const buf = Buffer.from(base64, 'base64');
+    if (buf.length > 10 * 1024 * 1024) return res.status(400).json({ error: 'Image too large (max 10MB)' });
+    const slug = (email.split('@')[0] || 'attendee').replace(/[^a-z0-9]+/gi, '-').slice(0, 40);
+    const filename = `poster-${slug}-${Date.now()}.png`;
+    const fs = require('fs');
+    fs.writeFileSync(path.join(__dirname, 'uploads', filename), buf);
+    const imageUrl = `/uploads/${filename}`;
+    if (db.pool) {
+      await db.query(
+        `UPDATE event_reservations SET poster_image_path = $1, updated_at = now() WHERE event_title = 'The Future of AI in Business' AND email = $2`,
+        [imageUrl, email]
+      );
+    }
+    res.json({ ok: true, url: imageUrl });
+  } catch (err) {
+    console.error('Save poster image error:', err.message);
+    res.status(500).json({ error: 'Failed to save image' });
   }
 });
 
@@ -753,8 +776,10 @@ app.get('/api/admin/events/reservations', adminAuth, async (req, res) => {
       email: r.email,
       phone: r.phone || '',
       ticketType: r.ticket_type || '-',
-      attendanceType: r.attendance_type || '',
       lanyardCategory: r.lanyard_category || '',
+      paymentChoice: r.payment_choice || '',
+      posterImagePath: r.poster_image_path || '',
+      registrationStep: r.registration_step || '',
       bookingStatus: r.booking_status || 'pending',
       paid: (r.booking_status === 'paid'),
       createdAt: r.created_at

@@ -601,112 +601,162 @@
       <div id="register-form-area">
         <div style="border-radius:1rem;padding:2rem;border:1px solid rgba(47,166,179,0.2);background:rgba(10,37,64,0.3);">
           <h3 style="font-weight:900;font-size:1.5rem;margin-bottom:0.5rem;">Reserve your seat</h3>
-          <p style="font-size:0.85rem;color:rgba(255,255,255,0.5);margin-bottom:1.5rem;">31 October 2026 · Sarit Expo Centre, Nairobi</p>
+          <p style="font-size:0.85rem;color:rgba(255,255,255,0.5);margin-bottom:1.25rem;">31 October 2026 · Sarit Expo Centre, Nairobi</p>
+
+          <!-- Step indicators -->
+          <div style="display:flex;align-items:center;margin-bottom:1.5rem;">
+            <div id="step-dot-1" class="step-dot active" onclick="regGoStep(1)" style="width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:0.8rem;background:#2FA6B3;color:#fff;border:2px solid #2FA6B3;cursor:pointer;flex-shrink:0;">1</div>
+            <div style="flex:1;height:2px;background:rgba(255,255,255,0.12);margin:0 0.5rem;" class="step-line-1"></div>
+            <div id="step-dot-2" class="step-dot" onclick="regGoStep(2)" style="width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:0.8rem;background:rgba(255,255,255,0.06);color:rgba(255,255,255,0.4);border:2px solid rgba(255,255,255,0.15);cursor:pointer;flex-shrink:0;">2</div>
+            <div style="flex:1;height:2px;background:rgba(255,255,255,0.12);margin:0 0.5rem;" class="step-line-2"></div>
+            <div id="step-dot-3" class="step-dot" onclick="regGoStep(3)" style="width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:0.8rem;background:rgba(255,255,255,0.06);color:rgba(255,255,255,0.4);border:2px solid rgba(255,255,255,0.15);cursor:pointer;flex-shrink:0;">3</div>
+            <div style="flex:1;height:2px;background:rgba(255,255,255,0.12);margin:0 0.5rem;" class="step-line-3"></div>
+            <div id="step-dot-4" class="step-dot" onclick="regGoStep(4)" style="width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:0.8rem;background:rgba(255,255,255,0.06);color:rgba(255,255,255,0.4);border:2px solid rgba(255,255,255,0.15);cursor:pointer;flex-shrink:0;">4</div>
+          </div>
 
           <form data-form="event-register" id="event-register-form" style="display:flex;flex-direction:column;gap:0.75rem;">
             <input type="hidden" name="eventTitle" value="The Future of AI in Business">
             <input type="hidden" name="eventDate" value="31 October 2026">
-            <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.75rem;">
-              <div>
-                <label class="form-label">First Name *</label>
-                <input type="text" name="firstName" class="form-input" required placeholder="James">
-              </div>
-              <div>
-                <label class="form-label">Last Name</label>
-                <input type="text" name="lastName" class="form-input" placeholder="Mwangi">
-              </div>
-            </div>
-            <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.75rem;">
-              <div>
-                <label class="form-label">Email *</label>
-                <input type="email" name="email" class="form-input" required placeholder="you@company.co.ke">
-              </div>
-              <div>
-                <label class="form-label">Phone</label>
-                <input type="tel" name="phone" class="form-input" placeholder="+254 712 345 678">
-              </div>
-            </div>
-            <div>
-              <label class="form-label">Company</label>
-              <input type="text" name="company" class="form-input" placeholder="Your company name">
-            </div>
-            <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.75rem;">
-              <div>
-                <label class="form-label">Ticket Type *</label>
-                <select name="ticketType" id="ticketType" class="form-input" required>
-                  <option value="standard">Standard</option>
-                  <option value="vip">VIP</option>
-                </select>
-              </div>
-              <div>
-                <label class="form-label">Attendance *</label>
-                <select name="attendanceType" class="form-input" required>
-                  <option value="in-person">In-Person</option>
-                  <option value="virtual">Virtual</option>
-                </select>
-              </div>
-            </div>
-            <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.75rem;">
-              <div>
-                <label class="form-label" style="display:block;margin-bottom:0.5rem;">Your lanyard * <span style="color:rgba(255,255,255,0.5);font-weight:400;">— your lanyard colour says who you are</span></label>
-                <div class="lanyard-picker" style="display:flex;flex-wrap:wrap;gap:0.45rem;">
-                  <button type="button" class="lanyard-chip" data-value="developer" data-color="#2FA6B3" style="display:flex;align-items:center;gap:0.5rem;padding:0.5rem 0.75rem;border-radius:999px;border:1px solid rgba(255,255,255,0.14);background:rgba(255,255,255,0.04);cursor:pointer;color:#e5e7eb;font-size:0.75rem;font-weight:700;">
-                    <span style="width:14px;height:14px;border-radius:50%;background:#2FA6B3;display:inline-block;flex-shrink:0;"></span>Developer
-                  </button>
-                  <button type="button" class="lanyard-chip" data-value="founder" data-color="#F39C24" style="display:flex;align-items:center;gap:0.5rem;padding:0.5rem 0.75rem;border-radius:999px;border:1px solid rgba(255,255,255,0.14);background:rgba(255,255,255,0.04);cursor:pointer;color:#e5e7eb;font-size:0.75rem;font-weight:700;">
-                    <span style="width:14px;height:14px;border-radius:50%;background:#F39C24;display:inline-block;flex-shrink:0;"></span>Business Owner
-                  </button>
-                  <button type="button" class="lanyard-chip" data-value="hiring" data-color="#10B981" style="display:flex;align-items:center;gap:0.5rem;padding:0.5rem 0.75rem;border-radius:999px;border:1px solid rgba(255,255,255,0.14);background:rgba(255,255,255,0.04);cursor:pointer;color:#e5e7eb;font-size:0.75rem;font-weight:700;">
-                    <span style="width:14px;height:14px;border-radius:50%;background:#10B981;display:inline-block;flex-shrink:0;"></span>Hiring
-                  </button>
-                  <button type="button" class="lanyard-chip" data-value="jobSeeker" data-color="#3B82F6" style="display:flex;align-items:center;gap:0.5rem;padding:0.5rem 0.75rem;border-radius:999px;border:1px solid rgba(255,255,255,0.14);background:rgba(255,255,255,0.04);cursor:pointer;color:#e5e7eb;font-size:0.75rem;font-weight:700;">
-                    <span style="width:14px;height:14px;border-radius:50%;background:#3B82F6;display:inline-block;flex-shrink:0;"></span>Job Seeker
-                  </button>
-                  <button type="button" class="lanyard-chip" data-value="speaker" data-color="#EC4899" style="display:flex;align-items:center;gap:0.5rem;padding:0.5rem 0.75rem;border-radius:999px;border:1px solid rgba(255,255,255,0.14);background:rgba(255,255,255,0.04);cursor:pointer;color:#e5e7eb;font-size:0.75rem;font-weight:700;">
-                    <span style="width:14px;height:14px;border-radius:50%;background:#EC4899;display:inline-block;flex-shrink:0;"></span>Speaker
-                  </button>
+            <input type="hidden" name="lanyardCategory" id="lanyardCategory" value="">
+            <input type="hidden" name="paymentChoice" id="paymentChoice" value="">
+
+            <!-- STEP 1: Your Details -->
+            <div id="reg-step-1">
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.75rem;">
+                <div>
+                  <label class="form-label">First Name *</label>
+                  <input type="text" name="firstName" id="reg-firstName" class="form-input" required placeholder="James">
                 </div>
-                <input type="hidden" name="lanyardCategory" id="lanyardCategory" value="">
-                <p style="font-size:10px;color:rgba(255,255,255,0.45);margin-top:4px;" id="lanyard-hint">Each colour is printed on your lanyard and tells everyone what you do at the event.</p>
+                <div>
+                  <label class="form-label">Last Name</label>
+                  <input type="text" name="lastName" id="reg-lastName" class="form-input" placeholder="Mwangi">
+                </div>
               </div>
-              <div>
-                <label class="form-label">Additional Attendees</label>
-                <input type="number" name="additionalAttendees" class="form-input" value="0" min="0" max="10">
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.75rem;margin-top:0.75rem;">
+                <div>
+                  <label class="form-label">Email *</label>
+                  <input type="email" name="email" id="reg-email" class="form-input" required placeholder="you@company.co.ke">
+                </div>
+                <div>
+                  <label class="form-label">Phone</label>
+                  <input type="tel" name="phone" id="reg-phone" class="form-input" placeholder="+254 712 345 678">
+                </div>
+              </div>
+              <div style="margin-top:0.75rem;">
+                <label class="form-label">Company</label>
+                <input type="text" name="company" id="reg-company" class="form-input" placeholder="Your company name">
+              </div>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.75rem;margin-top:0.75rem;">
+                <div>
+                  <label class="form-label">Ticket Type *</label>
+                  <select name="ticketType" id="ticketType" class="form-input" required>
+                    <option value="standard">Standard — KES 2,500</option>
+                    <option value="vip">VIP — KES 4,000</option>
+                  </select>
+                </div>
+              </div>
+              <button type="button" onclick="regGoStep(2)" style="width:100%;padding:0.875rem;border-radius:0.75rem;font-weight:700;font-size:0.875rem;background:#2FA6B3;color:#fff;border:none;cursor:pointer;margin-top:1rem;transition:all 0.2s;">Next →</button>
+            </div>
+
+            <!-- STEP 2: Your Lanyard -->
+            <div id="reg-step-2" style="display:none;">
+              <p style="font-size:0.85rem;color:rgba(255,255,255,0.6);margin-bottom:1rem;">Pick your colour-coded lanyard — it tells everyone what you do at the event.</p>
+              <div class="lanyard-picker" style="display:flex;flex-wrap:wrap;gap:0.5rem;">
+                <button type="button" class="lanyard-chip" data-value="developer" data-color="#2FA6B3" style="display:flex;align-items:center;gap:0.5rem;padding:0.6rem 1rem;border-radius:999px;border:1px solid rgba(255,255,255,0.14);background:rgba(255,255,255,0.04);cursor:pointer;color:#e5e7eb;font-size:0.8rem;font-weight:700;">
+                  <span style="width:14px;height:14px;border-radius:50%;background:#2FA6B3;display:inline-block;flex-shrink:0;"></span>Developer
+                </button>
+                <button type="button" class="lanyard-chip" data-value="founder" data-color="#F39C24" style="display:flex;align-items:center;gap:0.5rem;padding:0.6rem 1rem;border-radius:999px;border:1px solid rgba(255,255,255,0.14);background:rgba(255,255,255,0.04);cursor:pointer;color:#e5e7eb;font-size:0.8rem;font-weight:700;">
+                  <span style="width:14px;height:14px;border-radius:50%;background:#F39C24;display:inline-block;flex-shrink:0;"></span>Business Owner
+                </button>
+                <button type="button" class="lanyard-chip" data-value="hiring" data-color="#10B981" style="display:flex;align-items:center;gap:0.5rem;padding:0.6rem 1rem;border-radius:999px;border:1px solid rgba(255,255,255,0.14);background:rgba(255,255,255,0.04);cursor:pointer;color:#e5e7eb;font-size:0.8rem;font-weight:700;">
+                  <span style="width:14px;height:14px;border-radius:50%;background:#10B981;display:inline-block;flex-shrink:0;"></span>Hiring
+                </button>
+                <button type="button" class="lanyard-chip" data-value="jobSeeker" data-color="#3B82F6" style="display:flex;align-items:center;gap:0.5rem;padding:0.6rem 1rem;border-radius:999px;border:1px solid rgba(255,255,255,0.14);background:rgba(255,255,255,0.04);cursor:pointer;color:#e5e7eb;font-size:0.8rem;font-weight:700;">
+                  <span style="width:14px;height:14px;border-radius:50%;background:#3B82F6;display:inline-block;flex-shrink:0;"></span>Job Seeker
+                </button>
+                <button type="button" class="lanyard-chip" data-value="speaker" data-color="#EC4899" style="display:flex;align-items:center;gap:0.5rem;padding:0.6rem 1rem;border-radius:999px;border:1px solid rgba(255,255,255,0.14);background:rgba(255,255,255,0.04);cursor:pointer;color:#e5e7eb;font-size:0.8rem;font-weight:700;">
+                  <span style="width:14px;height:14px;border-radius:50%;background:#EC4899;display:inline-block;flex-shrink:0;"></span>Speaker
+                </button>
+              </div>
+              <p style="font-size:10px;color:rgba(255,255,255,0.45);margin-top:6px;" id="lanyard-hint">Each colour is printed on your lanyard and tells everyone what you do at the event.</p>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.75rem;margin-top:1rem;">
+                <button type="button" onclick="regGoStep(1)" style="padding:0.875rem;border-radius:0.75rem;font-weight:700;font-size:0.875rem;background:rgba(255,255,255,0.06);color:#fff;border:1px solid rgba(255,255,255,0.2);cursor:pointer;">← Back</button>
+                <button type="button" onclick="regGoStep(3)" style="padding:0.875rem;border-radius:0.75rem;font-weight:700;font-size:0.875rem;background:#2FA6B3;color:#fff;border:none;cursor:pointer;">Next →</button>
               </div>
             </div>
-            <button type="submit" class="hero-btn-primary" style="background:var(--orange-energy);color:#fff;width:100%;justify-content:center;margin-top:0.5rem;">Complete Registration →</button>
+
+            <!-- STEP 3: Payment -->
+            <div id="reg-step-3" style="display:none;">
+              <div style="text-align:center;padding:1.5rem 0;">
+                <div style="width:56px;height:56px;border-radius:50%;background:rgba(16,185,129,0.15);border:2px solid #10B981;display:flex;align-items:center;justify-content:center;margin:0 auto 1rem;font-size:1.5rem;">✓</div>
+                <h3 style="font-weight:900;font-size:1.35rem;color:#fff;margin-bottom:0.35rem;">You're successfully booked!</h3>
+                <p style="font-size:0.85rem;color:rgba(255,255,255,0.55);">Your seat is reserved. Complete your payment to confirm.</p>
+              </div>
+
+              <div style="border:1px solid rgba(255,255,255,0.12);border-radius:0.75rem;padding:1rem;margin-bottom:1rem;">
+                <p style="font-size:0.8rem;color:rgba(255,255,255,0.5);font-weight:600;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:0.75rem;">How would you like to pay?</p>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.75rem;">
+                  <button type="button" id="pay-now-btn" onclick="regSelectPayment('pay_now')" style="padding:0.875rem;border-radius:0.75rem;font-weight:700;font-size:0.85rem;background:rgba(243,156,36,0.12);color:#F39C24;border:2px solid rgba(243,156,36,0.35);cursor:pointer;text-align:center;">Pay Now</button>
+                  <button type="button" id="pay-later-btn" onclick="regSelectPayment('pay_later')" style="padding:0.875rem;border-radius:0.75rem;font-weight:700;font-size:0.85rem;background:rgba(255,255,255,0.04);color:rgba(255,255,255,0.6);border:2px solid rgba(255,255,255,0.12);cursor:pointer;text-align:center;">Pay Later</button>
+                </div>
+              </div>
+
+              <!-- Payment details (shown when Pay Now selected) -->
+              <div id="pay-now-details" style="display:none;">
+                <!-- M-Pesa -->
+                <div style="border:1px solid rgba(47,166,179,0.25);border-radius:0.75rem;padding:1rem;margin-bottom:0.75rem;background:rgba(47,166,179,0.06);">
+                  <p style="font-size:0.8rem;font-weight:700;color:#2FA6B3;margin-bottom:0.5rem;">M-Pesa (Safaricom)</p>
+                  <div style="font-size:0.8rem;color:rgba(255,255,255,0.7);line-height:1.8;">
+                    <p>1. Lipa na M-Pesa → Pay Bill</p>
+                    <p>2. Business Number: <strong style="color:#fff;">542542</strong></p>
+                    <p>3. Account: <strong style="color:#fff;">43869</strong></p>
+                    <p>4. Amount: <strong style="color:#fff;" id="mpesa-amount">KES 2,500</strong></p>
+                    <p>5. Enter your M-Pesa PIN and confirm</p>
+                  </div>
+                </div>
+                <!-- Bank Transfer -->
+                <div style="border:1px solid rgba(255,255,255,0.12);border-radius:0.75rem;padding:1rem;background:rgba(255,255,255,0.03);">
+                  <p style="font-size:0.8rem;font-weight:700;color:rgba(255,255,255,0.8);margin-bottom:0.5rem;">Bank Transfer</p>
+                  <div style="font-size:0.8rem;color:rgba(255,255,255,0.7);line-height:1.8;">
+                    <p>Bank: KCB Bank</p>
+                    <p>Account Name: <strong style="color:#fff;">CRES Dynamics Ltd</strong></p>
+                    <p>Account Number: <strong style="color:#fff;">01209982836350</strong></p>
+                    <p>Reference: <strong style="color:#fff;" id="bank-ref">43869-JAME</strong></p>
+                  </div>
+                </div>
+              </div>
+
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.75rem;margin-top:1rem;">
+                <button type="button" onclick="regGoStep(2)" style="padding:0.875rem;border-radius:0.75rem;font-weight:700;font-size:0.875rem;background:rgba(255,255,255,0.06);color:#fff;border:1px solid rgba(255,255,255,0.2);cursor:pointer;">← Back</button>
+                <button type="button" onclick="regGoStep(4)" style="padding:0.875rem;border-radius:0.75rem;font-weight:700;font-size:0.875rem;background:#F39C24;color:#060B18;border:none;cursor:pointer;">Continue to your poster →</button>
+              </div>
+            </div>
+
+            <!-- STEP 4: Photo + Poster -->
+            <div id="reg-step-4" style="display:none;">
+              <p style="font-size:0.85rem;color:rgba(255,255,255,0.6);margin-bottom:1rem;">Upload a photo and we'll create your attendee poster. Download it and share online to invite others.</p>
+
+              <label class="form-label" style="display:block;text-align:left;margin-bottom:0.35rem;">Your photo *</label>
+              <input type="file" id="attendee-photo" accept="image/*" style="width:100%;padding:0.6rem;border-radius:0.5rem;border:1px solid rgba(47,166,179,0.35);background:rgba(255,255,255,0.04);color:#fff;font-size:0.8rem;margin-bottom:1rem;">
+
+              <!-- Poster card canvas -->
+              <div style="border-radius:1rem;overflow:hidden;border:1px solid rgba(255,255,255,0.15);background:#0A1628;margin-bottom:1rem;">
+                <canvas id="attendee-poster" width="1414" height="2000" style="width:100%;height:auto;display:block;"></canvas>
+              </div>
+
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.75rem;margin-bottom:0.75rem;">
+                <button type="button" id="poster-download" style="padding:0.875rem;border-radius:0.75rem;font-weight:700;font-size:0.85rem;background:#2FA6B3;color:#fff;border:none;cursor:pointer;">Download Poster ↓</button>
+                <button type="button" id="poster-copy-caption" style="padding:0.875rem;border-radius:0.75rem;font-weight:700;font-size:0.85rem;background:rgba(255,255,255,0.06);color:#fff;border:1px solid rgba(255,255,255,0.25);cursor:pointer;">Copy Caption</button>
+              </div>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.75rem;margin-bottom:0.75rem;">
+                <a id="poster-share-wa" href="#" target="_blank" rel="noopener noreferrer" style="padding:0.875rem;border-radius:0.75rem;font-weight:700;font-size:0.85rem;background:rgba(255,255,255,0.06);color:#fff;border:1px solid rgba(255,255,255,0.25);text-align:center;text-decoration:none;">Share on WhatsApp</a>
+                <a id="poster-share-x" href="#" target="_blank" rel="noopener noreferrer" style="padding:0.875rem;border-radius:0.75rem;font-weight:700;font-size:0.85rem;background:rgba(255,255,255,0.06);color:#fff;border:1px solid rgba(255,255,255,0.25);text-align:center;text-decoration:none;">Share on X</a>
+              </div>
+              <p style="font-size:10px;color:rgba(255,255,255,0.4);text-align:center;line-height:1.5;">#CRESDynamics #TheFutureOfAIinBusiness #FoundersLive #TechKenya #IvanKenya</p>
+
+              <button type="button" id="poster-proceed" onclick="regProceedShare()" style="width:100%;padding:0.875rem;border-radius:0.75rem;font-weight:700;font-size:0.875rem;background:#F39C24;color:#060B18;border:none;cursor:pointer;margin-top:1rem;">Proceed & Share →</button>
+            </div>
           </form>
-        </div>
-
-        <div id="registration-success" style="display:none;border-radius:1rem;padding:2rem;border:1px solid rgba(16,185,129,0.35);background:rgba(10,37,64,0.3);">
-          <div style="text-align:center;margin-bottom:1.25rem;">
-            <div style="width:64px;height:64px;border-radius:50%;background:rgba(16,185,129,0.15);border:2px solid #10B981;display:flex;align-items:center;justify-content:center;margin:0 auto 1rem;font-size:1.5rem;">✓</div>
-            <h3 style="font-weight:900;font-size:1.5rem;color:#fff;">You're in!</h3>
-            <p style="font-size:0.85rem;color:rgba(255,255,255,0.6);margin-top:0.25rem;">Your seat is reserved. We've safely saved your details, so don't worry if you get interrupted.</p>
-          </div>
-
-          <div style="border-top:1px solid rgba(255,255,255,0.1);border-bottom:1px solid rgba(255,255,255,0.1);padding:1.25rem 0;margin-bottom:1.25rem;text-align:center;">
-            <p style="font-size:0.8rem;color:rgba(255,255,255,0.55);font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:0.75rem;">Make your attendee poster</p>
-            <p style="font-size:0.82rem;color:rgba(255,255,255,0.5);margin-bottom:1rem;">Upload a photo, we'll place it on the event poster with your name and role. Download it and post it online to invite others.</p>
-
-            <label class="form-label" style="display:block;text-align:left;margin-bottom:0.35rem;">Your photo *</label>
-            <input type="file" id="attendee-photo" accept="image/*" style="width:100%;padding:0.6rem;border-radius:0.5rem;border:1px solid rgba(47,166,179,0.35);background:rgba(255,255,255,0.04);color:#fff;font-size:0.8rem;margin-bottom:0.75rem;">
-            <canvas id="attendee-poster" width="1414" height="2000" style="width:100%;height:auto;border-radius:0.75rem;border:1px solid rgba(255,255,255,0.15);display:block;"></canvas>
-
-            <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.75rem;margin-top:0.75rem;">
-              <button type="button" id="poster-download" class="hero-btn-primary" style="justify-content:center;font-size:0.85rem;padding:10px 16px;">Download Poster ↓</button>
-              <button type="button" id="poster-copy-caption" class="hero-btn-glass" style="justify-content:center;font-size:0.85rem;padding:10px 16px;color:#fff;border-color:rgba(255,255,255,0.35);background:rgba(255,255,255,0.06);">Copy Caption</button>
-            </div>
-
-            <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.75rem;margin-top:0.75rem;">
-              <a id="poster-share-wa" href="#" target="_blank" rel="noopener noreferrer" class="hero-btn-glass" style="justify-content:center;font-size:0.85rem;padding:10px 16px;text-align:center;color:#fff;border-color:rgba(255,255,255,0.35);background:rgba(255,255,255,0.06);">Share on WhatsApp</a>
-              <a id="poster-share-x" href="#" target="_blank" rel="noopener noreferrer" class="hero-btn-glass" style="justify-content:center;font-size:0.85rem;padding:10px 16px;text-align:center;color:#fff;border-color:rgba(255,255,255,0.35);background:rgba(255,255,255,0.06);">Share on X</a>
-            </div>
-
-            <p style="font-size:10px;color:rgba(255,255,255,0.4);margin-top:0.75rem;line-height:1.5;">#CRESDynamics #TheFutureOfAIinBusiness #FoundersLive #TechKenya #IvanKenya</p>
-          </div>
-
-          <p style="font-size:0.8rem;color:rgba(255,255,255,0.5);text-align:center;">Questions? <a href="https://wa.me/254708805496" style="color:#2FA6B3;">WhatsApp</a> · <a href="mailto:events@cresdynamics.com" style="color:#2FA6B3;">events@cresdynamics.com</a></p>
         </div>
       </div>
     </div>
@@ -721,7 +771,7 @@
       <p style="font-size:0.875rem;color:rgba(255,255,255,0.55);margin-bottom:1.5rem;">Practical talks and field lessons from operators who ship. More names announced soon.</p>
       <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:1rem;margin-bottom:1.5rem;">
         <div style="display:flex;flex-direction:column;align-items:center;text-align:center;border-radius:1rem;border:1px solid rgba(255,255,255,0.12);background:rgba(255,255,255,0.03);padding:1.25rem 0.75rem;">
-          <img src="/images/Speakers/Nelson Ochieng.png" alt="Nelson Ochieng" style="width:120px;height:120px;border-radius:9999px;object-fit:cover;border:3px solid rgba(47,166,179,0.6);margin-bottom:0.75rem;background:#fff;" loading="lazy">
+          <img src="/images/Speakers/Nelson Ochieng.webp" alt="Nelson Ochieng" style="width:120px;height:120px;border-radius:9999px;object-fit:cover;border:3px solid rgba(47,166,179,0.6);margin-bottom:0.75rem;background:#fff;" loading="lazy">
           <p style="font-weight:800;color:#fff;font-size:0.95rem;">Nelson Ochieng</p>
           <p style="font-size:0.72rem;color:rgba(255,255,255,0.5);">Founder, CRES Dynamics</p>
           <p style="font-size:0.72rem;color:#2FA6B3;margin-top:0.35rem;font-weight:600;line-height:1.4;">AI Agents & CRM That Ships</p>
@@ -843,37 +893,129 @@
   var form = document.getElementById('event-register-form');
   var STORE_KEY = 'cres_event_register';
   var COMPLETE_KEY = 'cres_event_register_complete';
+  var ROLE_LABEL = { developer:'Developer', founder:'Business Owner', hiring:'Hiring', jobSeeker:'Job Seeker', speaker:'Speaker' };
+  var currentStep = 1;
+  var registered = false;
+  var userPhotoImg = null;
+  var cachedCr = null, cachedFl = null, bgPromise = null;
 
-  // ─── LOCALSTORAGE AUTOSAVE (pick up where you left off) ───
-  function loadLocal(){
-    try { return JSON.parse(localStorage.getItem(STORE_KEY) || '{}'); } catch(e){ return {}; }
+  // ─── STEP NAVIGATION ───
+  function regGoStep(step){
+    if(step < 1 || step > 4) return;
+    if(step > currentStep + 1) return;
+    if(step === 2 && currentStep === 1){
+      var fn = document.getElementById('reg-firstName');
+      var em = document.getElementById('reg-email');
+      if(!fn || !fn.value.trim()){ if(fn) fn.focus(); return; }
+      if(!em || !em.value.trim()){ if(em) em.focus(); return; }
+    }
+    if(step === 3 && currentStep === 2){
+      var lanyard = document.getElementById('lanyardCategory');
+      if(!lanyard || !lanyard.value){
+        var hint = document.getElementById('lanyard-hint');
+        if(hint){ hint.style.color = '#F87171'; hint.textContent = 'Please pick your lanyard colour to continue.'; }
+        return;
+      }
+      if(!registered) regSubmit();
+    }
+    currentStep = step;
+    for(var i=1;i<=4;i++){
+      var el = document.getElementById('reg-step-'+i);
+      if(el) el.style.display = (i===step) ? 'block' : 'none';
+    }
+    updateStepDots();
   }
-  function saveLocal(obj){
-    try { localStorage.setItem(STORE_KEY, JSON.stringify(obj)); } catch(e){}
+  function updateStepDots(){
+    for(var i=1;i<=4;i++){
+      var dot = document.getElementById('step-dot-'+i);
+      if(!dot) continue;
+      if(i < currentStep){
+        dot.style.background = '#10B981'; dot.style.color = '#fff'; dot.style.borderColor = '#10B981';
+        dot.innerHTML = '✓';
+      } else if(i === currentStep){
+        dot.style.background = '#2FA6B3'; dot.style.color = '#fff'; dot.style.borderColor = '#2FA6B3';
+        dot.textContent = i;
+      } else {
+        dot.style.background = 'rgba(255,255,255,0.06)'; dot.style.color = 'rgba(255,255,255,0.4)'; dot.style.borderColor = 'rgba(255,255,255,0.15)';
+        dot.textContent = i;
+      }
+    }
   }
+  window.regGoStep = regGoStep;
+
+  // ─── PAYMENT SELECTION ───
+  window.regSelectPayment = function(choice){
+    var input = document.getElementById('paymentChoice');
+    if(input) input.value = choice;
+    var nowBtn = document.getElementById('pay-now-btn');
+    var laterBtn = document.getElementById('pay-later-btn');
+    var details = document.getElementById('pay-now-details');
+    if(choice === 'pay_now'){
+      if(nowBtn){ nowBtn.style.background = 'rgba(243,156,36,0.25)'; nowBtn.style.borderColor = '#F39C24'; nowBtn.style.color = '#F39C24'; }
+      if(laterBtn){ laterBtn.style.background = 'rgba(255,255,255,0.04)'; laterBtn.style.borderColor = 'rgba(255,255,255,0.12)'; laterBtn.style.color = 'rgba(255,255,255,0.6)'; }
+      if(details) details.style.display = 'block';
+      regUpdatePaymentAmounts();
+    } else {
+      if(laterBtn){ laterBtn.style.background = 'rgba(47,166,179,0.15)'; laterBtn.style.borderColor = '#2FA6B3'; laterBtn.style.color = '#2FA6B3'; }
+      if(nowBtn){ nowBtn.style.background = 'rgba(255,255,255,0.04)'; nowBtn.style.borderColor = 'rgba(255,255,255,0.12)'; nowBtn.style.color = 'rgba(255,255,255,0.6)'; }
+      if(details) details.style.display = 'none';
+    }
+    persist();
+  };
+  function regUpdatePaymentAmounts(){
+    var ticket = document.getElementById('ticketType');
+    var val = ticket ? ticket.value : 'standard';
+    var amount = val === 'vip' ? 'KES 4,000' : 'KES 2,500';
+    var mpesaAmt = document.getElementById('mpesa-amount');
+    if(mpesaAmt) mpesaAmt.textContent = amount;
+    var fn = (document.getElementById('reg-firstName')||{}).value || 'GUEST';
+    var ref = '43869-' + fn.substring(0,4).toUpperCase();
+    var bankRef = document.getElementById('bank-ref');
+    if(bankRef) bankRef.textContent = ref;
+  }
+
+  // ─── REGISTRATION SUBMIT ───
+  function regSubmit(){
+    if(registered) return;
+    var data = collectData();
+    data.paymentChoice = (document.getElementById('paymentChoice')||{}).value || '';
+    if(!data.firstName || !data.email) return;
+    var xhr = new XMLHttpRequest();
+    xhr.open('POST', '/api/events/register', true);
+    xhr.setRequestHeader('Content-Type','application/json');
+    xhr.onreadystatechange = function(){
+      if(xhr.readyState === 4){
+        try {
+          var res = JSON.parse(xhr.responseText);
+          if(xhr.status === 200 && res.id){
+            registered = true;
+            window._attendee = { firstName: data.firstName || '', role: ROLE_LABEL[data.lanyardCategory] || data.lanyardCategory || '', ticket: data.ticketType || 'standard', email: data.email || '' };
+            try { localStorage.setItem(COMPLETE_KEY, JSON.stringify(window._attendee)); } catch(e){}
+          }
+        } catch(e){}
+      }
+    };
+    xhr.send(JSON.stringify(data));
+  }
+
+  // ─── LOCALSTORAGE + PROGRESSIVE AUTOSAVE ───
+  function loadLocal(){ try { return JSON.parse(localStorage.getItem(STORE_KEY) || '{}'); } catch(e){ return {}; } }
+  function saveLocal(obj){ try { localStorage.setItem(STORE_KEY, JSON.stringify(obj)); } catch(e){} }
 
   if(form){
     var saved = loadLocal();
     if(saved.firstName || saved.email){
-      var fields = form.querySelectorAll('input, select');
+      var fields = form.querySelectorAll('input[name], select[name]');
       for(var i=0;i<fields.length;i++){
         var f = fields[i];
-        if(f.name && saved[f.name] !== undefined){
-          if(f.type === 'number' || f.tagName === 'SELECT') f.value = saved[f.name];
-          else f.value = saved[f.name];
-        }
+        if(f.name && saved[f.name] !== undefined && f.type !== 'hidden') f.value = saved[f.name];
       }
-      var restored = document.createElement('p');
-      restored.textContent = 'We restored your saved details. Continue where you left off.';
-      restored.style.cssText = 'font-size:11px;color:#34d399;text-align:center;margin-top:-0.5rem;';
-      form.insertBefore(restored, form.firstChild);
     }
 
-    var timer = null;
-    var lastSent = '';
+    var timer = null, lastSent = '';
     function collectData(){
       var d = { eventTitle:'The Future of AI in Business', eventDate:'31 October 2026' };
-      var fields = form.querySelectorAll('input, select');
+      var fields = form.querySelectorAll('input[name], select[name]');
       for(var i=0;i<fields.length;i++){
         if(fields[i].name) d[fields[i].name] = fields[i].value;
       }
@@ -882,7 +1024,7 @@
     function persist(){
       var data = collectData();
       saveLocal(data);
-      if(!data.email) return;
+      if(!data.firstName && !data.email && !data.phone) return;
       var key = JSON.stringify(data);
       if(key === lastSent) return;
       lastSent = key;
@@ -890,23 +1032,8 @@
     }
     form.addEventListener('input', function(){ clearTimeout(timer); timer = setTimeout(persist, 1500); });
     form.addEventListener('change', function(){ clearTimeout(timer); timer = setTimeout(persist, 500); });
-    form.addEventListener('submit', function(e){
-      if(!lanyardInput || !lanyardInput.value){
-        e.preventDefault();
-        e.stopImmediatePropagation();
-        var hint = document.getElementById('lanyard-hint');
-        if(hint){ hint.style.color = '#F87171'; hint.textContent = 'Please pick your lanyard colour to continue.'; }
-        var picker = document.querySelector('.lanyard-picker');
-        if(picker) picker.scrollIntoView({ behavior:'smooth', block:'center' });
-      }
-    });
+    form.addEventListener('submit', function(e){ e.preventDefault(); });
   }
-
-  // ─── ROLE MAPPING ───
-  var ROLE_LABEL = {
-    developer:'Developer', founder:'Business Owner', hiring:'Hiring',
-    jobSeeker:'Job Seeker', speaker:'Speaker'
-  };
 
   // ─── LANYARD CHIP PICKER ───
   function hexToRgba(hex, alpha){
@@ -921,13 +1048,9 @@
     lanyardChips.forEach(function(chip){
       var color = chip.getAttribute('data-color');
       if(chip.getAttribute('data-value') === lanyardInput.value){
-        chip.style.borderColor = color;
-        chip.style.boxShadow = '0 0 0 1px ' + color;
-        chip.style.background = hexToRgba(color, 0.16);
+        chip.style.borderColor = color; chip.style.boxShadow = '0 0 0 1px ' + color; chip.style.background = hexToRgba(color, 0.16);
       } else {
-        chip.style.borderColor = 'rgba(255,255,255,0.14)';
-        chip.style.boxShadow = 'none';
-        chip.style.background = 'rgba(255,255,255,0.04)';
+        chip.style.borderColor = 'rgba(255,255,255,0.14)'; chip.style.boxShadow = 'none'; chip.style.background = 'rgba(255,255,255,0.04)';
       }
     });
   }
@@ -937,168 +1060,137 @@
       lanyardInput.value = chip.getAttribute('data-value');
       var hint = document.getElementById('lanyard-hint');
       if(hint && hint.style.color === 'rgb(248, 113, 113)'){ hint.style.color = 'rgba(255,255,255,0.45)'; hint.textContent = 'Each colour is printed on your lanyard and tells everyone what you do at the event.'; }
-      syncChips();
+      syncChips(); persist();
     });
   });
   syncChips();
 
-  // ─── SUCCESS FLOW ───
-  function startPoster(opts){
-    var o = opts || {};
-    var firstName = o.firstName || '';
-    var role = ROLE_LABEL[o.role] || o.role || '';
-    window._attendee = { firstName: firstName, role: role, ticket: o.ticket || 'standard' };
-    try { localStorage.setItem(COMPLETE_KEY, JSON.stringify(window._attendee)); } catch(e){}
-  }
-
-  var complete = null;
-  try { complete = JSON.parse(localStorage.getItem(COMPLETE_KEY) || 'null'); } catch(e){}
-  if(!complete && form){ complete = window._attendee || null; }
-  if(complete && !window._attendee){ window._attendee = complete; }
-
   // ─── POSTER BUILDER ───
   var posterCanvas = document.getElementById('attendee-poster');
-  var cachedBg = null, cachedCr = null, cachedFl = null;
-  var bgPromise = null;
   function loadImage(src){
     return new Promise(function(resolve, reject){
-      var img = new Image();
-      img.onload = function(){ resolve(img); };
-      img.onerror = reject;
-      img.src = src;
+      var img = new Image(); img.onload = function(){ resolve(img); }; img.onerror = reject; img.src = src;
     });
   }
   function getAssets(){
     if(!bgPromise){
       bgPromise = Promise.all([
-        loadImage('/images/The-ai-event-the-future-of-ai-in-business.jpg'),
         loadImage('/images/events/partners/cres-dynamics.png'),
         loadImage('/images/events/partners/founders-live-nairobi.png')
-      ]).then(function(arr){
-        cachedBg = arr[0]; cachedCr = arr[1]; cachedFl = arr[2];
-        return arr;
-      }).catch(function(){ return null; });
+      ]).then(function(arr){ cachedCr = arr[0]; cachedFl = arr[1]; return arr; }).catch(function(){ return null; });
     }
     return bgPromise;
   }
-
   function roundRect(ctx, x, y, w, h, r){
-    ctx.beginPath();
-    ctx.moveTo(x+r, y);
-    ctx.arcTo(x+w, y, x+w, y+h, r);
-    ctx.arcTo(x+w, y+h, x, y+h, r);
-    ctx.arcTo(x, y+h, x, y, r);
-    ctx.arcTo(x, y, x+w, y, r);
+    ctx.beginPath(); ctx.moveTo(x+r, y);
+    ctx.arcTo(x+w, y, x+w, y+h, r); ctx.arcTo(x+w, y+h, x, y+h, r); ctx.arcTo(x, y+h, x, y, r); ctx.arcTo(x, y, x+w, y, r);
     ctx.closePath();
   }
 
-  var userPhotoImg = null;
   function renderPoster(photo){
-    var demo = document.getElementById('attendee-photo');
     var a = window._attendee || { firstName:'', role:'', ticket:'standard' };
     var nameLine = a.firstName ? a.firstName : 'Attendee';
-    var roleLine = a.role || 'Future of AI in Business';
+    var roleLine = a.role || '';
+    var ROLE_COLORS = { Developer:'#2FA6B3', 'Business Owner':'#F39C24', Hiring:'#10B981', 'Job Seeker':'#3B82F6', Speaker:'#EC4899' };
+    var roleColor = ROLE_COLORS[roleLine] || '#2FA6B3';
 
     getAssets().then(function(){
-      if(!posterCanvas || !cachedBg) return;
+      if(!posterCanvas) return;
       var ctx = posterCanvas.getContext('2d');
       var W = posterCanvas.width, H = posterCanvas.height;
       ctx.clearRect(0,0,W,H);
-      ctx.drawImage(cachedBg, 0, 0, W, H);
 
-      // Contrast card for photo + text
-      var cardW = 660, cardH = 1050;
-      var cardX = (W-cardW)/2, cardY = 430;
-      ctx.fillStyle = 'rgba(6,11,24,0.78)';
-      roundRect(ctx, cardX, cardY, cardW, cardH, 28);
-      ctx.fill();
-      ctx.strokeStyle = 'rgba(255,255,255,0.25)';
-      ctx.lineWidth = 2;
-      roundRect(ctx, cardX+1, cardY+1, cardW-2, cardH-2, 27);
-      ctx.stroke();
+      // Background - solid dark
+      ctx.fillStyle = '#0A1628';
+      ctx.fillRect(0,0,W,H);
 
-      // Header text
+      // ── Top logos bar ──
+      var topY = 60;
+      if(cachedCr){
+        var cw = 260, ch = 65;
+        ctx.drawImage(cachedCr, (W-cw)/2 - 80, topY, cw, ch);
+      }
+      if(cachedFl){
+        var fw = 240, fh = 70;
+        ctx.drawImage(cachedFl, (W-fw)/2 + 80, topY + 5, fw, fh);
+      }
+
+      // ── Heading ──
       ctx.textAlign = 'center';
-      ctx.fillStyle = '#F39C24';
-      ctx.font = '700 34px Arial, sans-serif';
-      ctx.fillText("I'M ATTENDING!", W/2, cardY + 60);
       ctx.fillStyle = '#ffffff';
-      ctx.font = '700 46px Arial, sans-serif';
-      ctx.fillText('The Future of AI in Business', W/2, cardY + 120);
+      ctx.font = '700 52px Arial, sans-serif';
+      ctx.fillText('The Future of AI in Business', W/2, topY + 200);
+      ctx.fillStyle = 'rgba(255,255,255,0.55)';
+      ctx.font = '500 26px Arial, sans-serif';
+      ctx.fillText('31 October 2026 · Sarit Expo Centre, Nairobi', W/2, topY + 250);
 
-      // Photo frame
-      var pw = 520, ph = 520;
-      var px = (W-pw)/2, py = cardY + 155;
+      // ── Photo frame (middle-lower) ──
+      var pw = 680, ph = 680;
+      var px = (W-pw)/2, py = topY + 310;
+
+      // White border
       ctx.save();
-      roundRect(ctx, px-10, py-10, pw+20, ph+20, 24);
+      roundRect(ctx, px-12, py-12, pw+24, ph+24, 24);
       ctx.fillStyle = '#ffffff';
       ctx.fill();
       ctx.restore();
+
+      // Photo
       ctx.save();
       roundRect(ctx, px, py, pw, ph, 16);
       ctx.clip();
       if(photo && photo.width && photo.height){
-        var srcR = photo.width/photo.height;
-        var dstR = 1;
+        var srcR = photo.width/photo.height, dstR = 1;
         var sw, sh, sx, sy;
         if(srcR > dstR){ sh = photo.height; sw = photo.height*dstR; sx = (photo.width-sw)/2; sy = 0; }
         else { sw = photo.width; sh = photo.width/dstR; sx = 0; sy = (photo.height-sh)/2; }
         ctx.drawImage(photo, sx, sy, sw, sh, px, py, pw, ph);
       } else {
-        ctx.fillStyle = '#0A1628';
+        ctx.fillStyle = '#142440';
         ctx.fillRect(px, py, pw, ph);
-        ctx.fillStyle = '#2FA6B3';
-        ctx.font = '700 90px Arial, sans-serif';
-        ctx.fillText('📷', W/2, py+300);
+        ctx.fillStyle = 'rgba(47,166,179,0.3)';
+        ctx.font = '700 120px Arial, sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText('📷', W/2, py + ph/2 + 40);
+        ctx.fillStyle = 'rgba(255,255,255,0.35)';
+        ctx.font = '500 24px Arial, sans-serif';
+        ctx.fillText('Upload your photo', W/2, py + ph/2 + 90);
       }
       ctx.restore();
 
-      // Name + role
+      // ── Name + role ──
       ctx.textAlign = 'center';
       ctx.fillStyle = '#ffffff';
       ctx.font = '700 56px Arial, sans-serif';
-      ctx.fillText(nameLine, W/2, py + ph + 70);
-      ctx.fillStyle = '#2FA6B3';
-      ctx.font = '600 30px Arial, sans-serif';
-      ctx.fillText(roleLine, W/2, py + ph + 125);
+      ctx.fillText(nameLine, W/2, py + ph + 80);
+      if(roleLine){
+        ctx.fillStyle = roleColor;
+        ctx.font = '600 30px Arial, sans-serif';
+        ctx.fillText(roleLine, W/2, py + ph + 135);
+      }
 
-      // Date / venue line
-      ctx.fillStyle = 'rgba(255,255,255,0.85)';
-      ctx.font = '500 26px Arial, sans-serif';
-      ctx.fillText('• 31 October 2026 • Sarit Expo Centre, Nairobi •', W/2, cardY + cardH - 40);
+      // ── Date / venue line ──
+      ctx.fillStyle = 'rgba(255,255,255,0.7)';
+      ctx.font = '500 24px Arial, sans-serif';
+      ctx.fillText('• 31 October 2026 • Sarit Expo Centre, Nairobi •', W/2, H - 180);
 
-      // Bottom logos bar - drawn under card is cardH covers rest. Draw logos at bottom of canvas:
-      drawLogos(ctx, W, H);
+      // ── Bottom logos bar ──
+      var barH = 140, barY = H - barH;
+      ctx.fillStyle = 'rgba(6,11,24,0.9)';
+      ctx.fillRect(0, barY, W, barH);
+      ctx.strokeStyle = 'rgba(255,255,255,0.12)';
+      ctx.lineWidth = 1;
+      ctx.beginPath(); ctx.moveTo(0, barY); ctx.lineTo(W, barY); ctx.stroke();
+      ctx.fillStyle = 'rgba(255,255,255,0.4)';
+      ctx.font = '600 18px Arial, sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText('POWERED BY', W/2, barY + 30);
+      if(cachedCr){ var blw = 320, blh = 80; ctx.drawImage(cachedCr, W/2 - blw - 15, barY + 40, blw, blh); }
+      if(cachedFl){ var blrw = 280, blrh = 85; ctx.drawImage(cachedFl, W/2 + 15, barY + 38, blrw, blrh); }
     });
   }
 
-  function drawLogos(ctx, W, H){
-    var barH = 210;
-    var barY = H - barH;
-    ctx.fillStyle = 'rgba(6,11,24,0.85)';
-    ctx.fillRect(0, barY, W, barH);
-    ctx.strokeStyle = 'rgba(255,255,255,0.15)';
-    ctx.lineWidth = 1;
-    ctx.beginPath();
-    ctx.moveTo(0, barY);
-    ctx.lineTo(W, barY);
-    ctx.stroke();
-
-    ctx.fillStyle = 'rgba(255,255,255,0.5)';
-    ctx.font = '600 20px Arial, sans-serif';
-    ctx.textAlign = 'center';
-    ctx.fillText('POWERED BY', W/2, barY + 30);
-
-    if(cachedCr){
-      var lw = 420, lh = 105;
-      ctx.drawImage(cachedCr, W/2 - lw - 20, barY + (barH-lh)/2 + 10, lw, lh);
-    }
-    if(cachedFl){
-      var rw = 360, rh = 115;
-      ctx.drawImage(cachedFl, W/2 + 30, barY + (barH-rh)/2 + 10, rw, rh);
-    }
-  }
-
+  // ─── PHOTO INPUT ───
   var photoInput = document.getElementById('attendee-photo');
   if(photoInput){
     photoInput.addEventListener('change', function(){
@@ -1107,16 +1199,14 @@
       var reader = new FileReader();
       reader.onload = function(e){
         var img = new Image();
-        img.onload = function(){
-          userPhotoImg = img;
-          renderPoster(img);
-        };
+        img.onload = function(){ userPhotoImg = img; renderPoster(img); };
         img.src = e.target.result;
       };
       reader.readAsDataURL(file);
     });
   }
 
+  // ─── DOWNLOAD ───
   var downloadBtn = document.getElementById('poster-download');
   if(downloadBtn){
     downloadBtn.addEventListener('click', function(){
@@ -1129,7 +1219,8 @@
     });
   }
 
-  var caption = "I've registered for The Future of AI in Business — 31 October 2026, Sarit Expo Centre, Nairobi. See you there! 🚀 #CRESDynamics #TheFutureOfAIinBusiness #FoundersLive #TechKenya #IvanKenya";
+  // ─── COPY CAPTION ───
+  var caption = "I've registered for The Future of AI in Business — 31 October 2026, Sarit Expo Centre, Nairobi. See you there! #CRESDynamics #TheFutureOfAIinBusiness #FoundersLive #TechKenya #IvanKenya";
   var encCaption = encodeURIComponent(caption);
   var copyBtn = document.getElementById('poster-copy-caption');
   if(copyBtn){
@@ -1138,46 +1229,56 @@
         copyBtn.textContent = 'Copied ✓';
         setTimeout(function(){ copyBtn.textContent = 'Copy Caption'; }, 1800);
       }).catch(function(){
-        var ta = document.createElement('textarea');
-        ta.value = caption; document.body.appendChild(ta); ta.select();
+        var ta = document.createElement('textarea'); ta.value = caption; document.body.appendChild(ta); ta.select();
         document.execCommand('copy'); document.body.removeChild(ta);
-        copyBtn.textContent = 'Copied ✓';
-        setTimeout(function(){ copyBtn.textContent = 'Copy Caption'; }, 1800);
+        copyBtn.textContent = 'Copied ✓'; setTimeout(function(){ copyBtn.textContent = 'Copy Caption'; }, 1800);
       });
     });
   }
+
+  // ─── SHARE BUTTONS ───
   var waBtn = document.getElementById('poster-share-wa');
   if(waBtn) waBtn.href = 'https://wa.me/?text=' + encCaption;
   var xBtn = document.getElementById('poster-share-x');
   if(xBtn) xBtn.href = 'https://twitter.com/intent/tweet?text=' + encCaption;
 
-  // Generate initial poster (decorative) on first render
-  getAssets().then(function(){
-    if(!complete) renderPoster(null);
-  });
-
-  // Hook fired from main.js after successful server submission
-  window.CRESEventSuccess = function(payload){
-    var formCard = form ? form.closest('div[id="register-form-area"] > div') : null;
-    // hide the form card, show success panel
-    var formHolder = form ? form.parentElement : null;
-    if(formHolder) formHolder.style.display = 'none';
-    var successEl = document.getElementById('registration-success');
-    if(successEl){
-      successEl.style.display = 'block';
-      successEl.scrollIntoView({ behavior:'smooth', block:'center' });
-    }
-    startPoster({
-      firstName: payload.firstName || '',
-      role: payload.lanyardCategory || '',
-      ticket: payload.ticketType || 'standard'
+  // ─── PROCEED & SHARE (save poster to server) ───
+  window.regProceedShare = function(){
+    if(!posterCanvas) return;
+    var dataUrl = posterCanvas.toDataURL('image/png');
+    var a = window._attendee || {};
+    var email = a.email || (document.getElementById('reg-email')||{}).value || '';
+    if(!email){ alert('Please go back and enter your email first.'); return; }
+    var btn = document.getElementById('poster-proceed');
+    if(btn){ btn.textContent = 'Saving...'; btn.disabled = true; }
+    fetch('/api/events/register/save-image', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ email: email, imageData: dataUrl })
+    }).then(function(r){ return r.json(); }).then(function(res){
+      if(btn){ btn.textContent = 'Saved ✓'; setTimeout(function(){ btn.textContent = 'Proceed & Share →'; btn.disabled = false; }, 2000); }
+    }).catch(function(){
+      if(btn){ btn.textContent = 'Proceed & Share →'; btn.disabled = false; }
     });
+  };
+
+  // ─── CRESEventSuccess (called from main.js after form submit) ───
+  window.CRESEventSuccess = function(payload){
+    registered = true;
+    window._attendee = { firstName: payload.firstName || '', role: payload.lanyardCategory || '', ticket: payload.ticketType || 'standard', email: payload.email || '' };
+    try { localStorage.setItem(COMPLETE_KEY, JSON.stringify(window._attendee)); } catch(e){}
+    regGoStep(3);
     renderPoster(userPhotoImg);
-    // send final beacon in case
     if(payload.email){
       var d = Object.assign({}, payload);
       navigator.sendBeacon('/api/events/register-draft', new Blob([JSON.stringify(d)], {type:'application/json'}));
     }
   };
+
+  // ─── INIT ───
+  var complete = null;
+  try { complete = JSON.parse(localStorage.getItem(COMPLETE_KEY) || 'null'); } catch(e){}
+  if(complete) window._attendee = complete;
+  regGoStep(1);
+  getAssets().then(function(){ renderPoster(userPhotoImg); });
 })();
 </script>
