@@ -1065,8 +1065,13 @@
   });
   syncChips();
 
-  // ─── POSTER BUILDER ───
+  // ─── POSTER BUILDER (blue theme, drag-to-position) ───
   var posterCanvas = document.getElementById('attendee-poster');
+  var photoOffset = { x: 0, y: 0 };
+  var isDragging = false;
+  var dragStart = { x: 0, y: 0 };
+  var photoFrame = { x: 0, y: 0, w: 680, h: 680 };
+
   function loadImage(src){
     return new Promise(function(resolve, reject){
       var img = new Image(); img.onload = function(){ resolve(img); }; img.onerror = reject; img.src = src;
@@ -1086,6 +1091,46 @@
     ctx.arcTo(x+w, y, x+w, y+h, r); ctx.arcTo(x+w, y+h, x, y+h, r); ctx.arcTo(x, y+h, x, y, r); ctx.arcTo(x, y, x+w, y, r);
     ctx.closePath();
   }
+  function canvasCoords(e){
+    if(!posterCanvas) return { x:0, y:0 };
+    var rect = posterCanvas.getBoundingClientRect();
+    var scaleX = posterCanvas.width / rect.width;
+    var scaleY = posterCanvas.height / rect.height;
+    var clientX = e.touches ? e.touches[0].clientX : e.clientX;
+    var clientY = e.touches ? e.touches[0].clientY : e.clientY;
+    return { x: (clientX - rect.left) * scaleX, y: (clientY - rect.top) * scaleY };
+  }
+
+  // ─── DRAG-TO-POSITION ───
+  if(posterCanvas){
+    posterCanvas.addEventListener('mousedown', function(e){ startDrag(e); });
+    posterCanvas.addEventListener('touchstart', function(e){ e.preventDefault(); startDrag(e); }, {passive:false});
+    function startDrag(e){
+      if(!userPhotoImg) return;
+      var c = canvasCoords(e);
+      var f = photoFrame;
+      if(c.x >= f.x && c.x <= f.x+f.w && c.y >= f.y && c.y <= f.y+f.h){
+        isDragging = true;
+        dragStart = { x: c.x, y: c.y };
+      }
+    }
+    document.addEventListener('mousemove', function(e){ moveDrag(e); });
+    document.addEventListener('touchmove', function(e){ moveDrag(e); }, {passive:true});
+    function moveDrag(e){
+      if(!isDragging || !userPhotoImg) return;
+      var c = canvasCoords(e);
+      var dx = c.x - dragStart.x;
+      var dy = c.y - dragStart.y;
+      dragStart = { x: c.x, y: c.y };
+      photoOffset.x += dx / (photoFrame.w / 2);
+      photoOffset.y += dy / (photoFrame.h / 2);
+      photoOffset.x = Math.max(-1, Math.min(1, photoOffset.x));
+      photoOffset.y = Math.max(-1, Math.min(1, photoOffset.y));
+      renderPoster(userPhotoImg);
+    }
+    document.addEventListener('mouseup', function(){ isDragging = false; });
+    document.addEventListener('touchend', function(){ isDragging = false; });
+  }
 
   function renderPoster(photo){
     var a = window._attendee || { firstName:'', role:'', ticket:'standard' };
@@ -1100,42 +1145,78 @@
       var W = posterCanvas.width, H = posterCanvas.height;
       ctx.clearRect(0,0,W,H);
 
-      // Background - solid dark
-      ctx.fillStyle = '#0A1628';
+      // ── Background gradient (blue) ──
+      var grad = ctx.createLinearGradient(0, 0, 0, H);
+      grad.addColorStop(0, '#0D1F3C');
+      grad.addColorStop(0.5, '#0C2140');
+      grad.addColorStop(1, '#091A30');
+      ctx.fillStyle = grad;
       ctx.fillRect(0,0,W,H);
 
-      // ── Top logos bar ──
-      var topY = 60;
-      if(cachedCr){
-        var cw = 260, ch = 65;
-        ctx.drawImage(cachedCr, (W-cw)/2 - 80, topY, cw, ch);
+      // ── Subtle radial glow at top ──
+      var glow = ctx.createRadialGradient(W/2, 0, 0, W/2, 0, W*0.6);
+      glow.addColorStop(0, 'rgba(47,166,179,0.08)');
+      glow.addColorStop(1, 'transparent');
+      ctx.fillStyle = glow;
+      ctx.fillRect(0, 0, W, H*0.4);
+
+      // ── Top logos (well aligned, professional) ──
+      var topY = 50;
+      var logoGap = 40;
+      if(cachedCr && cachedFl){
+        var cw = 220, ch = 55;
+        var fw = 200, fh = 58;
+        var totalW = cw + logoGap + fw;
+        var startX = (W - totalW) / 2;
+        ctx.drawImage(cachedCr, startX, topY, cw, ch);
+        ctx.drawImage(cachedFl, startX + cw + logoGap, topY + (ch - fh)/2, fw, fh);
+      } else if(cachedCr){
+        ctx.drawImage(cachedCr, (W-260)/2, topY, 260, 65);
+      } else if(cachedFl){
+        ctx.drawImage(cachedFl, (W-240)/2, topY, 240, 70);
       }
-      if(cachedFl){
-        var fw = 240, fh = 70;
-        ctx.drawImage(cachedFl, (W-fw)/2 + 80, topY + 5, fw, fh);
-      }
+
+      // ── Divider line ──
+      ctx.strokeStyle = 'rgba(47,166,179,0.25)';
+      ctx.lineWidth = 1;
+      ctx.beginPath(); ctx.moveTo(W*0.2, topY + 80); ctx.lineTo(W*0.8, topY + 80); ctx.stroke();
 
       // ── Heading ──
       ctx.textAlign = 'center';
       ctx.fillStyle = '#ffffff';
-      ctx.font = '700 52px Arial, sans-serif';
-      ctx.fillText('The Future of AI in Business', W/2, topY + 200);
-      ctx.fillStyle = 'rgba(255,255,255,0.55)';
-      ctx.font = '500 26px Arial, sans-serif';
-      ctx.fillText('31 October 2026 · Sarit Expo Centre, Nairobi', W/2, topY + 250);
+      ctx.font = '700 50px Arial, sans-serif';
+      ctx.fillText('The Future of AI in Business', W/2, topY + 150);
 
-      // ── Photo frame (middle-lower) ──
+      // ── Date + venue ──
+      ctx.fillStyle = 'rgba(47,166,179,0.9)';
+      ctx.font = '600 24px Arial, sans-serif';
+      ctx.fillText('31 October 2026 · Sarit Expo Centre, Nairobi', W/2, topY + 195);
+
+      // ── Topics line ──
+      ctx.fillStyle = 'rgba(255,255,255,0.45)';
+      ctx.font = '500 20px Arial, sans-serif';
+      ctx.fillText('Topics: AI Agents · Automation · CRM · Production Systems · Voice AI', W/2, topY + 235);
+
+      // ── Photo frame (middle) ──
       var pw = 680, ph = 680;
-      var px = (W-pw)/2, py = topY + 310;
+      var px = (W-pw)/2, py = topY + 280;
+      photoFrame = { x: px, y: py, w: pw, h: ph };
+
+      // Outer glow
+      ctx.save();
+      roundRect(ctx, px-16, py-16, pw+32, ph+32, 28);
+      ctx.fillStyle = 'rgba(47,166,179,0.12)';
+      ctx.fill();
+      ctx.restore();
 
       // White border
       ctx.save();
-      roundRect(ctx, px-12, py-12, pw+24, ph+24, 24);
+      roundRect(ctx, px-10, py-10, pw+20, ph+20, 22);
       ctx.fillStyle = '#ffffff';
       ctx.fill();
       ctx.restore();
 
-      // Photo
+      // Photo (with drag offset)
       ctx.save();
       roundRect(ctx, px, py, pw, ph, 16);
       ctx.clip();
@@ -1144,49 +1225,95 @@
         var sw, sh, sx, sy;
         if(srcR > dstR){ sh = photo.height; sw = photo.height*dstR; sx = (photo.width-sw)/2; sy = 0; }
         else { sw = photo.width; sh = photo.width/dstR; sx = 0; sy = (photo.height-sh)/2; }
+        // Apply drag offset
+        sx -= photoOffset.x * (photo.width - sw) / 2;
+        sy -= photoOffset.y * (photo.height - sh) / 2;
+        sx = Math.max(0, Math.min(photo.width - sw, sx));
+        sy = Math.max(0, Math.min(photo.height - sh, sy));
         ctx.drawImage(photo, sx, sy, sw, sh, px, py, pw, ph);
       } else {
         ctx.fillStyle = '#142440';
         ctx.fillRect(px, py, pw, ph);
         ctx.fillStyle = 'rgba(47,166,179,0.3)';
-        ctx.font = '700 120px Arial, sans-serif';
+        ctx.font = '700 100px Arial, sans-serif';
         ctx.textAlign = 'center';
-        ctx.fillText('📷', W/2, py + ph/2 + 40);
-        ctx.fillStyle = 'rgba(255,255,255,0.35)';
-        ctx.font = '500 24px Arial, sans-serif';
-        ctx.fillText('Upload your photo', W/2, py + ph/2 + 90);
+        ctx.fillText('📷', W/2, py + ph/2 + 30);
+        ctx.fillStyle = 'rgba(255,255,255,0.3)';
+        ctx.font = '500 22px Arial, sans-serif';
+        ctx.fillText('Upload your photo', W/2, py + ph/2 + 75);
+        ctx.fillStyle = 'rgba(255,255,255,0.2)';
+        ctx.font = '400 16px Arial, sans-serif';
+        ctx.fillText('Drag to position your face', W/2, py + ph/2 + 105);
       }
       ctx.restore();
 
-      // ── Name + role ──
-      ctx.textAlign = 'center';
-      ctx.fillStyle = '#ffffff';
-      ctx.font = '700 56px Arial, sans-serif';
-      ctx.fillText(nameLine, W/2, py + ph + 80);
-      if(roleLine){
-        ctx.fillStyle = roleColor;
-        ctx.font = '600 30px Arial, sans-serif';
-        ctx.fillText(roleLine, W/2, py + ph + 135);
+      // ── Drag hint (when photo loaded) ──
+      if(photo && photo.width){
+        ctx.fillStyle = 'rgba(255,255,255,0.25)';
+        ctx.font = '400 14px Arial, sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText('↕ ↔ Drag photo to position', W/2, py + ph + 18);
       }
 
-      // ── Date / venue line ──
-      ctx.fillStyle = 'rgba(255,255,255,0.7)';
-      ctx.font = '500 24px Arial, sans-serif';
-      ctx.fillText('• 31 October 2026 • Sarit Expo Centre, Nairobi •', W/2, H - 180);
+      // ── Name + role badge ──
+      var nameY = py + ph + 60;
+      ctx.textAlign = 'center';
+      ctx.fillStyle = '#ffffff';
+      ctx.font = '700 54px Arial, sans-serif';
+      ctx.fillText(nameLine, W/2, nameY);
+
+      if(roleLine){
+        // Role badge (pill shape)
+        ctx.font = '700 24px Arial, sans-serif';
+        var badgeText = roleLine.toUpperCase();
+        var badgeW = ctx.measureText(badgeText).width + 40;
+        var badgeH = 44;
+        var badgeX = (W - badgeW) / 2;
+        var badgeY = nameY + 20;
+        ctx.save();
+        roundRect(ctx, badgeX, badgeY, badgeW, badgeH, badgeH/2);
+        ctx.fillStyle = roleColor;
+        ctx.fill();
+        ctx.restore();
+        ctx.fillStyle = '#ffffff';
+        ctx.font = '700 22px Arial, sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText(badgeText, W/2, badgeY + 30);
+      }
+
+      // ── Tagline ──
+      var tagY = nameY + 90;
+      ctx.fillStyle = 'rgba(255,255,255,0.5)';
+      ctx.font = '500 20px Arial, sans-serif';
+      ctx.fillText('Join 200+ business leaders and tech professionals', W/2, tagY);
+
+      // ── Bottom section ──
+      var bottomY = H - 200;
+
+      // Divider
+      ctx.strokeStyle = 'rgba(47,166,179,0.2)';
+      ctx.lineWidth = 1;
+      ctx.beginPath(); ctx.moveTo(W*0.15, bottomY); ctx.lineTo(W*0.85, bottomY); ctx.stroke();
+
+      // Date/venue
+      ctx.fillStyle = 'rgba(255,255,255,0.6)';
+      ctx.font = '500 22px Arial, sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText('31 October 2026 · Sarit Expo Centre, Westlands, Nairobi', W/2, bottomY + 40);
 
       // ── Bottom logos bar ──
-      var barH = 140, barY = H - barH;
-      ctx.fillStyle = 'rgba(6,11,24,0.9)';
+      var barH = 130, barY = H - barH;
+      ctx.fillStyle = 'rgba(8,18,38,0.95)';
       ctx.fillRect(0, barY, W, barH);
-      ctx.strokeStyle = 'rgba(255,255,255,0.12)';
+      ctx.strokeStyle = 'rgba(47,166,179,0.15)';
       ctx.lineWidth = 1;
       ctx.beginPath(); ctx.moveTo(0, barY); ctx.lineTo(W, barY); ctx.stroke();
-      ctx.fillStyle = 'rgba(255,255,255,0.4)';
-      ctx.font = '600 18px Arial, sans-serif';
+      ctx.fillStyle = 'rgba(255,255,255,0.35)';
+      ctx.font = '600 16px Arial, sans-serif';
       ctx.textAlign = 'center';
-      ctx.fillText('POWERED BY', W/2, barY + 30);
-      if(cachedCr){ var blw = 320, blh = 80; ctx.drawImage(cachedCr, W/2 - blw - 15, barY + 40, blw, blh); }
-      if(cachedFl){ var blrw = 280, blrh = 85; ctx.drawImage(cachedFl, W/2 + 15, barY + 38, blrw, blrh); }
+      ctx.fillText('POWERED BY', W/2, barY + 28);
+      if(cachedCr){ var blw = 280, blh = 70; ctx.drawImage(cachedCr, W/2 - blw - 12, barY + 38, blw, blh); }
+      if(cachedFl){ var blrw = 250, blrh = 72; ctx.drawImage(cachedFl, W/2 + 12, barY + 36, blrw, blrh); }
     });
   }
 
@@ -1199,7 +1326,11 @@
       var reader = new FileReader();
       reader.onload = function(e){
         var img = new Image();
-        img.onload = function(){ userPhotoImg = img; renderPoster(img); };
+        img.onload = function(){
+          userPhotoImg = img;
+          photoOffset = { x: 0, y: 0 };
+          renderPoster(img);
+        };
         img.src = e.target.result;
       };
       reader.readAsDataURL(file);
