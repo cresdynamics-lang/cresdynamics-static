@@ -79,6 +79,64 @@ const { sendEmail, hasResendConfigured, nlToBr, escapeHtml } = require('./lib/em
 const INBOX = 'info@cresdynamics.com';
 const SENDER = process.env.SENDER_EMAIL || 'onboarding@resend.dev';
 
+// ─── Daily Registration Summary ───
+async function sendDailySummary() {
+  try {
+    const result = await db.query(
+      `SELECT COUNT(*) as total FROM event_reservations WHERE DATE(created_at) = CURRENT_DATE`
+    );
+    const total = parseInt(result.rows[0].total) || 0;
+    if (total === 0) return;
+
+    const byTicket = await db.query(
+      `SELECT ticket_type, COUNT(*) as count FROM event_reservations WHERE DATE(created_at) = CURRENT_DATE GROUP BY ticket_type`
+    );
+    const byLanyard = await db.query(
+      `SELECT lanyard_category, COUNT(*) as count FROM event_reservations WHERE DATE(created_at) = CURRENT_DATE AND lanyard_category IS NOT NULL AND lanyard_category != '' GROUP BY lanyard_category`
+    );
+
+    const today = new Date().toLocaleDateString('en-GB', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+    const ticketBreakdown = byTicket.rows.map(r => `${r.ticket_type}: ${r.count}`).join(', ');
+    const lanyardBreakdown = byLanyard.rows.map(r => `${r.lanyard_category}: ${r.count}`).join(', ');
+
+    await sendEmail({
+      from: `CRES Events <${SENDER}>`,
+      to: INBOX,
+      subject: `Daily Registration Summary — ${total} registration${total !== 1 ? 's' : ''} today`,
+      html: `<!DOCTYPE html><html><head><meta charset="utf-8"></head><body style="margin:0;padding:0;background:#f4f6f8;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;">
+      <div style="max-width:500px;margin:24px auto;background:#ffffff;border-radius:12px;box-shadow:0 2px 12px rgba(0,0,0,0.06);overflow:hidden;">
+        <div style="background:#0D1F3C;padding:24px 28px;text-align:center;">
+          <h1 style="margin:0;color:#ffffff;font-size:20px;font-weight:700;">📊 Daily Registration Summary</h1>
+          <p style="margin:6px 0 0;color:#94a3b8;font-size:13px;">${today}</p>
+        </div>
+        <div style="padding:28px;">
+          <div style="text-align:center;margin-bottom:24px;">
+            <p style="margin:0;color:#0D1F3C;font-size:42px;font-weight:800;">${total}</p>
+            <p style="margin:4px 0 0;color:#6b7280;font-size:14px;">registration${total !== 1 ? 's' : ''} today</p>
+          </div>
+          ${ticketBreakdown ? `<table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:16px;">
+            <tr><td style="padding:10px 14px;background:#f9fafb;border-radius:8px;color:#4a5568;font-size:14px;"><strong>By Ticket:</strong> ${ticketBreakdown}</td></tr>
+          </table>` : ''}
+          ${lanyardBreakdown ? `<table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:16px;">
+            <tr><td style="padding:10px 14px;background:#f9fafb;border-radius:8px;color:#4a5568;font-size:14px;"><strong>By Lanyard:</strong> ${lanyardBreakdown}</td></tr>
+          </table>` : ''}
+          <p style="margin:16px 0 0;color:#9ca3af;font-size:12px;text-align:center;">CRES Dynamics · Automated daily summary</p>
+        </div>
+      </div></body></html>`
+    });
+    console.log(`[daily-summary] Sent: ${total} registrations today`);
+  } catch (e) {
+    console.error('[daily-summary] Failed:', e.message);
+  }
+}
+
+// Run daily summary at 11 PM (Nairobi time, UTC+3 = 20:00 UTC)
+const cron = require('node-cron');
+cron.schedule('0 20 * * *', () => {
+  console.log('[daily-summary] Triggered');
+  sendDailySummary();
+}, { timezone: 'Africa/Nairobi' });
+
 // ─── Auth helpers ───
 const crypto = require('crypto');
 
@@ -230,12 +288,15 @@ app.post('/api/events/register', async (req, res) => {
       const date = eventDate || '31 October 2026';
       const ticketLabel = (ticketType || 'standard') === 'vip' ? 'VIP' : 'Standard';
       const lanyardLabel = ({ developer: 'Developer', founder: 'Business Owner', hiring: 'Hiring', jobSeeker: 'Job Seeker', speaker: 'Speaker' }[lanyardCategory] || 'Not selected');
+      const regId = result.rows[0].id;
+      const refCode = 'TFOAIIB-' + String(regId).padStart(3, '0');
       // Notify admin
       sendEmail({
         from: `CRES Events <${SENDER}>`,
         to: INBOX,
         subject: `New Registration: ${escapeHtml(firstName)} for ${escapeHtml(title)}`,
         html: `<h2>New Event Registration</h2>
+          <p><strong>Ref:</strong> ${escapeHtml(refCode)}</p>
           <p><strong>Event:</strong> ${escapeHtml(title)} — ${escapeHtml(date)}</p>
           <p><strong>Name:</strong> ${escapeHtml(firstName)} ${escapeHtml(lastName || '')}</p>
           <p><strong>Email:</strong> ${escapeHtml(email)}</p>
@@ -285,8 +346,11 @@ app.post('/api/events/register', async (req, res) => {
           <td style="padding:6px 0;color:#4a5568;font-size:14px;">1:30 PM – 7:00 PM EAT</td>
         </tr><tr>
           <td style="padding:6px 0;color:#4a5568;font-size:14px;vertical-align:top;">🎫</td>
-          <td style="padding:6px 0;color:#4a5568;font-size:14px;"><strong>${escapeHtml(ticketLabel)} Ticket</strong></td>
-        </tr></table>
+           <td style="padding:6px 0;color:#4a5568;font-size:14px;"><strong>${escapeHtml(ticketLabel)} Ticket</strong></td>
+        </tr>
+        ${company ? `<tr><td style="padding:6px 0;color:#4a5568;font-size:14px;vertical-align:top;">🏢</td><td style="padding:6px 0;color:#4a5568;font-size:14px;">${escapeHtml(company)}</td></tr>` : ''}
+        ${refCode ? `<tr><td style="padding:6px 0;color:#4a5568;font-size:14px;vertical-align:top;">📋</td><td style="padding:6px 0;color:#4a5568;font-size:14px;">Ref: <strong>${escapeHtml(refCode)}</strong></td></tr>` : ''}
+      </table>
       </td></tr>
     </table>
 
@@ -329,7 +393,7 @@ app.post('/api/events/register', async (req, res) => {
               <tr><td style="padding:3px 0;color:#6b7280;font-size:13px;">Bank: KCB Bank</td></tr>
               <tr><td style="padding:3px 0;color:#1a202c;font-size:13px;font-weight:600;">Account: CRES Dynamics Ltd</td></tr>
               <tr><td style="padding:3px 0;color:#1a202c;font-size:13px;font-weight:600;">Account Number: 01209982836350</td></tr>
-              <tr><td style="padding:3px 0;color:#6b7280;font-size:13px;">Reference: ${escapeHtml(accountRef)}-${escapeHtml(firstName.substring(0,4).toUpperCase())}</td></tr>
+              <tr><td style="padding:3px 0;color:#6b7280;font-size:13px;">Reference: ${escapeHtml(refCode)}</td></tr>
             </table>
           </td></tr>
         </table>
