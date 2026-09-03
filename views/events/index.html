@@ -136,6 +136,50 @@
   </div>
 </section>
 
+<section style="background:linear-gradient(180deg,#0A1B34,#0C2140);padding:4rem 1.5rem;border-top:1px solid rgba(255,255,255,0.08);border-bottom:1px solid rgba(255,255,255,0.08);">
+  <div style="max-width:600px;margin:0 auto;text-align:center;">
+    <span class="eyebrow" style="color:#fff;">Event Highlight</span>
+    <h2 style="font-weight:900;font-size:clamp(1.5rem,4vw,2rem);color:#fff;margin-bottom:1.5rem;">See what happened last time</h2>
+    <div style="position:relative;width:100%;max-width:400px;margin:0 auto;border-radius:1rem;overflow:hidden;border:1px solid rgba(255,255,255,0.14);box-shadow:0 12px 32px rgba(0,0,0,0.4);aspect-ratio:9/16;background:#0A1628;">
+      <div id="ev-video-thumbnail" style="position:absolute;inset:0;cursor:pointer;" onclick="playEventVideo()">
+        <img src="https://img.youtube.com/vi/KeQTcOn6Rg4/maxresdefault.jpg" alt="Event video preview" style="width:100%;height:100%;object-fit:cover;" loading="lazy">
+        <div style="position:absolute;inset:0;background:linear-gradient(to top,rgba(5,11,26,0.7),rgba(5,11,26,0.2),transparent);"></div>
+        <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;">
+          <div style="width:80px;height:80px;border-radius:50%;background:rgba(243,156,36,0.92);display:flex;align-items:center;justify-content:center;box-shadow:0 8px 40px rgba(243,156,36,0.6);transition:transform 0.2s;" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform=''">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="#0A1628"><polygon points="8,5 19,12 8,19"/></svg>
+          </div>
+        </div>
+      </div>
+      <div id="ev-video-iframe" style="position:absolute;inset:0;display:none;">
+        <iframe src="" title="Event video" style="width:100%;height:100%;border:0;" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen loading="lazy"></iframe>
+      </div>
+    </div>
+  </div>
+</section>
+<script>
+function playEventVideo(){
+  var thumb = document.getElementById('ev-video-thumbnail');
+  var iframe = document.getElementById('ev-video-iframe');
+  if(thumb && iframe){
+    thumb.style.display = 'none';
+    iframe.style.display = 'block';
+    iframe.querySelector('iframe').src = 'https://www.youtube.com/embed/KeQTcOn6Rg4?autoplay=1&rel=0';
+  }
+}
+</script>
+
+<div id="floating-event-btn" style="position:fixed;bottom:24px;right:24px;z-index:100;display:none;">
+  <a href="/events/the-future-of-ai-in-business" style="display:block;padding:14px 28px;border-radius:9999px;font-weight:900;font-size:0.9rem;background:linear-gradient(135deg,#F39C24,#F5702D);color:#0A1628;text-decoration:none;box-shadow:0 8px 30px rgba(243,156,36,0.5);transition:transform 0.2s,box-shadow 0.2s;" onmouseover="this.style.transform='translateY(-2px)';this.style.boxShadow='0 12px 40px rgba(243,156,36,0.6)'" onmouseout="this.style.transform='';this.style.boxShadow='0 8px 30px rgba(243,156,36,0.5)'">
+    View Event →
+  </a>
+</div>
+<script>
+setTimeout(function(){
+  var btn = document.getElementById('floating-event-btn');
+  if(btn){ btn.style.display = 'block'; btn.style.opacity = '0'; btn.style.transition = 'opacity 0.5s'; setTimeout(function(){ btn.style.opacity = '1'; }, 50); }
+}, 5000);
+</script>
+
 <section class="section-light">
   <div class="section-container">
     <div style="text-align:center;margin-bottom:2.5rem;">
