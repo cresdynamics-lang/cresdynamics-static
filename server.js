@@ -1134,6 +1134,7 @@ app.get('/events', (req, res) => renderPage(res, 'events/index.html'));
 app.get('/events/the-future-of-ai-in-business', (req, res) => renderPage(res, 'events/future-ai.html'));
 app.get('/events/the-future-of-ai-in-business/programme', (req, res) => renderPage(res, 'events/programme.html'));
 app.get('/events/speak', (req, res) => renderPage(res, 'events/speak.html'));
+app.get('/events/sponsorship', (req, res) => renderPage(res, 'events/sponsorship.html'));
 
 // Case studies
 app.get('/case-studies', (req, res) => renderPage(res, 'case-studies/index.html'));
