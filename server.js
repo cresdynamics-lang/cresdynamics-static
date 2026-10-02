@@ -215,15 +215,19 @@ async function checkBotSpikeAndAlert() {
 const INBOX = 'info@cresdynamics.com';
 // ─── Attack-surface lockdown (registered FIRST so original handlers never run) ───
 const LOCKDOWN_MSG = 'Submissions are currently disabled. Please email info@cresdynamics.com or call +254 708 805 496.';
+const EVENTS_CLOSED_MSG = 'Event registration is closed. The event has been postponed to a later date. Contact the CRES Dynamics team if you need a system: info@cresdynamics.com or +254 708 805 496.';
 function lockdownGuard(req, res) {
   return res.status(410).json({ error: LOCKDOWN_MSG, email: 'info@cresdynamics.com', phone: '+254708805496' });
 }
+function eventsClosedGuard(req, res) {
+  return res.status(410).json({ error: EVENTS_CLOSED_MSG, email: 'info@cresdynamics.com', phone: '+254708805496', postponed: true });
+}
 app.post('/api/careers/apply', lockdownGuard);
-app.post('/api/events/speakers/apply', lockdownGuard);
-app.post('/api/events/sponsors/apply', lockdownGuard);
-app.post('/api/events/register/save-image', lockdownGuard);
-app.post('/api/events/register', lockdownGuard);
-app.post('/api/events/register-draft', lockdownGuard);
+app.post('/api/events/speakers/apply', eventsClosedGuard);
+app.post('/api/events/sponsors/apply', eventsClosedGuard);
+app.post('/api/events/register/save-image', eventsClosedGuard);
+app.post('/api/events/register', eventsClosedGuard);
+app.post('/api/events/register-draft', eventsClosedGuard);
 app.post('/api/chat-lead', lockdownGuard);
 app.post('/api/chat', lockdownGuard);
 
@@ -1400,12 +1404,12 @@ app.get('/blog/:slug', async (req, res) => {
   }
 });
 
-// Events
-app.get('/events', (req, res) => renderPage(res, 'events/index.html'));
-app.get('/events/the-future-of-ai-in-business', (req, res) => renderPage(res, 'events/future-ai.html'));
-app.get('/events/the-future-of-ai-in-business/programme', (req, res) => renderPage(res, 'events/programme.html'));
-app.get('/events/speak', (req, res) => renderPage(res, 'events/speak.html'));
-app.get('/events/sponsorship', (req, res) => renderPage(res, 'events/sponsorship.html'));
+// Events — closed / postponed (all deep links redirect; registration APIs return 410)
+app.get('/events', (req, res) => renderPage(res, 'events/index.html', {
+  title: 'Event Postponed - CRES Dynamics',
+  description: 'This event has been postponed to a later date. Registrations are closed. Contact the CRES Dynamics team if you need a system for your business.',
+}));
+app.get(/^\/events\/.+/, (req, res) => res.redirect(301, '/events'));
 
 // Case studies
 app.get('/case-studies', (req, res) => renderPage(res, 'case-studies/index.html'));
@@ -1489,9 +1493,7 @@ app.get('/sitemap.xml', async (req, res) => {
     'industries/retail.html': '/industries/retail',
     'industries/multi-unit.html': '/industries/multi-unit',
     'events/index.html': '/events',
-    'events/future-ai.html': '/events/the-future-of-ai-in-business',
-    'events/programme.html': '/events/the-future-of-ai-in-business/programme',
-    'events/speak.html': '/events/speak', 'events/sponsorship.html': '/events/sponsorship',
+
     'case-studies/index.html': '/case-studies',
     'services/websites.html': '/websites', 'services/erp.html': '/erp',
     'services/e-commerce.html': '/e-commerce', 'services/ai-automation.html': '/ai-automation',
