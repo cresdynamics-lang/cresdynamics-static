@@ -1,0 +1,217 @@
+================================================================================
+                    CRES DYNAMICS CODEBASE STRUCTURE
+                           VISUAL SUMMARY
+================================================================================
+
+PROJECT ROOT: /Users/airm1/Projects/cresdynamics-static
+
+┌─ HOMEPAGE & LAYOUT ─────────────────────────────────────────────────────────┐
+│                                                                               │
+│  views/layout.html (Master Template)                                         │
+│  ├── Header (fixed, z-index: 50)                                            │
+│  │   ├── Logo + Brand                                                        │
+│  │   ├── Desktop Nav (7 items)                                               │
+│  │   │   ├── Who We Are (dropdown, 6 items)                                 │
+│  │   │   ├── CresOS (link)                                                   │
+│  │   │   ├── Systems (dropdown, 6 items)                                    │
+│  │   │   ├── Services (dropdown, 7 items)                                   │
+│  │   │   ├── Case Proof (link)                                              │
+│  │   │   ├── Projects (link)                                                │
+│  │   │   └── Events (link)                                                  │
+│  │   ├── CTA: "Book Session" (WhatsApp)                                     │
+│  │   └── Mobile Hamburger (responsive)                                       │
+│  │                                                                            │
+│  ├── Main Content (dynamic)                                                  │
+│  │   └── {{content}} injected here (index.html, about.html, etc.)           │
+│  │                                                                            │
+│  └── Footer                                                                  │
+│      ├── Navigation Links (6 columns)                                        │
+│      ├── Company Info                                                        │
+│      └── Social Links (X, Instagram)                                         │
+│                                                                               │
+│  views/index.html (Homepage Content)                                         │
+│  ├── Hero 1: Systems (white, radial gradients)                              │
+│  ├── Hero 2: Websites (white, radial gradients)                             │
+│  ├── Hero 3: Ads (white, radial gradients)                                  │
+│  ├── Marquee (orange, scrolling text)                                       │
+│  ├── Pain Points (navy, 4 emoji cards)                                       │
+│  ├── Outcomes (white, 3-col grid)                                           │
+│  └── How This Works (teal, 3 steps)                                          │
+│                                                                               │
+└───────────────────────────────────────────────────────────────────────────────┘
+
+┌─ STYLING SYSTEM ────────────────────────────────────────────────────────────┐
+│                                                                               │
+│  public/css/styles.css (180 lines)                                           │
+│                                                                               │
+│  COLOR PALETTE                                                               │
+│  ├─ Navy Dark:      #1A2433  (dark sections, buttons)                       │
+│  ├─ Navy Primary:   #2F3B52  (body text)                                    │
+│  ├─ Teal Accent:    #2FA6B3  (CTAs, highlights)                             │
+│  ├─ Teal Deep:      #1E7C88  (section backgrounds)                          │
+│  ├─ Orange Energy:  #F39C24  (highlights)                                   │
+│  ├─ Orange Hover:   #E48B18  (hover states)                                 │
+│  └─ White:          #FFFFFF  (backgrounds)                                  │
+│                                                                               │
+│  COMPONENT CLASSES                                                           │
+│  ├─ Sections:    .section-dark, .section-teal, .section-light               │
+│  ├─ Cards:       .card, .card-light                                         │
+│  ├─ Buttons:     .hero-btn-primary, .hero-btn-glass                         │
+│  ├─ Grids:       .grid-2, .grid-3, .grid-4, .grid-6                         │
+│  ├─ Navigation:  .nav-glass, .nav-link-glass, .nav-dropdown                 │
+│  └─ Effects:     .scroll-reveal, .animate-fade-in                           │
+│                                                                               │
+│  MODERN PATTERNS                                                             │
+│  ├─ Glassmorphism:  backdrop-filter: blur(12px)                             │
+│  ├─ Gradients:      Radial & linear gradient accents                        │
+│  ├─ Animations:     Scroll reveal, hover effects, marquee                   │
+│  ├─ Shadows:        --shadow-sm, --shadow-md, --shadow-lg                   │
+│  └─ Typography:     Responsive clamp() sizing                                │
+│                                                                               │
+└───────────────────────────────────────────────────────────────────────────────┘
+
+┌─ NAVIGATION DROPDOWNS STRUCTURE ────────────────────────────────────────────┐
+│                                                                               │
+│  DROPDOWN 1: "WHO WE ARE" (6 items, 6-column grid)                          │
+│  ├─ 1. /about              [wh0-we-wre.jpg]        "Who We Are"             │
+│  ├─ 2. /why-us             [why-us-us.jpg]         "Why Us"                 │
+│  ├─ 3. /how-we-work        [how-we-work.jpg]       "How We Work"            │
+│  ├─ 4. /how-we-build       [how-we-build.jpg]      "How We Build"           │
+│  ├─ 5. /events             [events-westlands.jpg]  "Events"                 │
+│  └─ 6. /contact            [contact-us.jpg]        "Contact"                │
+│                                                                               │
+│  DROPDOWN 2: "SYSTEMS" (6 items, 5-column grid)                             │
+│  ├─ 1. /cresos             [business-operating system.jpg]  "CresOS"        │
+│  ├─ 2. /finance-platforms  [finance-plartforms.jpg]        "Finance"       │
+│  ├─ 3. /operations-workflow [streamline-your-workflow.jpg] "Operations"    │
+│  ├─ 4. /ai-automation      [workflow-automation.jpg]        "AI"            │
+│  ├─ 5. /erp                [modern-erp.jpg]                 "ERP"           │
+│  └─ 6. /services/bos       [business-operating system.jpg]  "BOS"           │
+│                                                                               │
+│  DROPDOWN 3: "SERVICES" (7 items, 4-column grid)                            │
+│  ├─ 1. /websites           [websites.jpg]                   "Websites"      │
+│  ├─ 2. /e-commerce         [e-commerce.jpg]                 "E-Commerce"    │
+│  ├─ 3. /services/bos       [business-operating system.jpg]  "BOS"           │
+│  ├─ 4. /finance-platforms  [finance.jpg]                    "Finance"       │
+│  ├─ 5. /ai-automation      [time-automation.jpg]            "AI"            │
+│  ├─ 6. /software           [custome-software.jpg]           "Custom SW"     │
+│  └─ 7. /operations-workflow [streamline-your-workflow.jpg] "Operations"    │
+│                                                                               │
+│  IMAGE SPECS: 100% width × 96px height, 8px radius, object-fit: cover      │
+│                                                                               │
+└───────────────────────────────────────────────────────────────────────────────┘
+
+┌─ JAVASCRIPT FUNCTIONALITY ──────────────────────────────────────────────────┐
+│                                                                               │
+│  public/js/main.js (360 lines)                                               │
+│                                                                               │
+│  SCROLL ANIMATIONS                                                           │
+│  └─ IntersectionObserver watches .scroll-reveal elements                    │
+│     └─ Triggered at 10% visibility, adds .visible class for fade-in         │
+│                                                                               │
+│  NAVIGATION                                                                  │
+│  ├─ Desktop Dropdowns: Mouse-enter opens, 150ms delay on mouse-leave        │
+│  ├─ Active Nav Link: Compares pathname with href, adds .active class        │
+│  ├─ Scroll Effect: Header darkens at scrollY > 40px                         │
+│  └─ Mobile Menu: Hamburger toggles .open on #mobile-menu                    │
+│                                                                               │
+│  CHAT WIDGET (Frank)                                                         │
+│  ├─ Phase 1: closed (launcher button visible)                               │
+│  ├─ Phase 2: peek (preview message)                                         │
+│  ├─ Phase 3: open (full chat window)                                        │
+│  ├─ Lead Capture: Form collects name, phone, email                          │
+│  └─ API Integration: POST /api/chat for AI responses                        │
+│                                                                               │
+└───────────────────────────────────────────────────────────────────────────────┘
+
+┌─ RESPONSIVE DESIGN ─────────────────────────────────────────────────────────┐
+│                                                                               │
+│  BREAKPOINTS                                                                 │
+│  ├─ Mobile:        < 768px   (1-column, hamburger menu, no desktop nav)     │
+│  ├─ Tablet:        769-1024px (2-3 columns, hamburger menu)                 │
+│  └─ Desktop:       > 1024px   (full layout, desktop nav)                    │
+│                                                                               │
+│  GRID SYSTEMS                                                                │
+│  ├─ .grid-2:  2 cols → 1 col on mobile                                      │
+│  ├─ .grid-3:  3 cols → 2 cols tablet → 1 col mobile                         │
+│  ├─ .grid-4:  4 cols → 2 cols tablet → 1 col mobile                         │
+│  └─ .grid-6:  6 cols → 3 cols tablet → 1 col mobile                         │
+│                                                                               │
+│  MOBILE FEATURES                                                             │
+│  ├─ Hamburger Button:  Hidden on desktop, shown at max-width: 1024px        │
+│  ├─ Desktop Nav:       Hidden on mobile, shown at min-width: 1024px         │
+│  └─ Touch Optimized:   Larger tap targets, simplified forms                 │
+│                                                                               │
+└───────────────────────────────────────────────────────────────────────────────┘
+
+┌─ MODERN DESIGN PATTERNS USED ───────────────────────────────────────────────┐
+│                                                                               │
+│  1. GLASSMORPHISM                                                            │
+│     └─ Navigation: backdrop-filter blur + translucent overlay                │
+│                                                                               │
+│  2. GRADIENT ACCENTS                                                         │
+│     ├─ Hero titles: Dual-color gradient underlines                          │
+│     └─ Hero sections: Radial gradients for depth                            │
+│                                                                               │
+│  3. MICRO-INTERACTIONS                                                       │
+│     ├─ Cards: translateY(-4px) on hover                                     │
+│     ├─ Buttons: Shadow elevation + transform                                │
+│     └─ All transitions: 0.2s-0.35s cubic-bezier                             │
+│                                                                               │
+│  4. SCROLL ANIMATIONS                                                        │
+│     └─ Elements fade-in + slide-up as user scrolls                          │
+│                                                                               │
+│  5. COLOR PSYCHOLOGY                                                         │
+│     ├─ Navy: Trust & authority                                              │
+│     ├─ Teal: Innovation & progress                                          │
+│     ├─ Orange: Energy & excitement                                          │
+│     └─ White: Clarity & breathing room                                      │
+│                                                                               │
+│  6. RESPONSIVE TYPOGRAPHY                                                    │
+│     ├─ H1: clamp(2rem, 5vw, 3.5rem)  [scales with viewport]                │
+│     └─ H2: clamp(1.5rem, 3vw, 2.5rem) [fluid sizing]                       │
+│                                                                               │
+│  7. REUSABLE COMPONENTS                                                      │
+│     ├─ Card variants: Light & dark                                          │
+│     ├─ Buttons: Primary & glass                                             │
+│     └─ Grids: Responsive 2/3/4/6 column layouts                             │
+│                                                                               │
+└───────────────────────────────────────────────────────────────────────────────┘
+
+┌─ KEY FILE PATHS ────────────────────────────────────────────────────────────┐
+│                                                                               │
+│  MODIFY FOR DESIGN UPDATES:                                                  │
+│  1. /public/css/styles.css           [Colors, layout, animations]            │
+│  2. /views/layout.html               [Navigation, footer structure]          │
+│  3. /views/index.html                [Homepage content & sections]           │
+│  4. /public/js/main.js               [Interactive behaviors]                 │
+│                                                                               │
+│  IMAGES:                                                                     │
+│  └─ /public/images/                  [All brand assets & dropdown images]   │
+│                                                                               │
+│  BACKEND:                                                                    │
+│  ├─ server.js                        [Express routes & rendering]            │
+│  ├─ db/index.js                      [PostgreSQL connection]                 │
+│  └─ db/schema.sql                    [Database tables]                       │
+│                                                                               │
+└───────────────────────────────────────────────────────────────────────────────┘
+
+TYPOGRAPHY:
+└─ Font: Inter (Google Fonts)
+   ├─ 400: Regular body text
+   ├─ 500: Medium labels
+   ├─ 600: Semi-bold details
+   ├─ 700: Bold section titles
+   ├─ 800: Extra bold
+   └─ 900: Ultra bold hero titles
+
+PERFORMANCE:
+├─ No build step required (vanilla CSS/JS)
+├─ Minimal JavaScript (no frameworks)
+├─ GPU-accelerated CSS animations
+├─ Lazy-loaded images with object-fit
+└─ Passive event listeners for scroll events
+
+================================================================================
+                            END OF VISUAL SUMMARY
+================================================================================

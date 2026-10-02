@@ -27,8 +27,20 @@ const uploadStorage = multer.diskStorage({
 });
 const upload = multer({ storage: uploadStorage, limits: { fileSize: 20 * 1024 * 1024 } });
 
-app.use(express.static(path.join(__dirname, 'public')));
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+app.use(express.static(path.join(__dirname, 'public'), {
+  maxAge: process.env.NODE_ENV === 'production' ? '7d' : 0,
+  etag: true,
+  setHeaders(res, filePath) {
+    if (/\.(?:css|js)$/i.test(filePath)) {
+      res.setHeader('Cache-Control', 'public, max-age=86400, must-revalidate');
+    } else if (/\.(?:png|jpe?g|gif|webp|svg|ico|woff2?)$/i.test(filePath)) {
+      res.setHeader('Cache-Control', 'public, max-age=604800, immutable');
+    }
+  },
+}));
+app.use('/uploads', express.static(path.join(__dirname, 'uploads'), {
+  maxAge: '1d',
+}));
 app.set('trust proxy', true);
 
 // ─── Site analytics (traffic capture for Director dashboard in CRM) ───
@@ -73,10 +85,148 @@ app.use((req, res, next) => {
   next();
 });
 
+const appProtect = require('./lib/applicationProtection');
 const db = require('./db/index');
 const { sendEmail, hasResendConfigured, nlToBr, escapeHtml } = require('./lib/email');
 
+// ─── Abuse protection: in-memory rate limiting + spam guard ───
+const rate = {
+  hits: new Map(),
+  abuse: {
+    rejected: 0,
+    rateLimited: 0,
+    windowStart: Date.now(),
+    lastAlertAt: 0,
+    recent: [], // { t, reason, route } capped
+  },
+  recordAbuse(kind, reason, route) {
+    const bucket = rate.abuse;
+    if (kind === 'reject') bucket.rejected += 1;
+    if (kind === 'rate') bucket.rateLimited += 1;
+    bucket.recent.push({ t: Date.now(), kind, reason: reason || '', route: route || '' });
+    if (bucket.recent.length > 200) bucket.recent.shift();
+  },
+  abuseSnapshot() {
+    return {
+      windowStart: new Date(rate.abuse.windowStart).toISOString(),
+      rejected: rate.abuse.rejected,
+      rateLimited: rate.abuse.rateLimited,
+      recent: rate.abuse.recent.slice(-20),
+    };
+  },
+  resetAbuseWindow() {
+    rate.abuse.rejected = 0;
+    rate.abuse.rateLimited = 0;
+    rate.abuse.windowStart = Date.now();
+    rate.abuse.recent = [];
+  },
+  limiter(route, windowMs, max) {
+    return (req, res, next) => {
+      const fwd = (req.headers['x-forwarded-for'] || '').split(',')[0].trim();
+      const ip = (fwd || req.ip || req.socket?.remoteAddress || 'unknown').replace(/^::ffff:/, '');
+      const key = route + '|' + ip;
+      const now = Date.now();
+      const bucket = (rate.hits.get(key) || []).filter((t) => now - t < windowMs);
+      if (bucket.length >= max) {
+        rate.recordAbuse('rate', 'ip_limit', route);
+        return res.status(429).json({ error: 'Too many requests. Please try again later.' });
+      }
+      bucket.push(now);
+      rate.hits.set(key, bucket);
+      next();
+    };
+  },
+  spamGuard() {
+    return (req, res, next) => {
+      const body = req.body || {};
+      let reason = '';
+      // Honeypot fields (must stay empty)
+      if (typeof body.website === 'string' && body.website.trim().length > 0) reason = 'honeypot_website';
+      if (!reason && typeof body.companywebsite_hp === 'string' && body.companywebsite_hp.trim().length > 0) reason = 'honeypot_company';
+      if (!reason && typeof body.fax_number === 'string' && body.fax_number.trim().length > 0) reason = 'honeypot_fax';
+      const email = (body.email || '').trim().toLowerCase();
+      if (!reason && /\.eth$/i.test(email)) reason = 'eth_email';
+      // Bot / disposable patterns (incl. @example.com flood pattern)
+      if (!reason && /@(?:example\.com|mailinator\.com|guerrillamail\.com|tempmail|10minutemail|trashmail|yopmail\.com)\b/i.test(email)) reason = 'disposable_email';
+      if (!reason && /^attendee\.[0-9a-f]+@/i.test(email)) reason = 'attendee_bot';
+      const phone = String(body.phone || body.contactPhone || '');
+      // Mass PK spam signature from 2026 flood
+      if (!reason && /^\+?92\d{10,}$/.test(phone.replace(/[\s-]/g, '')) && /@example\.com$/i.test(email)) reason = 'pk_example_flood';
+      const joined = JSON.stringify(body || {}).toLowerCase();
+      if (!reason && /bank transfer|bitcoin|casino|viagra|\.eth@|new crypto|crypto\s*investment/i.test(joined)) reason = 'keyword_spam';
+      // Timing honeypot: forms submitted in <800ms after page paint token are bots
+      const started = parseInt(body._form_started || '0', 10);
+      if (!reason && started && Date.now() - started < 800) reason = 'timing_honeypot';
+      if (reason) {
+        rate.recordAbuse('reject', reason, req.path);
+        return res.status(400).json({ error: 'Submission rejected.' });
+      }
+      next();
+    };
+  },
+};
+setInterval(() => {
+  const now = Date.now();
+  for (const [k, v] of rate.hits) {
+    if (v.length === 0 || now - v[v.length - 1] > 3600_000) rate.hits.delete(k);
+  }
+}, 600_000);
+const formLimiter = rate.limiter('form', 60 * 1000, 10);      // max 10 public submissions/min/IP
+const loginLimiter = rate.limiter('login', 15 * 60 * 1000, 10); // max 10 login attempts/15min/IP
+
+const BOT_SPIKE_THRESHOLD = parseInt(process.env.BOT_SPIKE_THRESHOLD || '40', 10);
+const BOT_SPIKE_COOLDOWN_MS = parseInt(process.env.BOT_SPIKE_COOLDOWN_MS || String(60 * 60 * 1000), 10);
+
+async function checkBotSpikeAndAlert() {
+  const snap = rate.abuseSnapshot();
+  const total = snap.rejected + snap.rateLimited;
+  if (total < BOT_SPIKE_THRESHOLD) return;
+  if (Date.now() - rate.abuse.lastAlertAt < BOT_SPIKE_COOLDOWN_MS) return;
+  rate.abuse.lastAlertAt = Date.now();
+  const topReasons = {};
+  for (const r of rate.abuse.recent) {
+    topReasons[r.reason || r.kind] = (topReasons[r.reason || r.kind] || 0) + 1;
+  }
+  const reasonLine = Object.entries(topReasons).map(([k, v]) => `${k}: ${v}`).join(', ') || 'n/a';
+  console.warn(`[abuse] BOT SPIKE: rejected=${snap.rejected} rateLimited=${snap.rateLimited} reasons=${reasonLine}`);
+  try {
+    if (hasResendConfigured()) {
+      await sendEmail({
+        from: `CRES Alerts <${SENDER}>`,
+        to: process.env.ALERT_EMAIL || INBOX,
+        subject: `[CRES] Bot / abuse spike - ${total} events`,
+        html: `<p>Abuse window spike on cresdynamics.</p>
+          <ul>
+            <li>Rejected: <strong>${snap.rejected}</strong></li>
+            <li>Rate-limited: <strong>${snap.rateLimited}</strong></li>
+            <li>Threshold: ${BOT_SPIKE_THRESHOLD}</li>
+            <li>Window start: ${snap.windowStart}</li>
+            <li>Reasons: ${escapeHtml(reasonLine)}</li>
+          </ul>
+          <p>Check PM2 logs and /api/admin/abuse-stats. Event register remains locked down if still enabled.</p>`,
+      });
+    }
+  } catch (err) {
+    console.error('[abuse] alert email failed:', err.message);
+  }
+  rate.resetAbuseWindow();
+}
+
 const INBOX = 'info@cresdynamics.com';
+// ─── Attack-surface lockdown (registered FIRST so original handlers never run) ───
+const LOCKDOWN_MSG = 'Submissions are currently disabled. Please email info@cresdynamics.com or call +254 708 805 496.';
+function lockdownGuard(req, res) {
+  return res.status(410).json({ error: LOCKDOWN_MSG, email: 'info@cresdynamics.com', phone: '+254708805496' });
+}
+app.post('/api/careers/apply', lockdownGuard);
+app.post('/api/events/speakers/apply', lockdownGuard);
+app.post('/api/events/sponsors/apply', lockdownGuard);
+app.post('/api/events/register/save-image', lockdownGuard);
+app.post('/api/events/register', lockdownGuard);
+app.post('/api/events/register-draft', lockdownGuard);
+app.post('/api/chat-lead', lockdownGuard);
+app.post('/api/chat', lockdownGuard);
+
 const SENDER = process.env.SENDER_EMAIL || 'onboarding@resend.dev';
 
 // ─── Daily Registration Summary ───
@@ -102,7 +252,7 @@ async function sendDailySummary() {
     await sendEmail({
       from: `CRES Events <${SENDER}>`,
       to: INBOX,
-      subject: `Daily Registration Summary — ${total} registration${total !== 1 ? 's' : ''} today`,
+      subject: `Daily Registration Summary - ${total} registration${total !== 1 ? 's' : ''} today`,
       html: `<!DOCTYPE html><html><head><meta charset="utf-8"></head><body style="margin:0;padding:0;background:#f4f6f8;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;">
       <div style="max-width:500px;margin:24px auto;background:#ffffff;border-radius:12px;box-shadow:0 2px 12px rgba(0,0,0,0.06);overflow:hidden;">
         <div style="background:#0D1F3C;padding:24px 28px;text-align:center;">
@@ -135,6 +285,10 @@ const cron = require('node-cron');
 cron.schedule('0 20 * * *', () => {
   console.log('[daily-summary] Triggered');
   sendDailySummary();
+}, { timezone: 'Africa/Nairobi' });
+// Bot / abuse spike check every 15 minutes
+cron.schedule('*/15 * * * *', () => {
+  checkBotSpikeAndAlert().catch(err => console.error('[abuse] check failed:', err.message));
 }, { timezone: 'Africa/Nairobi' });
 
 // ─── Auth helpers ───
@@ -190,10 +344,16 @@ function bodyToHtml(body) {
 // ════════════════════════════════════════════════════════════════════
 
 // Contact form
-app.post('/api/contact', async (req, res) => {
+app.post('/api/contact', formLimiter, rate.spamGuard(), async (req, res) => {
   try {
-    const { fullName, email, contactPhone, projectTitle, projectDetail, subscribe } = req.body;
-    if (!fullName || !email || !contactPhone || !projectTitle) {
+    const body = req.body || {};
+    const fullName = body.fullName || body.name;
+    const email = body.email;
+    const contactPhone = body.contactPhone || body.phone || 'n/a';
+    const projectTitle = body.projectTitle || body.service || body.company || 'Website contact';
+    const projectDetail = body.projectDetail || body.message || '';
+    const subscribe = body.subscribe || false;
+    if (!fullName || !email || !projectDetail) {
       return res.status(400).json({ error: 'Missing required fields' });
     }
     await db.query(
@@ -226,7 +386,7 @@ app.post('/api/contact', async (req, res) => {
 });
 
 // Career application
-app.post('/api/careers/apply', upload.single('cv'), async (req, res) => {
+app.post('/api/careers/apply', formLimiter, upload.single('cv'), rate.spamGuard(), appProtect.protectFileUpload(), async (req, res) => {
   try {
     const { fullName, email, phone, role, linkedin, portfolio, experience, whyCres } = req.body;
     if (!fullName || !email || !role || !experience || !whyCres) {
@@ -242,7 +402,7 @@ app.post('/api/careers/apply', upload.single('cv'), async (req, res) => {
       sendEmail({
         from: `CRES Careers <${SENDER}>`,
         to: INBOX,
-        subject: `New Application: ${escapeHtml(role)} — ${escapeHtml(fullName)}`,
+        subject: `New Application: ${escapeHtml(role)} - ${escapeHtml(fullName)}`,
         html: `<h2>New Career Application</h2>
           <p><strong>Name:</strong> ${escapeHtml(fullName)}</p>
           <p><strong>Email:</strong> ${escapeHtml(email)}</p>
@@ -264,8 +424,22 @@ app.post('/api/careers/apply', upload.single('cv'), async (req, res) => {
 });
 
 // Event registration
-app.post('/api/events/register', async (req, res) => {
+app.post('/api/events/register', formLimiter, rate.spamGuard(), async (req, res) => {
   try {
+      // ── Input validation: English characters only + valid email/phone ──
+      {
+        const _email = String(req.body.email || '').trim();
+        const _phone = String(req.body.phone || '').trim();
+        const _EMAIL_RE = /^[A-Za-z0-9._%+\-]+@[A-Za-z0-9.\-]+\.[A-Za-z]{2,}$/;
+        const _PHONE_RE = /^\+?[0-9][0-9\s\-]{8,14}$/;
+        const _EN_RE = /^[\x20-\x7E]+$/;
+        if (!_EMAIL_RE.test(_email)) return res.status(400).json({ error: 'Please enter a valid email address.' });
+        if (_phone && !_PHONE_RE.test(_phone)) return res.status(400).json({ error: 'Please enter a valid phone number (e.g. 07XXXXXXXX or +2547XXXXXXXX).' });
+        for (const _v of [req.body.firstName, req.body.lastName, req.body.company, _email, _phone]) {
+          if (_v && !_EN_RE.test(String(_v))) return res.status(400).json({ error: 'Please use English characters only.' });
+        }
+      }
+
     const { eventTitle, eventDate, firstName, lastName, email, phone, company, ticketType, lanyardCategory, paymentChoice } = req.body;
     if (!firstName || !email) {
       return res.status(400).json({ error: 'Missing required fields' });
@@ -297,7 +471,7 @@ app.post('/api/events/register', async (req, res) => {
         subject: `New Registration: ${escapeHtml(firstName)} for ${escapeHtml(title)}`,
         html: `<h2>New Event Registration</h2>
           <p><strong>Ref:</strong> ${escapeHtml(refCode)}</p>
-          <p><strong>Event:</strong> ${escapeHtml(title)} — ${escapeHtml(date)}</p>
+          <p><strong>Event:</strong> ${escapeHtml(title)} - ${escapeHtml(date)}</p>
           <p><strong>Name:</strong> ${escapeHtml(firstName)} ${escapeHtml(lastName || '')}</p>
           <p><strong>Email:</strong> ${escapeHtml(email)}</p>
           <p><strong>Phone:</strong> ${escapeHtml(phone || '')}</p>
@@ -314,7 +488,7 @@ app.post('/api/events/register', async (req, res) => {
       sendEmail({
         from: `CRES Events <${SENDER}>`,
         to: email,
-        subject: `You're In — ${title}`,
+        subject: `You're In - ${title}`,
         html: `<!DOCTYPE html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"></head><body style="margin:0;padding:0;background:#f4f6f8;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;">
 <table width="100%" cellpadding="0" cellspacing="0" style="background:#f4f6f8;"><tr><td align="center" style="padding:40px 20px;">
 <table width="600" cellpadding="0" cellspacing="0" style="background:#ffffff;border-radius:12px;overflow:hidden;box-shadow:0 2px 12px rgba(0,0,0,0.08);">
@@ -361,7 +535,7 @@ app.post('/api/events/register', async (req, res) => {
       <tr><td style="padding:6px 0;color:#4a5568;font-size:14px;">✓ Networking with 300+ founders, developers, and executives</td></tr>
       <tr><td style="padding:6px 0;color:#4a5568;font-size:14px;">✓ Colour-coded lanyard for smart networking</td></tr>
       <tr><td style="padding:6px 0;color:#4a5568;font-size:14px;">✓ Lunch and refreshments</td></tr>
-      <tr><td style="padding:6px 0;color:#4a5568;font-size:14px;">✓ Monday Action Plan — walk out with a system you can use immediately</td></tr>
+      <tr><td style="padding:6px 0;color:#4a5568;font-size:14px;">✓ Monday Action Plan - walk out with a system you can use immediately</td></tr>
       ${ticketLabel === 'VIP' ? '<tr><td style="padding:6px 0;color:#2FA6B3;font-size:14px;font-weight:600;">✓ Priority seating and speaker Q&A access</td></tr><tr><td style="padding:6px 0;color:#2FA6B3;font-size:14px;font-weight:600;">✓ Exclusive VIP lounge</td></tr><tr><td style="padding:6px 0;color:#2FA6B3;font-size:14px;font-weight:600;">✓ Personalised AI readiness assessment for your business</td></tr>' : ''}
     </table>
 
@@ -369,7 +543,7 @@ app.post('/api/events/register', async (req, res) => {
     <table width="100%" cellpadding="0" cellspacing="0" style="background:#fffbeb;border:1px solid #fcd34d;border-radius:10px;margin-bottom:24px;">
       <tr><td style="padding:20px 24px;">
         <p style="margin:0 0 4px;color:#F39C24;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1.2px;">Complete Your Payment</p>
-        <p style="margin:0 0 16px;color:#92400e;font-size:15px;font-weight:600;">${escapeHtml(ticketLabel)} Ticket — ${ticketLabel === 'VIP' ? 'KES 4,000' : 'KES 2,500'}</p>
+        <p style="margin:0 0 16px;color:#92400e;font-size:15px;font-weight:600;">${escapeHtml(ticketLabel)} Ticket - ${ticketLabel === 'VIP' ? 'KES 4,000' : 'KES 2,500'}</p>
 
         <!-- M-Pesa -->
         <p style="margin:0 0 8px;color:#1a202c;font-size:14px;font-weight:700;">M-Pesa (Safaricom)</p>
@@ -433,8 +607,22 @@ app.post('/api/events/register', async (req, res) => {
 });
 
 // Auto-save event registration draft
-app.post('/api/events/register-draft', async (req, res) => {
+app.post('/api/events/register-draft', formLimiter, rate.spamGuard(), async (req, res) => {
   try {
+      // ── Input validation: English characters only + valid email/phone ──
+      {
+        const _email = String(req.body.email || '').trim();
+        const _phone = String(req.body.phone || '').trim();
+        const _EMAIL_RE = /^[A-Za-z0-9._%+\-]+@[A-Za-z0-9.\-]+\.[A-Za-z]{2,}$/;
+        const _PHONE_RE = /^\+?[0-9][0-9\s\-]{8,14}$/;
+        const _EN_RE = /^[\x20-\x7E]+$/;
+        if (!_EMAIL_RE.test(_email)) return res.status(400).json({ error: 'Please enter a valid email address.' });
+        if (_phone && !_PHONE_RE.test(_phone)) return res.status(400).json({ error: 'Please enter a valid phone number (e.g. 07XXXXXXXX or +2547XXXXXXXX).' });
+        for (const _v of [req.body.firstName, req.body.lastName, req.body.company, _email, _phone]) {
+          if (_v && !_EN_RE.test(String(_v))) return res.status(400).json({ error: 'Please use English characters only.' });
+        }
+      }
+
     const { eventTitle, eventDate, firstName, lastName, email, phone, company, ticketType, lanyardCategory, paymentChoice } = req.body;
     if (!email) return res.json({ ok: true, mode: 'skip' });
     const eTitle = eventTitle || 'The Future of AI in Business';
@@ -503,7 +691,7 @@ app.post('/api/events/register/save-image', async (req, res) => {
 });
 
 // Speaker application
-app.post('/api/events/speakers/apply', upload.fields([{ name: 'bioPdf' }, { name: 'image' }]), async (req, res) => {
+app.post('/api/events/speakers/apply', formLimiter, upload.fields([{ name: 'bioPdf' }, { name: 'image' }]), rate.spamGuard(), appProtect.protectFileUpload(), async (req, res) => {
   try {
     const { fullName, email, phone, company, topic, linkedin, audienceWhy } = req.body;
     if (!fullName || !email || !phone || !topic || !audienceWhy) {
@@ -525,7 +713,7 @@ app.post('/api/events/speakers/apply', upload.fields([{ name: 'bioPdf' }, { name
       sendEmail({
         from: `CRES Events <${SENDER}>`,
         to: INBOX,
-        subject: `Speaker Application: ${escapeHtml(fullName)} — ${escapeHtml(topic)}`,
+        subject: `Speaker Application: ${escapeHtml(fullName)} - ${escapeHtml(topic)}`,
         html: `<h2>New Speaker Application</h2>
           <p><strong>Name:</strong> ${escapeHtml(fullName)}</p>
           <p><strong>Email:</strong> ${escapeHtml(email)}</p>
@@ -534,8 +722,8 @@ app.post('/api/events/speakers/apply', upload.fields([{ name: 'bioPdf' }, { name
           <p><strong>Topic:</strong> ${escapeHtml(topic)}</p>
           <p><strong>LinkedIn:</strong> ${escapeHtml(linkedin || 'N/A')}</p>
           <p><strong>Why this audience:</strong><br>${nlToBr(escapeHtml(audienceWhy))}</p>
-          ${bioPdfFilename ? `<p><strong>Bio PDF:</strong> ${escapeHtml(bioPdfFilename)}${bioPdfPath && baseUrl ? ` — <a href="${baseUrl}${escapeHtml(bioPdfPath)}">View file</a>` : ''}</p>` : ''}
-          ${imageFilename ? `<p><strong>Image:</strong> ${escapeHtml(imageFilename)}${imagePath && baseUrl ? ` — <a href="${baseUrl}${escapeHtml(imagePath)}">View file</a>` : ''}</p>` : ''}`,
+          ${bioPdfFilename ? `<p><strong>Bio PDF:</strong> ${escapeHtml(bioPdfFilename)}${bioPdfPath && baseUrl ? ` - <a href="${baseUrl}${escapeHtml(bioPdfPath)}">View file</a>` : ''}</p>` : ''}
+          ${imageFilename ? `<p><strong>Image:</strong> ${escapeHtml(imageFilename)}${imagePath && baseUrl ? ` - <a href="${baseUrl}${escapeHtml(imagePath)}">View file</a>` : ''}</p>` : ''}`,
         replyTo: email,
       }).catch(e => console.error('Email send failed:', e.message));
     }
@@ -548,7 +736,7 @@ app.post('/api/events/speakers/apply', upload.fields([{ name: 'bioPdf' }, { name
 });
 
 // Sponsor application
-app.post('/api/events/sponsors/apply', async (req, res) => {
+app.post('/api/events/sponsors/apply', formLimiter, rate.spamGuard(), appProtect.protectApplication(), async (req, res) => {
   try {
     const { companyName, contactFullName, jobTitle, email, phone, companyWebsite, packageSelected, packageTier, whySponsor, howHeard } = req.body;
     if (!companyName || !contactFullName || !email || !phone || !packageSelected || !whySponsor) {
@@ -563,7 +751,7 @@ app.post('/api/events/sponsors/apply', async (req, res) => {
       sendEmail({
         from: `CRES Events <${SENDER}>`,
         to: INBOX,
-        subject: `Sponsor Application: ${escapeHtml(companyName)} — ${escapeHtml(packageSelected)}`,
+        subject: `Sponsor Application: ${escapeHtml(companyName)} - ${escapeHtml(packageSelected)}`,
         html: `<h2>New Sponsor Application</h2>
           <p><strong>Company:</strong> ${escapeHtml(companyName)}</p>
           <p><strong>Contact:</strong> ${escapeHtml(contactFullName)}</p>
@@ -698,7 +886,7 @@ app.get('/api/blog/:slug', async (req, res) => {
 // ADMIN API ROUTES
 // ════════════════════════════════════════════════════════════════════
 
-app.post('/api/admin/login', (req, res) => {
+app.post('/api/admin/login', loginLimiter, (req, res) => {
   const { email, password } = req.body;
   if (email === process.env.ADMIN_EMAIL && password === process.env.ADMIN_PASSWORD) {
     const token = signAdminSession(email, process.env.ADMIN_SESSION_SECRET);
@@ -1027,6 +1215,31 @@ app.get('/api/admin/dashboard', adminAuth, async (req, res) => {
   }
 });
 
+// ─── Health + abuse monitoring (Phase 4) ───
+app.get('/health', async (req, res) => {
+  let dbOk = false;
+  try {
+    await db.query('SELECT 1');
+    dbOk = true;
+  } catch (_) { /* leave false */ }
+  const ok = dbOk;
+  res.status(ok ? 200 : 503).json({
+    status: ok ? 'ok' : 'degraded',
+    service: 'cresdynamics',
+    uptime: Math.round(process.uptime()),
+    db: dbOk ? 'up' : 'down',
+    ts: new Date().toISOString(),
+  });
+});
+app.get('/api/health', (req, res) => res.redirect(302, '/health'));
+app.get('/api/admin/abuse-stats', adminAuth, (req, res) => {
+  res.json({
+    ...rate.abuseSnapshot(),
+    threshold: BOT_SPIKE_THRESHOLD,
+    cooldownMs: BOT_SPIKE_COOLDOWN_MS,
+  });
+});
+
 // Attendees CSV export
 app.get('/api/admin/events/attendees-export', adminAuth, async (req, res) => {
   try {
@@ -1055,11 +1268,20 @@ function renderPage(res, pageFile, data = {}) {
     const layout = fs.readFileSync(path.join(__dirname, 'views', 'layout.html'), 'utf8');
     const page = fs.readFileSync(path.join(__dirname, 'views', pageFile), 'utf8');
     let html = layout.replace('{{content}}', page);
-    for (const [key, val] of Object.entries(data)) {
-      html = html.replace(new RegExp(`{{${key}}}`, 'g'), val || '');
+    const base = (process.env.APP_BASE_URL || 'https://cresdynamics.com').replace(/\/$/, '');
+    const defaults = {
+      title: 'CRES Dynamics - Intelligent Systems That Run Your Business',
+      description: 'Intelligent Systems That Run Your Business. Custom operating systems, finance platforms, and websites that sell. Built in Nairobi for how your business actually works.',
+      ogImage: `${base}/images/logo.png`,
+      canonical: `${base}${res.req?.path || '/'}`,
+    };
+    const merged = { ...defaults, ...data };
+    if (!data.canonical && res.req?.path) merged.canonical = `${base}${res.req.path === '/' ? '/' : res.req.path}`;
+    for (const [key, val] of Object.entries(merged)) {
+      html = html.replace(new RegExp(`{{${key}}}`, 'g'), val == null ? '' : String(val));
     }
-    html = html.replace(/\{\{title\}\}/g, data.title || 'CRES Dynamics — Digital Innovation, Websites & AI in Nairobi');
-    html = html.replace(/\{\{description\}\}/g, data.description || 'CRES Dynamics builds high-performing websites, e-commerce platforms, ERPs, AI automation and predictive systems for growing businesses in Kenya and beyond.');
+    // Clear any leftover unmatched simple tokens
+    html = html.replace(/\{\{[a-zA-Z0-9_]+\}\}/g, '');
     res.send(html);
   } catch (err) {
     console.error(`Render error for ${pageFile}:`, err);
@@ -1093,7 +1315,35 @@ app.get('/growth-guides', (req, res) => renderPage(res, 'growth-guides.html'));
 app.get('/insights', (req, res) => renderPage(res, 'insights.html'));
 app.get('/terms', (req, res) => renderPage(res, 'terms.html'));
 app.get('/privacy', (req, res) => renderPage(res, 'privacy.html'));
-app.get('/data-security', (req, res) => renderPage(res, 'data-security.html'));
+app.get('/data-security', (req, res) => renderPage(res, 'data-security.html', {
+  title: 'Data & Security - CRES Dynamics',
+  description: 'How CRES Dynamics protects client systems: encryption, access control, backups, and Kenya Data Protection Act alignment.',
+}));
+
+// Industries
+app.get('/industries', (req, res) => renderPage(res, 'industries/index.html', {
+  title: 'Industries - Hospitality, Retail & Multi-unit | CRES Dynamics',
+  description: 'Industry systems for hospitality ops, retail commerce, and multi-unit groups - built in Nairobi for how your sector runs.',
+}));
+app.get('/industries/:slug', (req, res) => {
+  const valid = ['hospitality', 'retail', 'multi-unit'];
+  if (!valid.includes(req.params.slug)) return res.redirect('/industries');
+  const meta = {
+    hospitality: {
+      title: 'Hospitality Systems - Ops & Approvals | CRES Dynamics',
+      description: 'Hotel and hospitality operations platforms - HOD approvals, ownership, and audit trails that cut cycles from hours to minutes.',
+    },
+    retail: {
+      title: 'Retail Systems - Catalogue, M-Pesa & Discovery | CRES Dynamics',
+      description: 'Retail systems for Kenyan commerce - catalogue, WhatsApp demand, M-Pesa checkout, and organic discovery.',
+    },
+    'multi-unit': {
+      title: 'Multi-unit Business Systems | CRES Dynamics',
+      description: 'Group operating systems for multi-unit companies - per-unit finance and HR with one director-level view.',
+    },
+  }[req.params.slug];
+  renderPage(res, `industries/${req.params.slug}.html`, meta);
+});
 
 // Blog (dynamic from DB)
 app.get('/blog', async (req, res) => {
@@ -1101,9 +1351,17 @@ app.get('/blog', async (req, res) => {
     const posts = await db.queryMany(
       "SELECT id, slug, title, excerpt, category, published_at FROM blog_posts WHERE status = 'published' ORDER BY published_at DESC"
     );
-    renderPage(res, 'blog/index.html', { posts: JSON.stringify(posts) });
+    renderPage(res, 'blog/index.html', {
+      title: 'Blog - Systems, AI & growth insights | CRES Dynamics',
+      description: 'Practical insights from CRES Dynamics - operations systems, AI, and growth for businesses in Nairobi and across Africa.',
+      posts: JSON.stringify(posts).replace(/</g, '\\u003c'),
+    });
   } catch (err) {
-    renderPage(res, 'blog/index.html', { posts: '[]' });
+    renderPage(res, 'blog/index.html', {
+      title: 'Blog - CRES Dynamics',
+      description: 'Insights from CRES Dynamics on systems, AI, and growth.',
+      posts: '[]',
+    });
   }
 });
 
@@ -1115,14 +1373,27 @@ app.get('/blog/:slug', async (req, res) => {
     );
     if (!post) return res.redirect('/blog');
     const htmlBody = bodyToHtml(post.body);
+    const related = await db.queryMany(
+      "SELECT slug, title, category FROM blog_posts WHERE status = 'published' AND slug <> $1 ORDER BY published_at DESC LIMIT 3",
+      [post.slug]
+    );
+    const title = post.meta_title || post.title;
+    const description = post.meta_description || post.excerpt || '';
+    const author = post.author || 'CRES Dynamics';
     renderPage(res, 'blog/post.html', {
-      title: post.title,
+      title,
+      description,
       body: htmlBody,
-      category: post.category || '',
-      author: post.author,
+      category: post.category || 'Article',
+      author,
       date: post.published_at ? new Date(post.published_at).toLocaleDateString('en-KE', { year: 'numeric', month: 'long', day: 'numeric' }) : '',
+      dateIso: post.published_at ? new Date(post.published_at).toISOString() : '',
       excerpt: post.excerpt || '',
       slug: post.slug,
+      related: JSON.stringify(related).replace(/</g, '\\u003c'),
+      jsonTitle: JSON.stringify(title),
+      jsonDescription: JSON.stringify(description),
+      jsonAuthor: JSON.stringify(author),
     });
   } catch (err) {
     res.redirect('/blog');
@@ -1168,7 +1439,7 @@ function renderAdminPage(res, pageFile, data = {}) {
     for (const [key, val] of Object.entries(data)) {
       html = html.replace(new RegExp(`{{${key}}}`, 'g'), val || '');
     }
-    html = html.replace(/\{\{title\}\}/g, data.title || 'Admin — CRES Dynamics');
+    html = html.replace(/\{\{title\}\}/g, data.title || 'Admin - CRES Dynamics');
     res.send(html);
   } catch (err) {
     console.error(`Render admin error for ${pageFile}:`, err);
@@ -1190,6 +1461,82 @@ app.get('/admin/messages', adminAuth, (req, res) => renderAdminPage(res, 'admin/
 app.get('/admin/payments', adminAuth, (req, res) => renderAdminPage(res, 'admin/payments.html'));
 
 // Catch-all
+// ─── SEO: robots.txt ───
+app.get('/robots.txt', (req, res) => {
+  const host = req.get('host') || 'cresdynamics.com';
+  res.type('text/plain').send(`User-agent: *
+Allow: /
+Sitemap: https://${host}/sitemap.xml
+`);
+});
+
+// ─── SEO: dynamic XML sitemap ───
+app.get('/sitemap.xml', async (req, res) => {
+  const host = req.get('host') || 'cresdynamics.com';
+  const base = `https://${host}`;
+  const VIEWS_DIR = path.join(__dirname, 'views');
+  const ROUTE_MAP = {
+    'index.html': '', 'about.html': '/about', 'why-us.html': '/why-us',
+    'how-we-build.html': '/how-we-build', 'how-we-work.html': '/how-we-work',
+    'cresos.html': '/cresos', 'contact.html': '/contact', 'partners.html': '/partners',
+    'careers.html': '/careers', 'pricing.html': '/pricing',
+    'book-strategy-call.html': '/book-strategy-call', 'projects.html': '/projects',
+    'client-testimonials.html': '/client-testimonials', 'growth-guides.html': '/growth-guides',
+    'insights.html': '/insights', 'terms.html': '/terms', 'privacy.html': '/privacy',
+    'data-security.html': '/data-security', 'blog/index.html': '/blog',
+    'industries/index.html': '/industries',
+    'industries/hospitality.html': '/industries/hospitality',
+    'industries/retail.html': '/industries/retail',
+    'industries/multi-unit.html': '/industries/multi-unit',
+    'events/index.html': '/events',
+    'events/future-ai.html': '/events/the-future-of-ai-in-business',
+    'events/programme.html': '/events/the-future-of-ai-in-business/programme',
+    'events/speak.html': '/events/speak', 'events/sponsorship.html': '/events/sponsorship',
+    'case-studies/index.html': '/case-studies',
+    'services/websites.html': '/websites', 'services/erp.html': '/erp',
+    'services/e-commerce.html': '/e-commerce', 'services/ai-automation.html': '/ai-automation',
+    'services/finance-platforms.html': '/finance-platforms',
+    'services/operations-workflow.html': '/operations-workflow',
+    'services/software.html': '/software',
+  };
+  const pageFiles = [];
+  const walk = (dir) => {
+    for (const name of fs.readdirSync(dir)) {
+      if (name.startsWith('.')) continue;
+      const full = path.join(dir, name);
+      if (fs.statSync(full).isDirectory()) walk(full);
+      else if (name.endsWith('.html')) pageFiles.push(full.replace(VIEWS_DIR + path.sep, '').replace(/\\/g, '/'));
+    }
+  };
+  try { walk(VIEWS_DIR); } catch (err) { console.error('sitemap walk error:', err.message); }
+  const staticPaths = pageFiles
+    .filter(f => ROUTE_MAP[f] !== undefined)
+    .map(f => ROUTE_MAP[f])
+    .concat(
+      pageFiles
+        .filter(f => f.startsWith('solutions/') && f.includes('.html'))
+        .map(f => `/solutions/${f.split('/')[1].replace('.html', '')}`),
+      pageFiles
+        .filter(f => f.startsWith('case-studies/') && f.endsWith('.html') && f !== 'case-studies/index.html')
+        .map(f => `/case-studies/${f.split('/')[1].replace('.html', '')}`)
+    );
+  const today = new Date().toISOString().split('T')[0];
+  let urls = staticPaths.map(p => `  <url>\n    <loc>${base}${p}</loc>\n    <lastmod>${today}</lastmod>\n  </url>`);
+  try {
+    const posts = await db.queryMany(
+      "SELECT slug, COALESCE(updated_at, published_at, now()) AS lm FROM blog_posts WHERE status = 'published'"
+    );
+    for (const p of posts) {
+      const lm = (p.lm instanceof Date ? p.lm : new Date(p.lm)).toISOString().split('T')[0];
+      urls.push(`  <url>\n    <loc>${base}/blog/${p.slug}</loc>\n    <lastmod>${lm}</lastmod>\n  </url>`);
+    }
+  } catch (err) {
+    console.error('sitemap error:', err.message);
+  }
+  const xml = `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls.join('\n')}\n</urlset>`;
+  res.type('application/xml').send(xml);
+});
+
 app.use((req, res) => res.redirect('/'));
 
 app.listen(PORT, () => {

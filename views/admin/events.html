@@ -77,14 +77,14 @@
         return;
       }
       
-      var LANYARD_COLORS = { developer:'#2FA6B3', founder:'#F39C24', hiring:'#10B981', jobSeeker:'#3B82F6', speaker:'#EC4899' };
+      var LANYARD_COLORS = { developer:'#000000', founder:'#000000', hiring:'#10B981', jobSeeker:'#3B82F6', speaker:'#EC4899' };
       var LANYARD_LABELS = { developer:'Developer', founder:'Business Owner', hiring:'Hiring', jobSeeker:'Job Seeker', speaker:'Speaker' };
       
       tbody.innerHTML = reservations.map(r => {
         var lColor = LANYARD_COLORS[r.lanyardCategory] || '#888';
         var lLabel = LANYARD_LABELS[r.lanyardCategory] || r.lanyardCategory || '-';
         var payLabel = r.paymentChoice === 'pay_now' ? 'Pay Now' : r.paymentChoice === 'pay_later' ? 'Pay Later' : '-';
-        var posterCell = r.posterImagePath ? '<a href="'+r.posterImagePath+'" target="_blank" style="color:#2FA6B3;font-size:12px;">View poster</a>' : '<span style="color:#555;font-size:12px;">—</span>';
+        var posterCell = r.posterImagePath ? '<a href="'+r.posterImagePath+'" target="_blank" style="color:#000000;font-size:12px;">View poster</a>' : '<span style="color:#555;font-size:12px;">, </span>';
         var refCode = 'TFOAIIB-' + String(r.id).padStart(3, '0');
         return '<tr>' +
           '<td>' + r.name + '</td>' +
@@ -93,7 +93,7 @@
           '<td>' + r.phone + '</td>' +
           '<td>' + r.ticketType + '</td>' +
           '<td><span style="color:'+lColor+';font-weight:600;">'+lLabel+'</span></td>' +
-          '<td style="font-family:monospace;font-weight:600;color:#2FA6B3;">'+refCode+'</td>' +
+          '<td style="font-family:monospace;font-weight:600;color:#000000;">'+refCode+'</td>' +
           '<td>' + payLabel + '</td>' +
           '<td>' + posterCell + '</td>' +
           '<td><span class="status-badge '+(r.bookingStatus === 'paid' ? 'paid' : r.bookingStatus === 'cancelled' ? 'cancelled' : 'unpaid')+'">'+(r.bookingStatus === 'paid' ? 'Paid' : r.bookingStatus === 'cancelled' ? 'Cancelled' : 'Pending')+'</span></td>' +

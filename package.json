@@ -6,6 +6,8 @@
   "scripts": {
     "start": "node server.js",
     "dev": "node server.js",
+    "smoke": "node scripts/smoke.js",
+    "lighthouse": "node scripts/lighthouse-gate.js",
     "db:init": "node scripts/init-db.js",
     "db:seed": "node scripts/seed-blog.js"
   },

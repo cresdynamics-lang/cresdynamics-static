@@ -2,17 +2,50 @@
 (function() {
   'use strict';
 
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
   // ─── SCROLL REVEAL ───
   const revealElements = document.querySelectorAll('.scroll-reveal');
-  const revealObserver = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-      if (entry.isIntersecting) {
-        entry.target.classList.add('visible');
-        revealObserver.unobserve(entry.target);
-      }
+  if (reduceMotion) {
+    revealElements.forEach(el => el.classList.add('visible'));
+  } else {
+    // Auto-stagger children inside .reveal-stagger when not already .scroll-reveal
+    document.querySelectorAll('.reveal-stagger').forEach(group => {
+      Array.from(group.children).forEach((child, i) => {
+        if (!child.classList.contains('scroll-reveal')) child.classList.add('scroll-reveal');
+        child.style.transitionDelay = `${Math.min(i, 8) * 60}ms`;
+      });
     });
-  }, { threshold: 0.1, rootMargin: '0px 0px -50px 0px' });
-  revealElements.forEach(el => revealObserver.observe(el));
+    const revealObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+          revealObserver.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.1, rootMargin: '0px 0px -50px 0px' });
+    document.querySelectorAll('.scroll-reveal').forEach(el => revealObserver.observe(el));
+  }
+
+  // Lazy-load images that forgot loading attr (below-fold content images only)
+  document.querySelectorAll('main img:not([loading])').forEach((img, i) => {
+    if (i === 0) return; // keep first content image eager for LCP
+    img.setAttribute('loading', 'lazy');
+    img.setAttribute('decoding', 'async');
+  });
+
+  // Stamp timing honeypots on forms
+  const started = String(Date.now());
+  document.querySelectorAll('input[name="_form_started"]').forEach(el => { el.value = started; });
+  document.querySelectorAll('form').forEach(form => {
+    if (!form.querySelector('input[name="_form_started"]')) {
+      const h = document.createElement('input');
+      h.type = 'hidden';
+      h.name = '_form_started';
+      h.value = started;
+      form.appendChild(h);
+    }
+  });
 
   // ─── NAV SCROLL ───
   const header = document.getElementById('main-header');
@@ -42,14 +75,20 @@
       if (closeTimer) { clearTimeout(closeTimer); closeTimer = null; }
       if (activeDropdown && activeDropdown !== dropdown) {
         activeDropdown.classList.remove('open');
+        const prevBtn = document.querySelector(`.nav-item[data-dropdown] button[aria-controls="${activeDropdown.id}"]`);
+        if (prevBtn) prevBtn.setAttribute('aria-expanded', 'false');
       }
       dropdown.classList.add('open');
       activeDropdown = dropdown;
+      const btn = item.querySelector('button');
+      if (btn) btn.setAttribute('aria-expanded', 'true');
     });
 
     item.addEventListener('mouseleave', () => {
       closeTimer = setTimeout(() => {
         dropdown.classList.remove('open');
+        const btn = item.querySelector('button');
+        if (btn) btn.setAttribute('aria-expanded', 'false');
         if (activeDropdown === dropdown) activeDropdown = null;
       }, 150);
     });
@@ -61,6 +100,8 @@
     dropdown.addEventListener('mouseleave', () => {
       closeTimer = setTimeout(() => {
         dropdown.classList.remove('open');
+        const btn = item.querySelector('button');
+        if (btn) btn.setAttribute('aria-expanded', 'false');
         if (activeDropdown === dropdown) activeDropdown = null;
       }, 150);
     });
@@ -70,6 +111,7 @@
   document.addEventListener('click', (e) => {
     if (!e.target.closest('.nav-item') && !e.target.closest('.nav-dropdown')) {
       document.querySelectorAll('.nav-dropdown.open').forEach(d => d.classList.remove('open'));
+      document.querySelectorAll('.nav-item button[aria-expanded="true"]').forEach(b => b.setAttribute('aria-expanded', 'false'));
       activeDropdown = null;
     }
   });
@@ -356,5 +398,52 @@
     el.style.background = success ? 'rgba(16,185,129,0.15)' : 'rgba(239,68,68,0.15)';
     el.style.color = success ? '#34d399' : '#fca5a5';
     el.style.border = success ? '1px solid rgba(16,185,129,0.3)' : '1px solid rgba(239,68,68,0.3)';
+  }
+
+  // ─── CONTACT PAGE FORM (#contact-form) ───
+  const contactForm = document.getElementById('contact-form');
+  if (contactForm) {
+    contactForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const btn = contactForm.querySelector('button[type="submit"]');
+      const status = document.getElementById('contact-status');
+      const orig = btn?.textContent;
+      if (btn) { btn.disabled = true; btn.textContent = 'Sending…'; }
+      try {
+        const fd = new FormData(contactForm);
+        const payload = {
+          name: fd.get('name'),
+          email: fd.get('email'),
+          phone: fd.get('phone') || 'n/a',
+          company: fd.get('company') || '',
+          service: fd.get('service'),
+          message: fd.get('message'),
+          website: fd.get('website') || '',
+          _form_started: fd.get('_form_started') || '',
+        };
+        const res = await fetch('/api/contact', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
+        });
+        const data = await res.json().catch(() => ({}));
+        if (status) {
+          status.style.display = 'block';
+          status.style.color = res.ok ? '#34d399' : '#fca5a5';
+          status.textContent = res.ok
+            ? (data.message || 'Message sent. We will respond shortly.')
+            : (data.error || 'Could not send. Please WhatsApp or email us.');
+        }
+        if (res.ok) contactForm.reset();
+      } catch (_err) {
+        if (status) {
+          status.style.display = 'block';
+          status.style.color = '#fca5a5';
+          status.textContent = 'Network error. Please try WhatsApp or email.';
+        }
+      } finally {
+        if (btn) { btn.disabled = false; btn.textContent = orig; }
+      }
+    });
   }
 })();
