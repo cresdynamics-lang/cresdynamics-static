@@ -15,6 +15,8 @@ const ROUTES = [
   { path: '/industries/retail', mustInclude: ['Retail'] },
   { path: '/industries/multi-unit', mustInclude: ['Multi-unit'] },
   { path: '/blog', mustInclude: ['Blog', 'blog-grid'] },
+  { path: '/ai-systems', mustInclude: ['AI systems', 'systems administration'] },
+  { path: '/our-work', mustInclude: ['Systems we have built', 'CresOS'] },
   { path: '/data-security', mustInclude: ['Data', 'Security'] },
   { path: '/css/styles.css', mustInclude: ['--font-display', '.home-hero'] },
   { path: '/health', mustInclude: ['"status"'], allowStatus: [200, 503] },

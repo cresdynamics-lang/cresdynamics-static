@@ -1304,9 +1304,21 @@ app.get('/websites', (req, res) => renderPage(res, 'services/websites.html'));
 app.get('/erp', (req, res) => renderPage(res, 'services/erp.html'));
 app.get('/e-commerce', (req, res) => renderPage(res, 'services/e-commerce.html'));
 app.get('/ai-automation', (req, res) => renderPage(res, 'services/ai-automation.html'));
+app.get('/ai-systems', (req, res) => renderPage(res, 'services/ai-systems.html', {
+  title: 'AI Systems & Systems Administration Kenya | CRES Dynamics',
+  description: 'AI systems for companies in Kenya and systems administration in Nairobi: audit to rollout, 18-engineer team, servers, access, backups, and monitoring.',
+}));
+app.get('/our-work', (req, res) => renderPage(res, 'our-work.html', {
+  title: 'Our Work: Systems We Built for Companies | CRES Dynamics',
+  description: 'Proof hub for CRES Dynamics: CresOS, OptioHire, hospitality, retail, property, and live client systems organised by industry.',
+}));
 app.get('/finance-platforms', (req, res) => renderPage(res, 'services/finance-platforms.html'));
 app.get('/operations-workflow', (req, res) => renderPage(res, 'services/operations-workflow.html'));
 app.get('/software', (req, res) => renderPage(res, 'services/software.html'));
+app.get('/services/business-operating-system', (req, res) => renderPage(res, 'services/business-operating-system.html', {
+  title: 'Business Operating System (BOS) | CRES Dynamics',
+  description: 'AI-powered business operating system for Kenyan companies: finance, CRM, HR, and multi-unit operations on one platform.',
+}));
 app.get('/cresos', (req, res) => renderPage(res, 'cresos.html'));
 app.get('/contact', (req, res) => renderPage(res, 'contact.html'));
 app.get('/partners', (req, res) => renderPage(res, 'partners.html'));
@@ -1429,8 +1441,9 @@ app.get('/solutions/:slug', (req, res) => {
 
 // Services
 app.get('/services/:slug', (req, res) => {
-  const validSlugs = ['automation', 'finance', 'operations', 'websites'];
+  const validSlugs = ['automation', 'finance', 'operations', 'websites', 'business-operating-system', 'ai-systems'];
   if (!validSlugs.includes(req.params.slug)) return res.redirect('/');
+  if (req.params.slug === 'ai-systems') return res.redirect(301, '/ai-systems');
   renderPage(res, `services/${req.params.slug}.html`);
 });
 
@@ -1488,6 +1501,9 @@ app.get('/sitemap.xml', async (req, res) => {
     'client-testimonials.html': '/client-testimonials', 'growth-guides.html': '/growth-guides',
     'insights.html': '/insights', 'terms.html': '/terms', 'privacy.html': '/privacy',
     'data-security.html': '/data-security', 'blog/index.html': '/blog',
+    'our-work.html': '/our-work',
+    'services/ai-systems.html': '/ai-systems',
+    'services/business-operating-system.html': '/services/business-operating-system',
     'industries/index.html': '/industries',
     'industries/hospitality.html': '/industries/hospitality',
     'industries/retail.html': '/industries/retail',
