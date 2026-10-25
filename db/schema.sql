@@ -39,6 +39,7 @@ CREATE TABLE IF NOT EXISTS chat_sessions (
   last_message_at TIMESTAMPTZ
 );
 CREATE INDEX IF NOT EXISTS idx_chat_sessions_created_at ON chat_sessions (created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_chat_sessions_last_message ON chat_sessions (last_message_at DESC NULLS LAST, created_at DESC);
 
 CREATE TABLE IF NOT EXISTS chat_messages (
   id SERIAL PRIMARY KEY,
