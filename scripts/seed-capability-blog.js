@@ -262,7 +262,7 @@ async function seed() {
     try {
       const res = await pool.query(
         `INSERT INTO blog_posts (slug, title, excerpt, category, body, status, meta_title, meta_description, author, published_at)
-         VALUES ($1, $2, $3, $4, $5, 'published', $6, $7, 'CRES Dynamics', $8)
+         VALUES ($1, $2, $3, $4, $5, 'published', $6, $7, 'Cres Dynamics', $8)
          ON CONFLICT (slug) DO NOTHING`,
         [p.slug, p.title, p.excerpt, p.category, p.body, p.meta_title, p.meta_description, publishedAt]
       );

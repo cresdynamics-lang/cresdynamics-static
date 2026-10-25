@@ -12,6 +12,7 @@
       <p class="blog-post__excerpt">{{excerpt}}</p>
     </header>
 
+    {{eventNotice}}
     <div class="blog-post__content">
       {{body}}
     </div>
@@ -60,7 +61,7 @@
   "author": { "@type": "Organization", "name": {{jsonAuthor}} },
   "publisher": {
     "@type": "Organization",
-    "name": "CRES Dynamics",
+    "name": "Cres Dynamics",
     "logo": { "@type": "ImageObject", "url": "https://cresdynamics.com/images/logo.png" }
   },
   "mainEntityOfPage": "https://cresdynamics.com/blog/{{slug}}",
@@ -79,7 +80,9 @@
     var a = document.createElement('a');
     a.className = 'path-link';
     a.href = '/blog/' + p.slug;
-    a.innerHTML = '<span class="path-link__kicker">' + (p.category || 'Article') + '</span><div class="path-link__title">' + p.title + '</div>';
+    var k = document.createElement('span'); k.className = 'path-link__kicker'; k.textContent = p.category || 'Article';
+    var t = document.createElement('div'); t.className = 'path-link__title'; t.textContent = p.title;
+    a.appendChild(k); a.appendChild(t);
     grid.appendChild(a);
   });
   wrap.hidden = false;

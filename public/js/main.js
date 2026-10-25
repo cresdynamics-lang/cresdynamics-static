@@ -467,49 +467,56 @@
   }
 
   // ─── CONTACT PAGE FORM (#contact-form) ───
-  const contactForm = document.getElementById('contact-form');
-  if (contactForm) {
-    contactForm.addEventListener('submit', async (e) => {
+  // ─── CONVERSION EVENTS (sent to GA4 / Clarity when those are switched on) ───
+  function track(name, params) {
+    try { if (typeof window.gtag === 'function') window.gtag('event', name, params || {}); } catch (_) {}
+    try { if (typeof window.clarity === 'function') window.clarity('event', name); } catch (_) {}
+  }
+  document.addEventListener('click', (e) => {
+    const a = e.target.closest && e.target.closest('a[href]');
+    if (!a) return;
+    const href = a.getAttribute('href') || '';
+    if (href.indexOf('wa.me/') !== -1) track('whatsapp_click', { page: location.pathname });
+    else if (href.indexOf('tel:') === 0) track('phone_click', { page: location.pathname });
+    else if (href.indexOf('mailto:') === 0) track('email_click', { page: location.pathname });
+  });
+
+  // ─── ENQUIRY FORMS (contact page and service pages) ───
+  document.querySelectorAll('form[data-enquiry]').forEach((form) => {
+    const src = form.querySelector('input[name="sourcePage"]');
+    if (src) src.value = location.pathname;
+    form.addEventListener('submit', async (e) => {
       e.preventDefault();
-      const btn = contactForm.querySelector('button[type="submit"]');
-      const status = document.getElementById('contact-status');
-      const orig = btn?.textContent;
+      const btn = form.querySelector('button[type="submit"]');
+      const status = form.querySelector('.enq-status');
+      const say = (msg, ok) => { if (status) { status.hidden = false; status.textContent = msg; status.dataset.ok = ok ? '1' : '0'; } };
+      if (!form.checkValidity()) { form.reportValidity(); return; }
+      const orig = btn && btn.textContent;
       if (btn) { btn.disabled = true; btn.textContent = 'Sending…'; }
       try {
-        const fd = new FormData(contactForm);
-        const payload = {
-          name: fd.get('name'),
-          email: fd.get('email'),
-          phone: fd.get('phone') || 'n/a',
-          company: fd.get('company') || '',
-          service: fd.get('service'),
-          message: fd.get('message'),
-          website: fd.get('website') || '',
-          _form_started: fd.get('_form_started') || '',
-        };
+        const fd = new FormData(form);
+        const payload = {};
+        fd.forEach((v, k) => { payload[k] = typeof v === 'string' ? v : ''; });
         const res = await fetch('/api/contact', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(payload),
         });
         const data = await res.json().catch(() => ({}));
-        if (status) {
-          status.style.display = 'block';
-          status.style.color = res.ok ? '#34d399' : '#fca5a5';
-          status.textContent = res.ok
-            ? (data.message || 'Message sent. We will respond shortly.')
-            : (data.error || 'Could not send. Please WhatsApp or email us.');
+        if (res.ok) {
+          say(data.message || 'Enquiry sent. We will reply within 2 hours during working hours.', true);
+          track('generate_lead', { service: payload.service || '', page: location.pathname });
+          form.reset();
+          if (src) src.value = location.pathname;
+        } else {
+          say(data.error || 'That did not send. Please WhatsApp us on +254 708 805 496.', false);
         }
-        if (res.ok) contactForm.reset();
+        if (window.turnstile) try { window.turnstile.reset(); } catch (_) {}
       } catch (_err) {
-        if (status) {
-          status.style.display = 'block';
-          status.style.color = '#fca5a5';
-          status.textContent = 'Network error. Please try WhatsApp or email.';
-        }
+        say('No connection. Please WhatsApp us on +254 708 805 496 or email info@cresdynamics.com.', false);
       } finally {
         if (btn) { btn.disabled = false; btn.textContent = orig; }
       }
     });
-  }
+  });
 })();

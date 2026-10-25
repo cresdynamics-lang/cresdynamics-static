@@ -5,6 +5,7 @@
     </div>
     <nav class="sidebar-nav">
       <a href="/admin" class="sidebar-link">Dashboard</a>
+      <a href="/admin/enquiries" class="sidebar-link">Enquiries</a>
       <a href="/admin/events" class="sidebar-link">Events</a>
       <a href="/admin/blog" class="sidebar-link">Blog</a>
       <a href="/admin/applications" class="sidebar-link">Applications</a>
@@ -74,11 +75,11 @@
       
       tbody.innerHTML = payments.map(p => `
         <tr>
-          <td>${p.source}</td>
-          <td>${p.reference}</td>
-          <td>${p.currency || 'KES'} ${(p.amount || 0).toLocaleString()}</td>
-          <td><span class="status-badge status-${p.status}">${p.status}</span></td>
-          <td>${p.purpose}</td>
+          <td>${esc(p.source)}</td>
+          <td>${esc(p.reference)}</td>
+          <td>${esc(p.currency || 'KES')} ${(p.amount || 0).toLocaleString()}</td>
+          <td><span class="status-badge status-${esc(p.status)}">${esc(p.status)}</span></td>
+          <td>${esc(p.purpose)}</td>
           <td>${new Date(p.createdAt).toLocaleDateString()}</td>
         </tr>
       `).join('');

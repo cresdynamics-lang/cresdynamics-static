@@ -10,6 +10,14 @@
   <link rel="stylesheet" href="/css/admin.css">
   <link rel="icon" type="image/png" href="/images/favicon-circular.png">
   <title>{{title}}</title>
+  <script>
+    // Escape visitor-supplied text before it goes into admin tables
+    window.esc = function (v) {
+      return String(v == null ? '' : v).replace(/[&<>"']/g, function (c) {
+        return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+      });
+    };
+  </script>
 </head>
 <body>
 {{content}}

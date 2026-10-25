@@ -7,6 +7,7 @@
   <meta name="description" content="{{description}}">
   <meta name="robots" content="{{robots}}">
   {{siteVerification}}
+  {{headTags}}
   <meta name="theme-color" content="#141B28">
   <link rel="canonical" href="{{canonical}}">
   <meta property="og:type" content="website">
@@ -83,8 +84,8 @@
   <!-- HEADER -->
   <header id="main-header" class="nav-glass site-header" role="banner">
     <nav style="max-width:1280px;margin:0 auto;padding:8px 16px;display:flex;align-items:center;justify-content:space-between;" aria-label="Primary">
-      <a href="/" style="display:flex;align-items:center;gap:10px;text-decoration:none;flex-shrink:0;" aria-label="CRES Dynamics home">
-        <img src="/images/logo.png" alt="CRES Dynamics" width="36" height="36" style="width:36px;height:36px;border-radius:50%;object-fit:cover;">
+      <a href="/" style="display:flex;align-items:center;gap:10px;text-decoration:none;flex-shrink:0;" aria-label="Cres Dynamics home">
+        <img src="/images/logo.png" alt="Cres Dynamics" width="36" height="36" style="width:36px;height:36px;border-radius:50%;object-fit:cover;">
         <span class="brand-wordmark"><strong>CRES</strong> Dynamics</span>
       </a>
 
@@ -97,7 +98,7 @@
         <li><a href="/case-studies" class="nav-link-glass">Case Proof</a></li>
         <li><a href="/our-work" class="nav-link-glass">Our Work</a></li>
         <li><a href="/projects" class="nav-link-glass">Projects</a></li>
-        <li><a href="/events" class="nav-link-glass">Events</a></li>
+        <li><a href="/blog" class="nav-link-glass">Insights</a></li>
       </ul>
 
       <!-- Mobile hamburger -->
@@ -116,7 +117,7 @@
           <a href="/why-us" class="dropdown-item"><img data-src="/images/why-us-us.jpg" alt="" class="dropdown-img" width="160" height="96" loading="lazy"><div class="dropdown-title">Why Us</div><div class="dropdown-desc">Why serious businesses choose us</div></a>
           <a href="/how-we-work" class="dropdown-item"><img data-src="/images/how-we-work.jpg" alt="" class="dropdown-img" width="160" height="96" loading="lazy"><div class="dropdown-title">How We Work</div><div class="dropdown-desc">Discovery to go-live</div></a>
           <a href="/how-we-build" class="dropdown-item"><img data-src="/images/how-we-build.jpg" alt="" class="dropdown-img" width="160" height="96" loading="lazy"><div class="dropdown-title">How We Build</div><div class="dropdown-desc">Our system engineering framework</div></a>
-          <a href="/events" class="dropdown-item"><img data-src="/images/events-westlands.jpg" alt="" class="dropdown-img" width="160" height="96" loading="lazy"><div class="dropdown-title">Events</div><div class="dropdown-desc">Postponed · new date TBA</div></a>
+          <a href="/careers" class="dropdown-item"><img data-src="/images/devs-teams-techies-discussing.jpg" alt="" class="dropdown-img" width="160" height="96" loading="lazy"><div class="dropdown-title">Careers</div><div class="dropdown-desc">Join the engineering team</div></a>
           <a href="/contact" class="dropdown-item"><img data-src="/images/contact-us.jpg" alt="" class="dropdown-img" width="160" height="96" loading="lazy"><div class="dropdown-title">Contact</div><div class="dropdown-desc">Book a discovery session</div></a>
         </div>
       </div>
@@ -208,6 +209,7 @@
   <!-- MAIN CONTENT -->
   <main id="main-content" class="site-main">
     {{content}}
+    {{enquiryBlock}}
   </main>
 
   <!-- FOOTER -->

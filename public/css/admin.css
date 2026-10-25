@@ -278,3 +278,5 @@ img, video, iframe { max-width: 100%; }
   .form-actions { flex-wrap: wrap; }
 }
 @media (max-width: 380px) { .stats-grid { grid-template-columns: 1fr; } }
+.enq-toggle { display: inline-flex; align-items: center; gap: 8px; font-size: 0.9rem; color: var(--text-secondary); cursor: pointer; }
+.admin-hint { color: var(--text-muted); font-size: 0.88rem; margin: -0.75rem 0 1rem; }

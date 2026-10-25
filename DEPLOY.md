@@ -1,68 +1,75 @@
-# Deploy & staging hygiene — CRES Dynamics
+# Deploying cresdynamics.com
 
-This host runs **multiple apps**. Never treat Contabo as a single-site box.
+Production runs on a DigitalOcean droplet at **143.198.169.74** (SSH alias `do-new`, user `deploy` with sudo). The droplet hosts about 13 sites. Touch only cresdynamics.
+
+## Layout on the server
+
+| What | Where |
+|------|-------|
+| App directory | `/var/www/sites/cresdynamics.com` (owner `site_cresdynamics:websites`, mode 750, not a git checkout) |
+| Process | PM2 under user `site_cresdynamics`, app name `cresdynamics`, `PM2_HOME=/var/www/sites/cresdynamics.com/.pm2` |
+| Port | Node listens on `127.0.0.1:3000`; nginx proxies `cresdynamics.com` to it (`/etc/nginx/sites-enabled/cresdynamics`) |
+| Secrets | `/var/www/sites/cresdynamics.com/.env` (never committed) |
+| Database | PostgreSQL 16 on `127.0.0.1` |
+| DB backups | `/var/www/sites/cresdynamics.com/backups`, nightly 02:15 UTC, 7 days kept |
+
+## Deploy
+
+```bash
+# 1. From the repo, on a reviewed commit that is pushed to GitHub main
+python3 scripts/optimize-images.py          # only if images were added
+ssh do-new 'rm -rf ~/cres-deploy && mkdir -p ~/cres-deploy'
+rsync -az --relative server.js lib scripts views public db do-new:cres-deploy/
+
+# 2. Install into the app directory and restart only cresdynamics
+ssh do-new 'APP=/var/www/sites/cresdynamics.com
+  sudo rsync -a --chown=site_cresdynamics:websites --chmod=D750,F640 ~/cres-deploy/ $APP/
+  sudo chmod 750 $APP/scripts/*.sh $APP/scripts/uptime-check.js
+  sudo -u site_cresdynamics node --check $APP/server.js
+  sudo -u site_cresdynamics env PM2_HOME=$APP/.pm2 pm2 restart cresdynamics --update-env
+  rm -rf ~/cres-deploy'
+```
+
+If `package.json` changed, run `sudo -u site_cresdynamics bash -c 'cd $APP && npm install --omit=dev'` before the restart.
+
+Never use `rsync --delete` against the app directory: it holds `.env`, `uploads/`, `logs/`, `backups/` and `.pm2/`, which are not in git.
+
+## Verify
+
+```bash
+curl -sf https://cresdynamics.com/health          # {"status":"ok",...,"db":"up"}
+BASE_URL=https://cresdynamics.com npm run smoke   # all checks pass
+curl -sI https://www.cresdynamics.com/ | grep -i location   # 301 to apex
+```
+
+Spot-check that sibling sites still answer (each should return 200 or a 302 to its login):
+
+```bash
+ssh do-new 'for h in $(ls /var/www/sites); do echo "$(curl -sk -o /dev/null -w "%{http_code}" --resolve $h:443:127.0.0.1 https://$h/) $h"; done'
+```
+
+## Optional switches (set in `.env`, then restart)
+
+| Variable | Effect |
+|----------|--------|
+| `GOOGLE_SITE_VERIFICATION` | Adds the Search Console verification meta tag |
+| `GA4_ID` (`G-XXXX`) | Loads Google Analytics 4; WhatsApp clicks, phone taps and enquiries are sent as events |
+| `CLARITY_ID` | Loads Microsoft Clarity |
+| `TURNSTILE_SITE_KEY` + `TURNSTILE_SECRET_KEY` | Cloudflare Turnstile check on every enquiry form |
+| `BOOKING_URL` | "Book a 30-minute call" link (falls back to WhatsApp) |
+| `BACKUP_RCLONE_REMOTE` | Copies each nightly DB dump off the server with rclone (e.g. `spaces:cres-backups`) |
+| `ALERT_EMAIL` | Where uptime and bot-spike alerts go (default info@cresdynamics.com) |
+
+## Restore a database backup
+
+```bash
+gunzip -c backups/cresdynamics-db-YYYYMMDD-HHMMSS.sql.gz | psql "$DATABASE_URL"
+```
+
+Restore into a fresh database first and check it before pointing the app at it.
 
 ## Rules
 
-1. **Touch only `cresdynamics`** — PM2 process name / app directory `/var/www/sites/cresdynamics.com`.
-2. **Never** restart, kill, or reconfigure sibling apps (elijays, etc.).
-3. Prefer **`app-restart` / `pm2-safe`** wrappers over raw `pm2 restart all`.
-4. Keep event registration lockdown unless you intentionally re-open after spam controls prove stable.
-5. Deploy from a reviewed commit; avoid rsync `--delete` against shared parent paths.
-
-## Local → Contabo (marketing site)
-
-```bash
-# From laptop (example)
-rsync -az --exclude node_modules --exclude .git --exclude .env \
-  ./ contabo:/var/www/sites/cresdynamics.com/
-
-ssh contabo 'cd /var/www/sites/cresdynamics.com && npm install --omit=dev && app-restart cresdynamics'
-```
-
-Verify:
-
-```bash
-curl -sf https://cresdynamics.com/health
-curl -sf https://cresdynamics.com/ | head -c 200
-pm2 describe cresdynamics   # memory cap intact, only this process restarted
-```
-
-## Staging hygiene
-
-- Use a **branch + PR** for Phase changes; run `npm run smoke` against a local `PORT=3001` server.
-- Keep `.env` off git. Sync secrets via Contabo only.
-- After deploy, check:
-  - `/health` → `status: ok` (DB up)
-  - `/contact` form honeypot still present
-  - Nav hover images still load
-  - Sibling apps still respond (spot-check their public URL / API)
-
-## Monitoring
-
-| Signal | Where |
-|--------|--------|
-| Process up | PM2 + `/health` |
-| Bot / abuse spike | Email alert when rejects+429 ≥ `BOT_SPIKE_THRESHOLD` (default 40 / window). Stats: `/api/admin/abuse-stats` |
-| Daily event summary | Cron 20:00 Africa/Nairobi |
-
-Env knobs:
-
-```
-BOT_SPIKE_THRESHOLD=40
-BOT_SPIKE_COOLDOWN_MS=3600000
-ALERT_EMAIL=info@cresdynamics.com
-```
-
-## Rollback
-
-Keep dated backups under `/root/backups/cresdynamics-premerge-*` (or create one before deploy).
-
-```bash
-# restore tree then
-app-restart cresdynamics
-```
-
-## CI
-
-GitHub Actions (`.github/workflows/ci.yml`) runs smoke on PR/push. Lighthouse is soft by default (`LH_REQUIRE=0`); set `LH_REQUIRE=1` when you want it hard-fail.
+1. Commit and push to GitHub `main` before deploying, so the repo matches production.
+2. Restart only `cresdynamics`. Never restart all PM2 apps or reload nginx without checking the other sites.
+3. Never delete database rows during a deploy. Data clean-ups need written approval from Cres.

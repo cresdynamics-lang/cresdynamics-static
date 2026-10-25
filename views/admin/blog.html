@@ -5,6 +5,7 @@
     </div>
     <nav class="sidebar-nav">
       <a href="/admin" class="sidebar-link">Dashboard</a>
+      <a href="/admin/enquiries" class="sidebar-link">Enquiries</a>
       <a href="/admin/events" class="sidebar-link">Events</a>
       <a href="/admin/blog" class="sidebar-link active">Blog</a>
       <a href="/admin/applications" class="sidebar-link">Applications</a>
@@ -73,14 +74,14 @@
       
       tbody.innerHTML = posts.map(post => `
         <tr>
-          <td>${post.title}</td>
-          <td>${post.slug}</td>
+          <td>${esc(post.title)}</td>
+          <td>${esc(post.slug)}</td>
           <td><span class="status-badge ${post.published ? 'published' : 'draft'}">${post.published ? 'Published' : 'Draft'}</span></td>
           <td class="actions">
-            <a href="/admin/blog-editor?id=${post.id}" class="action-btn">Edit</a>
-            <button onclick="togglePublish(${post.id}, ${post.published})" class="action-btn">${post.published ? 'Unpublish' : 'Publish'}</button>
-            <a href="/blog/${post.slug}" target="_blank" class="action-btn">View</a>
-            <button onclick="deletePost(${post.id})" class="action-btn danger">Delete</button>
+            <a href="/admin/blog-editor?id=${esc(post.id)}" class="action-btn">Edit</a>
+            <button onclick="togglePublish(${esc(post.id)}, ${esc(post.published)})" class="action-btn">${post.published ? 'Unpublish' : 'Publish'}</button>
+            <a href="/blog/${esc(post.slug)}" target="_blank" class="action-btn">View</a>
+            <button onclick="deletePost(${esc(post.id)})" class="action-btn danger">Delete</button>
           </td>
         </tr>
       `).join('');

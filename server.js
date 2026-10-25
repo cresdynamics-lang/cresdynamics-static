@@ -9,12 +9,38 @@ process.on('uncaughtException', (err) => { console.error('Uncaught exception:', 
 process.on('unhandledRejection', (err) => { console.error('Unhandled rejection:', err?.message || err); });
 
 const app = express();
+app.disable('x-powered-by');
 const PORT = process.env.PORT || 3000;
 
 // Canonical host: send www.cresdynamics.com to the apex so Google indexes one copy
 app.use((req, res, next) => {
   const host = req.headers.host || '';
   if (/^www\./i.test(host)) return res.redirect(301, `https://${host.replace(/^www\./i, '')}${req.originalUrl}`);
+  next();
+});
+
+// Security headers. Inline scripts stay allowed because page templates use them.
+const CSP = [
+  "default-src 'self'",
+  "script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://www.clarity.ms https://*.clarity.ms https://challenges.cloudflare.com",
+  "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
+  "font-src 'self' data: https://fonts.gstatic.com",
+  "img-src 'self' data: blob: https:",
+  "media-src 'self' https:",
+  "connect-src 'self' https://*.google-analytics.com https://*.analytics.google.com https://www.googletagmanager.com https://*.clarity.ms https://challenges.cloudflare.com",
+  "frame-src https://challenges.cloudflare.com https://www.google.com https://www.youtube.com",
+  "object-src 'none'",
+  "base-uri 'self'",
+  "form-action 'self'",
+  "frame-ancestors 'self'",
+].join('; ');
+app.use((req, res, next) => {
+  res.setHeader('Strict-Transport-Security', 'max-age=31536000');
+  res.setHeader('X-Content-Type-Options', 'nosniff');
+  res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
+  res.setHeader('X-Frame-Options', 'SAMEORIGIN');
+  res.setHeader('Permissions-Policy', 'camera=(), microphone=(), geolocation=(), payment=()');
+  res.setHeader('Content-Security-Policy', CSP);
   next();
 });
 
@@ -63,7 +89,9 @@ app.use(express.static(path.join(__dirname, 'public'), {
 app.use('/uploads', express.static(path.join(__dirname, 'uploads'), {
   maxAge: '1d',
 }));
-app.set('trust proxy', true);
+// Only nginx on this machine is trusted, so req.ip is the real client address
+// (trusting every hop let bots spoof X-Forwarded-For and dodge rate limits).
+app.set('trust proxy', 'loopback');
 
 // ─── Site analytics (traffic capture for Director dashboard in CRM) ───
 // Fire-and-forget: page views are logged AFTER the response, and any error is
@@ -81,8 +109,7 @@ app.use((req, res, next) => {
   res.on('finish', () => {
     if (res.statusCode >= 400) return;
     try {
-      const fwd = (req.headers['x-forwarded-for'] || '').split(',')[0].trim();
-      const ip = (fwd || req.ip || req.socket?.remoteAddress || '').replace(/^::ffff:/, '');
+      const ip = (req.ip || req.socket?.remoteAddress || '').replace(/^::ffff:/, '');
       const ua = (req.headers['user-agent'] || '').slice(0, 500);
       const geo = ip ? geoip.lookup(ip) : null;
       const deviceType = /mobile|iphone|android/i.test(ua) ? 'mobile' : /ipad|tablet/i.test(ua) ? 'tablet' : 'desktop';
@@ -144,8 +171,7 @@ const rate = {
   },
   limiter(route, windowMs, max) {
     return (req, res, next) => {
-      const fwd = (req.headers['x-forwarded-for'] || '').split(',')[0].trim();
-      const ip = (fwd || req.ip || req.socket?.remoteAddress || 'unknown').replace(/^::ffff:/, '');
+      const ip = (req.ip || req.socket?.remoteAddress || 'unknown').replace(/^::ffff:/, '');
       const key = route + '|' + ip;
       const now = Date.now();
       const bucket = (rate.hits.get(key) || []).filter((t) => now - t < windowMs);
@@ -158,7 +184,7 @@ const rate = {
       next();
     };
   },
-  spamGuard() {
+  spamGuard(opts = {}) {
     return (req, res, next) => {
       const body = req.body || {};
       let reason = '';
@@ -175,10 +201,13 @@ const rate = {
       // Mass PK spam signature from 2026 flood
       if (!reason && /^\+?92\d{10,}$/.test(phone.replace(/[\s-]/g, '')) && /@example\.com$/i.test(email)) reason = 'pk_example_flood';
       const joined = JSON.stringify(body || {}).toLowerCase();
-      if (!reason && /bank transfer|bitcoin|casino|viagra|\.eth@|new crypto|crypto\s*investment/i.test(joined)) reason = 'keyword_spam';
+      if (!reason && /bank transfer|bitcoin|casino|viagra|\.eth@|new crypto|crypto\s*investment|lorem|ipsum/i.test(joined)) reason = 'keyword_spam';
+      const ua = String(req.headers['user-agent'] || '');
+      if (!reason && !/mozilla\/|applewebkit|gecko/i.test(ua)) reason = 'non_browser';
       // Timing honeypot: forms submitted in <800ms after page paint token are bots
       const started = parseInt(body._form_started || '0', 10);
       if (!reason && started && Date.now() - started < 800) reason = 'timing_honeypot';
+      if (!reason && opts.requireTiming && (!started || Date.now() - started > 86400000)) reason = 'missing_form_token';
       if (reason) {
         rate.recordAbuse('reject', reason, req.path);
         return res.status(400).json({ error: 'Submission rejected.' });
@@ -237,7 +266,7 @@ async function checkBotSpikeAndAlert() {
 const INBOX = 'info@cresdynamics.com';
 // ─── Attack-surface lockdown (registered FIRST so original handlers never run) ───
 const LOCKDOWN_MSG = 'Submissions are currently disabled. Please email info@cresdynamics.com or call +254 708 805 496.';
-const EVENTS_CLOSED_MSG = 'Event registration is closed. The event has been postponed to a later date. Contact the CRES Dynamics team if you need a system: info@cresdynamics.com or +254 708 805 496.';
+const EVENTS_CLOSED_MSG = 'Event registration is closed. The event has been postponed to a later date. Contact the Cres Dynamics team if you need a system: info@cresdynamics.com or +254 708 805 496.';
 function lockdownGuard(req, res) {
   return res.status(410).json({ error: LOCKDOWN_MSG, email: 'info@cresdynamics.com', phone: '+254708805496' });
 }
@@ -296,7 +325,7 @@ async function sendDailySummary() {
           ${lanyardBreakdown ? `<table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:16px;">
             <tr><td style="padding:10px 14px;background:#f9fafb;border-radius:8px;color:#4a5568;font-size:14px;"><strong>By Lanyard:</strong> ${lanyardBreakdown}</td></tr>
           </table>` : ''}
-          <p style="margin:16px 0 0;color:#9ca3af;font-size:12px;text-align:center;">CRES Dynamics · Automated daily summary</p>
+          <p style="margin:16px 0 0;color:#9ca3af;font-size:12px;text-align:center;">Cres Dynamics · Automated daily summary</p>
         </div>
       </div></body></html>`
     });
@@ -370,17 +399,78 @@ function bodyToHtml(body) {
 // ════════════════════════════════════════════════════════════════════
 
 // Contact form
-app.post('/api/contact', formLimiter, rate.spamGuard(), async (req, res) => {
+// ─── Enquiry protection ───
+// Cloudflare Turnstile switches on when TURNSTILE_SECRET_KEY is set (site key: TURNSTILE_SITE_KEY).
+async function verifyTurnstile(token, ip) {
+  const secret = process.env.TURNSTILE_SECRET_KEY;
+  if (!secret) return true;
+  if (!token) return false;
+  try {
+    const r = await fetch('https://challenges.cloudflare.com/turnstile/v0/siteverify', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: new URLSearchParams({ secret, response: String(token), remoteip: ip || '' }),
+    });
+    const data = await r.json();
+    return !!data.success;
+  } catch (err) {
+    console.error('[turnstile] verify failed:', err.message);
+    return true; // never lose a real enquiry because Cloudflare is unreachable
+  }
+}
+// Same email + same message, or more than 3 enquiries per email, within 24h is rejected.
+const recentEnquiries = new Map(); // key -> [timestamps]
+function enquiryRepeat(email, detail) {
+  const now = Date.now(), day = 86400000;
+  const e = String(email || '').trim().toLowerCase();
+  const dupKey = 'd|' + e + '|' + crypto.createHash('sha1').update(String(detail || '').trim().toLowerCase()).digest('hex');
+  const perKey = 'e|' + e;
+  const fresh = (k) => (recentEnquiries.get(k) || []).filter((t) => now - t < day);
+  const dup = fresh(dupKey), per = fresh(perKey);
+  if (dup.length >= 1) return 'duplicate_enquiry';
+  if (per.length >= 3) return 'email_daily_cap';
+  recentEnquiries.set(dupKey, dup.concat(now));
+  recentEnquiries.set(perKey, per.concat(now));
+  return '';
+}
+setInterval(() => {
+  const now = Date.now();
+  for (const [k, v] of recentEnquiries) if (!v.length || now - v[v.length - 1] > 86400000) recentEnquiries.delete(k);
+}, 3600_000);
+const enquiryLimiter = rate.limiter('enquiry', 10 * 60 * 1000, 5); // max 5 enquiries / 10 min / IP
+
+app.post('/api/contact', enquiryLimiter, formLimiter, rate.spamGuard({ requireTiming: true }), async (req, res) => {
   try {
     const body = req.body || {};
     const fullName = body.fullName || body.name;
     const email = body.email;
     const contactPhone = body.contactPhone || body.phone || 'n/a';
     const projectTitle = body.projectTitle || body.service || body.company || 'Website contact';
-    const projectDetail = body.projectDetail || body.message || '';
+    // Qualifying answers from the enquiry form are kept with the message
+    const qualifiers = [
+      body.company ? `Company: ${String(body.company).slice(0, 120)}` : '',
+      body.country ? `Country: ${String(body.country).slice(0, 80)}` : '',
+      body.budget ? `Budget: ${String(body.budget).slice(0, 60)}` : '',
+      body.timeline ? `Timeline: ${String(body.timeline).slice(0, 60)}` : '',
+      body.sourcePage ? `Page: ${String(body.sourcePage).slice(0, 200)}` : '',
+    ].filter(Boolean).join('\n');
+    const message = String(body.projectDetail || body.message || '').slice(0, 5000);
+    const projectDetail = qualifiers ? `${message}\n\n${qualifiers}` : message;
     const subscribe = body.subscribe || false;
-    if (!fullName || !email || !projectDetail) {
-      return res.status(400).json({ error: 'Missing required fields' });
+    if (!fullName || !email || !message.trim()) {
+      return res.status(400).json({ error: 'Please fill in your name, email and what you need.' });
+    }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(String(email).trim())) {
+      return res.status(400).json({ error: 'Please enter a valid email address.' });
+    }
+    const repeat = enquiryRepeat(email, message);
+    if (repeat) {
+      rate.recordAbuse('reject', repeat, req.path);
+      return res.status(429).json({ error: 'We already have this message. We will respond within 2 hours during working hours.' });
+    }
+    if (!(await verifyTurnstile(body['cf-turnstile-response'] || body.turnstileToken, req.ip))) {
+      rate.recordAbuse('reject', 'turnstile_failed', req.path);
+      return res.status(400).json({ error: 'Please complete the security check and try again.' });
     }
     await db.query(
       'INSERT INTO contact_leads (full_name, email, contact_phone, project_title, project_detail, subscribe) VALUES ($1,$2,$3,$4,$5,$6)',
@@ -390,7 +480,7 @@ app.post('/api/contact', formLimiter, rate.spamGuard(), async (req, res) => {
     // Send notification to inbox
     if (hasResendConfigured()) {
       sendEmail({
-        from: `CRES Dynamics <${SENDER}>`,
+        from: `Cres Dynamics <${SENDER}>`,
         to: INBOX,
         subject: `New Contact: ${escapeHtml(projectTitle)}`,
         html: `<h2>New Contact Form Submission</h2>
@@ -521,7 +611,7 @@ app.post('/api/events/register', formLimiter, rate.spamGuard(), async (req, res)
 
   <!-- Header -->
   <tr><td style="background:#2F3B52;padding:32px 40px;text-align:center;">
-    <img src="${logoUrl}" alt="CRES Dynamics" width="140" style="display:block;margin:0 auto 16px;">
+    <img src="${logoUrl}" alt="Cres Dynamics" width="140" style="display:block;margin:0 auto 16px;">
     <h1 style="margin:0;color:#ffffff;font-size:22px;font-weight:700;letter-spacing:-0.3px;">You're registered!</h1>
   </td></tr>
 
@@ -591,7 +681,7 @@ app.post('/api/events/register', formLimiter, rate.spamGuard(), async (req, res)
           <tr><td style="padding:14px 16px;border:1px solid #e5e7eb;">
             <table width="100%" cellpadding="0" cellspacing="0">
               <tr><td style="padding:3px 0;color:#6b7280;font-size:13px;">Bank: KCB Bank</td></tr>
-              <tr><td style="padding:3px 0;color:#1a202c;font-size:13px;font-weight:600;">Account: CRES Dynamics Ltd</td></tr>
+              <tr><td style="padding:3px 0;color:#1a202c;font-size:13px;font-weight:600;">Account: Cres Dynamics Ltd</td></tr>
               <tr><td style="padding:3px 0;color:#1a202c;font-size:13px;font-weight:600;">Account Number: 01209982836350</td></tr>
               <tr><td style="padding:3px 0;color:#6b7280;font-size:13px;">Reference: ${escapeHtml(refCode)}</td></tr>
             </table>
@@ -617,7 +707,7 @@ app.post('/api/events/register', formLimiter, rate.spamGuard(), async (req, res)
 
   <!-- Footer -->
   <tr><td style="background:#f8fafc;padding:24px 40px;border-top:1px solid #e2e8f0;">
-    <p style="margin:0 0 4px;color:#9ca3af;font-size:12px;text-align:center;">CRES Dynamics Ltd · Westlands, Nairobi, Kenya</p>
+    <p style="margin:0 0 4px;color:#9ca3af;font-size:12px;text-align:center;">Cres Dynamics Ltd · Westlands, Nairobi, Kenya</p>
     <p style="margin:0;color:#9ca3af;font-size:12px;text-align:center;">You registered as ${escapeHtml(email)}</p>
   </td></tr>
 
@@ -800,7 +890,7 @@ app.post('/api/events/sponsors/apply', formLimiter, rate.spamGuard(), appProtect
 });
 
 // Chat lead capture
-app.post('/api/chat-lead', async (req, res) => {
+app.post('/api/chat-lead', enquiryLimiter, formLimiter, rate.spamGuard(), async (req, res) => {
   try {
     const { name, phone, email, pageUrl, userAgent, sessionPublicId } = req.body;
     if (!name || !phone || !sessionPublicId) {
@@ -842,7 +932,7 @@ app.post('/api/chat', async (req, res) => {
             body: JSON.stringify({
               model: 'llama3-70b-8192',
               messages: [
-                { role: 'system', content: 'You are Frank, a helpful AI assistant at CRES Dynamics. Be concise and helpful. If asked about pricing or complex topics, suggest booking a strategy session.' },
+                { role: 'system', content: 'You are Frank, a helpful AI assistant at Cres Dynamics. Be concise and helpful. If asked about pricing or complex topics, suggest booking a strategy session.' },
                 ...historyForAI
               ],
               temperature: 0.7,
@@ -987,7 +1077,7 @@ app.post('/api/admin/blog', adminAuth, async (req, res) => {
     const result = await db.query(
       `INSERT INTO blog_posts (slug, title, excerpt, category, body, status, meta_title, meta_description, author, published_at)
        VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10) RETURNING id`,
-      [slug, title, excerpt || null, category || null, body, normalizedStatus, metaTitle || null, metaDescription || null, author || 'CRES Dynamics', publishedAt]
+      [slug, title, excerpt || null, category || null, body, normalizedStatus, metaTitle || null, metaDescription || null, author || 'Cres Dynamics', publishedAt]
     );
     res.json({ id: result.rows[0].id });
   } catch (err) {
@@ -1019,7 +1109,7 @@ app.patch('/api/admin/blog/:id', adminAuth, async (req, res) => {
       status: normalizedStatus,
       metaTitle: (metaTitle !== undefined ? metaTitle : existing.meta_title) || null,
       metaDescription: (metaDescription !== undefined ? metaDescription : existing.meta_description) || null,
-      author: author || existing.author || 'CRES Dynamics'
+      author: author || existing.author || 'Cres Dynamics'
     };
     await db.query(
       `UPDATE blog_posts SET title=$2, slug=$3, excerpt=$4, category=$5, body=$6, status=$7, meta_title=$8, meta_description=$9, author=$10, updated_at=now(), published_at=CASE WHEN $7='published' THEN COALESCE(published_at, now()) ELSE published_at END WHERE id=$1`,
@@ -1194,6 +1284,27 @@ app.get('/api/admin/messages', adminAuth, async (req, res) => {
   }
 });
 
+// Website enquiries (admin). Known spam is hidden unless ?all=1; nothing is deleted.
+const SPAM_SQL = `(project_detail ILIKE '%lorem%' OR project_detail ILIKE '%ipsum%' OR email ILIKE '%@example.com')`;
+app.get('/api/admin/enquiries', adminAuth, async (req, res) => {
+  try {
+    const showAll = req.query.all === '1';
+    const rows = await db.queryMany(
+      `SELECT id, full_name, email, contact_phone, project_title, project_detail, created_at, ${SPAM_SQL} AS likely_spam
+       FROM contact_leads ${showAll ? '' : `WHERE NOT ${SPAM_SQL}`}
+       ORDER BY created_at DESC LIMIT 200`
+    );
+    const spam = await db.queryOne(`SELECT count(*) AS n FROM contact_leads WHERE ${SPAM_SQL}`);
+    res.json({ hiddenSpam: Number(spam.n), rows: rows.map(r => ({
+      id: r.id, name: r.full_name, email: r.email, phone: r.contact_phone,
+      service: r.project_title, detail: r.project_detail, createdAt: r.created_at, likelySpam: r.likely_spam,
+    })) });
+  } catch (err) {
+    console.error('Enquiries load error:', err.message);
+    res.status(500).json({ error: 'Failed to load enquiries' });
+  }
+});
+
 // Payments (admin)
 app.get('/api/admin/payments', adminAuth, async (req, res) => {
   try {
@@ -1220,7 +1331,7 @@ app.get('/api/admin/dashboard', adminAuth, async (req, res) => {
   try {
     const [events, messages, applications, speakers, sponsors, payments, blog] = await Promise.all([
       db.queryOne(`SELECT COUNT(*) as total, COUNT(*) FILTER (WHERE booking_status='paid') as paid, COUNT(*) FILTER (WHERE booking_status='pending') as pending FROM event_reservations`),
-      db.queryOne(`SELECT COUNT(*) as total, COUNT(*) FILTER (WHERE subscribe=true) as subscribed FROM contact_leads`),
+      db.queryOne(`SELECT COUNT(*) FILTER (WHERE NOT ${SPAM_SQL}) as total, COUNT(*) FILTER (WHERE subscribe=true) as subscribed FROM contact_leads`),
       db.queryOne('SELECT COUNT(*) as total FROM career_applications'),
       db.queryOne('SELECT COUNT(*) as total FROM speaker_applications'),
       db.queryOne(`SELECT COUNT(*) as total, COUNT(*) FILTER (WHERE status='Confirmed') as confirmed FROM sponsors_applications`),
@@ -1290,14 +1401,54 @@ app.get('/api/admin/events/attendees-export', adminAuth, async (req, res) => {
 const fs = require('fs');
 const { PAGE_META } = require('./lib/page-meta');
 
+// Service pages that end with the shared enquiry form
+const ENQUIRY_PAGES = new Set([
+  '/websites', '/e-commerce', '/erp', '/software', '/ai-automation', '/ai-systems', '/ai-forecasting',
+  '/logistics-ai', '/school-management-system', '/finance-platforms', '/operations-workflow',
+  '/services/business-operating-system', '/cresos', '/pricing', '/projects', '/our-work',
+]);
+const WHATSAPP_BOOKING = 'https://wa.me/254708805496?text=Hi%2C%20I%27d%20like%20to%20book%20a%2030-minute%20call%20with%20Cres%20Dynamics.';
+
+function enquiryFields(prefix) {
+  return fs.readFileSync(path.join(__dirname, 'views', 'partials', 'enquiry-fields.html'), 'utf8').replace(/\{\{p\}\}/g, prefix);
+}
+
+// Analytics and bot-check tags, each switched on by its environment variable
+function headTags() {
+  const tags = [];
+  const ga = (process.env.GA4_ID || '').trim();
+  const clarity = (process.env.CLARITY_ID || '').trim();
+  if (/^G-[A-Z0-9]+$/i.test(ga)) {
+    tags.push(`<script async src="https://www.googletagmanager.com/gtag/js?id=${ga}"></script>`,
+      `<script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','${ga}');</script>`);
+  }
+  if (/^[a-z0-9]+$/i.test(clarity)) {
+    tags.push(`<script>(function(c,l,a,r,i,t,y){c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);})(window,document,"clarity","script","${clarity}");</script>`);
+  }
+  if (process.env.TURNSTILE_SITE_KEY) {
+    tags.push('<script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>');
+  }
+  return tags.join('\n  ');
+}
+
 function renderPage(res, pageFile, data = {}, status = 200) {
   try {
     const layout = fs.readFileSync(path.join(__dirname, 'views', 'layout.html'), 'utf8');
     const page = fs.readFileSync(path.join(__dirname, 'views', pageFile), 'utf8');
     let html = layout.replace('{{content}}', page);
     const base = (process.env.APP_BASE_URL || 'https://cresdynamics.com').replace(/\/$/, '');
+    const reqPath = res.req?.path || '/';
+    const siteKey = (process.env.TURNSTILE_SITE_KEY || '').replace(/[^\w-]/g, '');
     const defaults = {
-      title: 'CRES Dynamics - Intelligent Systems That Run Your Business',
+      // Nested partials first: their own {{tokens}} are filled by the entries that follow
+      enquiryBlock: ENQUIRY_PAGES.has(reqPath)
+        ? fs.readFileSync(path.join(__dirname, 'views', 'partials', 'enquiry-section.html'), 'utf8').replace('{{enquiryFields}}', enquiryFields('s'))
+        : '',
+      enquiryFields: enquiryFields('c'),
+      turnstileWidget: siteKey ? `<div class="cf-turnstile" data-sitekey="${siteKey}" data-theme="light"></div>` : '',
+      bookingUrl: (process.env.BOOKING_URL || WHATSAPP_BOOKING).replace(/"/g, '%22'),
+      headTags: headTags(),
+      title: 'Cres Dynamics - Intelligent Systems That Run Your Business',
       description: 'Intelligent Systems That Run Your Business. Custom operating systems, finance platforms, and websites that sell. Built in Nairobi for how your business actually works.',
       ogImage: `${base}/images/logo.png`,
       canonical: `${base}${res.req?.path || '/'}`,
@@ -1336,8 +1487,8 @@ app.get('/ai-forecasting', (req, res) => renderPage(res, 'services/ai-forecastin
 app.get('/logistics-ai', (req, res) => renderPage(res, 'services/logistics-ai.html'));
 app.get('/school-management-system', (req, res) => renderPage(res, 'services/school-management-system.html'));
 app.get('/our-work', (req, res) => renderPage(res, 'our-work.html', {
-  title: 'Our Work: Systems We Built for Companies | CRES Dynamics',
-  description: 'Proof hub for CRES Dynamics: CresOS, OptioHire, hospitality, retail, property, and live client systems organised by industry.',
+  title: 'Our Work: Systems We Built for Companies | Cres Dynamics',
+  description: 'Proof hub for Cres Dynamics: CresOS, OptioHire, hospitality, retail, property, and live client systems organised by industry.',
 }));
 app.get('/finance-platforms', (req, res) => renderPage(res, 'services/finance-platforms.html'));
 app.get('/operations-workflow', (req, res) => renderPage(res, 'services/operations-workflow.html'));
@@ -1356,13 +1507,13 @@ app.get('/insights', (req, res) => renderPage(res, 'insights.html'));
 app.get('/terms', (req, res) => renderPage(res, 'terms.html'));
 app.get('/privacy', (req, res) => renderPage(res, 'privacy.html'));
 app.get('/data-security', (req, res) => renderPage(res, 'data-security.html', {
-  title: 'Data & Security - CRES Dynamics',
-  description: 'How CRES Dynamics protects client systems: encryption, access control, backups, and Kenya Data Protection Act alignment.',
+  title: 'Data & Security - Cres Dynamics',
+  description: 'How Cres Dynamics protects client systems: encryption, access control, backups, and Kenya Data Protection Act alignment.',
 }));
 
 // Industries
 app.get('/industries', (req, res) => renderPage(res, 'industries/index.html', {
-  title: 'Industries - Hospitality, Retail & Multi-unit | CRES Dynamics',
+  title: 'Industries - Hospitality, Retail & Multi-unit | Cres Dynamics',
   description: 'Industry systems for hospitality ops, retail commerce, and multi-unit groups - built in Nairobi for how your sector runs.',
 }));
 app.get('/industries/:slug', (req, res) => {
@@ -1370,15 +1521,15 @@ app.get('/industries/:slug', (req, res) => {
   if (!valid.includes(req.params.slug)) return res.redirect('/industries');
   const meta = {
     hospitality: {
-      title: 'Hospitality Systems - Ops & Approvals | CRES Dynamics',
+      title: 'Hospitality Systems - Ops & Approvals | Cres Dynamics',
       description: 'Hotel and hospitality operations platforms - HOD approvals, ownership, and audit trails that cut cycles from hours to minutes.',
     },
     retail: {
-      title: 'Retail Systems - Catalogue, M-Pesa & Discovery | CRES Dynamics',
+      title: 'Retail Systems - Catalogue, M-Pesa & Discovery | Cres Dynamics',
       description: 'Retail systems for Kenyan commerce - catalogue, WhatsApp demand, M-Pesa checkout, and organic discovery.',
     },
     'multi-unit': {
-      title: 'Multi-unit Business Systems | CRES Dynamics',
+      title: 'Multi-unit Business Systems | Cres Dynamics',
       description: 'Group operating systems for multi-unit companies - per-unit finance and HR with one director-level view.',
     },
   }[req.params.slug];
@@ -1392,18 +1543,28 @@ app.get('/blog', async (req, res) => {
       "SELECT id, slug, title, excerpt, category, published_at FROM blog_posts WHERE status = 'published' ORDER BY published_at DESC"
     );
     renderPage(res, 'blog/index.html', {
-      title: 'Blog - Systems, AI & growth insights | CRES Dynamics',
-      description: 'Practical insights from CRES Dynamics - operations systems, AI, and growth for businesses in Nairobi and across Africa.',
+      title: 'Blog - Systems, AI & growth insights | Cres Dynamics',
+      description: 'Practical insights from Cres Dynamics - operations systems, AI, and growth for businesses in Nairobi and across Africa.',
       posts: JSON.stringify(posts).replace(/</g, '\\u003c'),
     });
   } catch (err) {
     renderPage(res, 'blog/index.html', {
-      title: 'Blog - CRES Dynamics',
-      description: 'Insights from CRES Dynamics on systems, AI, and growth.',
+      title: 'Blog - Cres Dynamics',
+      description: 'Insights from Cres Dynamics on systems, AI, and growth.',
       posts: '[]',
     });
   }
 });
+
+// Posts about the postponed event point readers to what Cres Dynamics builds
+const EVENT_POST_RE = /event|conference|summit|networking|scan-the-room|future-of-ai-in-business|double-your-sales/i;
+const EVENT_NOTICE = `<aside class="event-notice" aria-label="Event update">
+      <strong>Event update:</strong> The Future of AI in Business event has been postponed and registrations are closed.
+      If you are here to bring AI into your company, Cres Dynamics builds
+      <a href="/ai-systems">AI systems and AI agents</a>, <a href="/ai-forecasting">AI forecasting for directors</a>,
+      <a href="/services/business-operating-system">business operating systems</a> and <a href="/logistics-ai">logistics AI</a>.
+      <a href="/contact">Talk to the team</a>.
+    </aside>`;
 
 app.get('/blog/:slug', async (req, res) => {
   try {
@@ -1419,8 +1580,10 @@ app.get('/blog/:slug', async (req, res) => {
     );
     const title = post.meta_title || post.title;
     const description = post.meta_description || post.excerpt || '';
-    const author = post.author || 'CRES Dynamics';
+    // Older posts store the author as 'CRES Dynamics'; show the one brand spelling
+    const author = (post.author || 'Cres Dynamics').replace(/^CRES Dynamics$/, 'Cres Dynamics');
     renderPage(res, 'blog/post.html', {
+      eventNotice: EVENT_POST_RE.test(post.slug) ? EVENT_NOTICE : '',
       title,
       description,
       body: htmlBody,
@@ -1442,8 +1605,8 @@ app.get('/blog/:slug', async (req, res) => {
 
 // Events — closed / postponed (all deep links redirect; registration APIs return 410)
 app.get('/events', (req, res) => renderPage(res, 'events/index.html', {
-  title: 'Event Postponed - CRES Dynamics',
-  description: 'This event has been postponed to a later date. Registrations are closed. Contact the CRES Dynamics team if you need a system for your business.',
+  title: 'Event Postponed - Cres Dynamics',
+  description: 'This event has been postponed to a later date. Registrations are closed. Contact the Cres Dynamics team if you need a system for your business.',
 }));
 app.get(/^\/events\/.+/, (req, res) => res.redirect(301, '/events'));
 
@@ -1480,7 +1643,7 @@ function renderAdminPage(res, pageFile, data = {}) {
     for (const [key, val] of Object.entries(data)) {
       html = html.replace(new RegExp(`{{${key}}}`, 'g'), val || '');
     }
-    html = html.replace(/\{\{title\}\}/g, data.title || 'Admin - CRES Dynamics');
+    html = html.replace(/\{\{title\}\}/g, data.title || 'Admin - Cres Dynamics');
     res.send(html);
   } catch (err) {
     console.error(`Render admin error for ${pageFile}:`, err);
@@ -1499,6 +1662,7 @@ app.get('/admin/applications', adminAuth, (req, res) => renderAdminPage(res, 'ad
 app.get('/admin/speakers', adminAuth, (req, res) => renderAdminPage(res, 'admin/speakers.html'));
 app.get('/admin/sponsors', adminAuth, (req, res) => renderAdminPage(res, 'admin/sponsors.html'));
 app.get('/admin/messages', adminAuth, (req, res) => renderAdminPage(res, 'admin/messages.html'));
+app.get('/admin/enquiries', adminAuth, (req, res) => renderAdminPage(res, 'admin/enquiries.html', { title: 'Enquiries - CRES Admin' }));
 app.get('/admin/payments', adminAuth, (req, res) => renderAdminPage(res, 'admin/payments.html'));
 
 // Catch-all
@@ -1600,7 +1764,7 @@ app.use((req, res) => {
 });
 
 app.listen(PORT, '127.0.0.1', () => {
-  console.log(`CRES Dynamics server running on http://localhost:${PORT}`);
+  console.log(`Cres Dynamics server running on http://localhost:${PORT}`);
 });
 
 // Prune site analytics older than 6 months (covers the director's longest window)

@@ -5,6 +5,7 @@
     </div>
     <nav class="sidebar-nav">
       <a href="/admin" class="sidebar-link">Dashboard</a>
+      <a href="/admin/enquiries" class="sidebar-link">Enquiries</a>
       <a href="/admin/events" class="sidebar-link">Events</a>
       <a href="/admin/blog" class="sidebar-link">Blog</a>
       <a href="/admin/applications" class="sidebar-link active">Applications</a>
@@ -74,11 +75,11 @@
       
       tbody.innerHTML = applications.map(app => `
         <tr>
-          <td>${app.name}</td>
-          <td>${app.role}</td>
-          <td>${app.email}</td>
-          <td>${app.phone}</td>
-          <td>${app.cvFileName ? app.cvFileName : '-'}</td>
+          <td>${esc(app.name)}</td>
+          <td>${esc(app.role)}</td>
+          <td>${esc(app.email)}</td>
+          <td>${esc(app.phone)}</td>
+          <td>${esc(app.cvFileName ? app.cvFileName : '-')}</td>
           <td>${new Date(app.createdAt).toLocaleDateString()}</td>
         </tr>
       `).join('');

@@ -1,0 +1,79 @@
+          <input type="hidden" name="_form_started" value="">
+          <input type="hidden" name="sourcePage" value="">
+          <div class="hp-field" aria-hidden="true">
+            <label>Website <input type="text" name="website" tabindex="-1" autocomplete="off"></label>
+          </div>
+          <div class="enq-grid">
+            <div>
+              <label class="form-label" for="{{p}}-name">Your name *</label>
+              <input class="form-input" type="text" id="{{p}}-name" name="name" required placeholder="e.g. James Mwangi" autocomplete="name">
+            </div>
+            <div>
+              <label class="form-label" for="{{p}}-email">Work email *</label>
+              <input class="form-input" type="email" id="{{p}}-email" name="email" required placeholder="you@company.com" autocomplete="email">
+            </div>
+            <div>
+              <label class="form-label" for="{{p}}-phone">Phone or WhatsApp</label>
+              <input class="form-input" type="tel" id="{{p}}-phone" name="phone" placeholder="+254 7XX XXX XXX" autocomplete="tel">
+            </div>
+            <div>
+              <label class="form-label" for="{{p}}-company">Company</label>
+              <input class="form-input" type="text" id="{{p}}-company" name="company" placeholder="Company name" autocomplete="organization">
+            </div>
+            <div>
+              <label class="form-label" for="{{p}}-country">Country</label>
+              <select class="form-input" id="{{p}}-country" name="country">
+                <option value="Kenya">Kenya</option>
+                <option value="Uganda">Uganda</option>
+                <option value="Tanzania">Tanzania</option>
+                <option value="Rwanda">Rwanda</option>
+                <option value="Other Africa">Elsewhere in Africa</option>
+                <option value="United States">United States</option>
+                <option value="UK / Europe">UK / Europe</option>
+                <option value="Other">Other</option>
+              </select>
+            </div>
+            <div>
+              <label class="form-label" for="{{p}}-service">What do you need? *</label>
+              <select class="form-input" id="{{p}}-service" name="service" required>
+                <option value="">Select…</option>
+                <option value="AI system / AI agents">AI system or AI agents</option>
+                <option value="AI forecasting / executive advisor">AI forecasting for directors</option>
+                <option value="Logistics / inventory AI">Logistics and inventory AI</option>
+                <option value="Business operating system">Business operating system (CresOS / BOS)</option>
+                <option value="School management system">School management system</option>
+                <option value="ERP">Custom ERP</option>
+                <option value="Ecommerce website">Ecommerce website</option>
+                <option value="High-end website">High-end website</option>
+                <option value="Custom software">Custom software</option>
+                <option value="Something else">Something else</option>
+              </select>
+            </div>
+            <div>
+              <label class="form-label" for="{{p}}-budget">Budget range</label>
+              <select class="form-input" id="{{p}}-budget" name="budget">
+                <option value="">Not sure yet</option>
+                <option value="Under KES 500k">Under KES 500,000</option>
+                <option value="KES 500k–2M">KES 500,000 – 2M</option>
+                <option value="KES 2M–10M">KES 2M – 10M</option>
+                <option value="Over KES 10M">Over KES 10M</option>
+              </select>
+            </div>
+            <div>
+              <label class="form-label" for="{{p}}-timeline">When do you need it?</label>
+              <select class="form-input" id="{{p}}-timeline" name="timeline">
+                <option value="">Flexible</option>
+                <option value="As soon as possible">As soon as possible</option>
+                <option value="1–3 months">In 1–3 months</option>
+                <option value="3–6 months">In 3–6 months</option>
+                <option value="Exploring">Just exploring</option>
+              </select>
+            </div>
+          </div>
+          <div>
+            <label class="form-label" for="{{p}}-message">What should the system do, or what is broken? *</label>
+            <textarea class="form-input form-textarea" id="{{p}}-message" name="message" required rows="4" placeholder="e.g. We run 4 branches on spreadsheets and can't see stock or cash in one place."></textarea>
+          </div>
+          {{turnstileWidget}}
+          <button class="btn btn-primary" type="submit" style="width:100%;">Send enquiry</button>
+          <p class="enq-status" role="status" hidden></p>
