@@ -1,6 +1,7 @@
 /**
- * Capability blog seeding: 4 posts targeting searches for what Cres Dynamics builds
- * (AI systems, school management systems, ecommerce websites, logistics AI).
+ * Capability blog seeding: 6 posts targeting searches for what Cres Dynamics builds
+ * (AI systems, school management systems, ecommerce websites, logistics AI,
+ * business operating systems, AI agents).
  *
  * INSERT-ONLY: ON CONFLICT DO NOTHING. Existing posts and all other data are never
  * updated or deleted. Safe to re-run.
@@ -175,6 +176,80 @@ The AI advisor turns all of this into a short weekly briefing for directors: sto
 Cres Dynamics runs 6-month demand forecasting for Smart Brands across warehouses, supermarket POS, and distributor networks, and builds logistics operating systems covering fleet, warehouse exceptions, real-time tracking, and field feedback. Our systems run in more than 10 countries.
 
 See the <a href="/logistics-ai">logistics and inventory AI system</a>, read about <a href="/ai-forecasting">AI forecasting for directors</a>, or <a href="/contact">send us a sample of your stock data and see what it would have predicted</a>.
+`,
+  },
+  {
+    slug: 'business-operating-system-kenya-cresos-bos',
+    title: 'Business Operating System for Kenyan Companies: Replace 10 Disconnected Tools With One System',
+    excerpt: 'What a business operating system is, why growing Kenyan companies outgrow WhatsApp, spreadsheets, and separate apps, and how CresOS and the Cres Dynamics BOS run finance, CRM, HR, and operations in one place.',
+    category: 'Business Operating Systems',
+    meta_title: 'Business Operating System Kenya: CresOS & BOS | Cres Dynamics',
+    meta_description: 'A business operating system runs finance, CRM, HR, projects, and multi-branch operations in one platform. How Kenyan companies replace scattered tools with CresOS.',
+    published_days_ago: 0,
+    body: `Most growing companies in Kenya run on a patchwork: sales in WhatsApp, money in spreadsheets and M-Pesa statements, staff records in a folder, projects in someone's head, and reports assembled by hand every Friday. Each tool works on its own. Together they hide the truth about the business. A business operating system fixes that by putting every department on one platform. This guide explains what that means, and how Cres Dynamics Ltd builds business operating systems for companies in Nairobi, across Kenya, and in more than 10 countries.
+
+## What a business operating system is
+
+A business operating system (BOS) is one platform that runs the core of a company: finance, sales and CRM, HR and payroll, projects, procurement, inventory, and reporting. Instead of exporting data from one app to paste into another, every department works on the same records. When sales closes a deal, finance sees the invoice, operations sees the work, and the director sees the numbers, without anyone forwarding a spreadsheet.
+
+## Signs you have outgrown your tools
+
+You need a business operating system when month-end takes a week of reconciling, when two managers quote different numbers for the same thing, when approvals wait days because the right person did not see a message, when you cannot tell which branch or business unit is actually profitable, and when only one person knows how a critical process works.
+
+## CresOS: one system, every department
+
+CresOS is the modular business operating system built by Cres Dynamics. It covers projects, finance, CRM, HR, team chat, analytics, and AI in one platform, with M-Pesa built in. Companies switch on the modules they need and add more as they grow. Pricing is by module, not per seat, so adding staff does not punish growth.
+
+## BOS: the operating system that thinks ahead
+
+The Cres Dynamics BOS takes CresOS further. It predicts what is coming, automates repetitive work, and surfaces answers before directors ask. That includes cash forecasts 30, 60, and 90 days out, demand predictions 3 and 6 months ahead, and an AI advisor that sends directors a weekly briefing on what changed and what to act on.
+
+## Built for multi-branch and multi-unit groups
+
+Kenyan groups often run several branches or completely different businesses under one owner. A business operating system should let each unit run its own finance, staff, and stock while giving owners one consolidated view. Cres Dynamics built exactly this for Millenia, where one operating system runs 6 business units with per-unit dashboards and group reporting. For Zerepy Homes, one system replaced five departments' worth of scattered tools across property management, tenant screening, rent collection, and maintenance.
+
+## How rollout works without stopping the business
+
+A business operating system is not a big-bang switch. We start with the department where the pain is sharpest, usually finance or sales, migrate its data, train the team, and go live. Then the next department joins the same platform. Each step delivers value on its own, so the company never waits a year to see a return.
+
+If your company is searching for a business operating system in Kenya, see <a href="/cresos">CresOS</a>, the <a href="/services/business-operating-system">AI-powered BOS</a>, the <a href="/case-studies/millenia-bos">Millenia BOS case study</a>, or <a href="/contact">book a strategy session with Cres Dynamics</a>.
+`,
+  },
+  {
+    slug: 'ai-agents-for-business-kenya-executive-advisor',
+    title: 'AI Agents for Business in Kenya: Sales Agents, Hiring Agents, and AI Advisors That Tell Directors What to Do',
+    excerpt: 'What AI agents actually do for Kenyan businesses: WhatsApp sales agents that close orders at 2 AM, hiring agents that screen every applicant, operations agents, and AI advisors that brief directors.',
+    category: 'AI & Systems',
+    meta_title: 'AI Agents for Business in Kenya | Cres Dynamics',
+    meta_description: 'AI agents for Kenyan businesses: WhatsApp sales agents, hiring agents, operations agents, and AI advisors that tell directors what to act on. Built by Cres Dynamics.',
+    published_days_ago: 1,
+    body: `An AI agent is software that does a job, not just answers a question. It reads information, makes a decision within rules you set, takes an action, and hands off to a person when it should. For Kenyan businesses, that means fewer leads lost overnight, faster hiring, quicker approvals, and directors who see problems early. This guide covers the AI agents that pay off fastest, with real examples from systems Cres Dynamics Ltd has built.
+
+## WhatsApp sales agents that sell while you sleep
+
+Kenyan customers ask before they buy, and they ask on WhatsApp, often late at night. A sales agent trained on your products, prices, stock, and delivery areas answers instantly, recommends alternatives, takes the order, and passes serious or complex buyers to a human in the morning with the full conversation attached. Cres Dynamics built this for Frank Labels: clients message at 2 AM, and the business answers.
+
+## Hiring agents that screen every applicant
+
+When a role attracts hundreds of CVs, good candidates get lost. A hiring agent reads every application, matches skills to the role, ranks candidates, and gives the hiring manager a shortlist with reasons. OptioHire, built and run by Cres Dynamics, does exactly this, removing guesswork and inconsistency from first-round screening. A human still makes every hiring decision.
+
+## Product and customer knowledge agents
+
+Many companies sit on years of product and customer data that nobody can query. A knowledge agent trained on that data answers staff and customer questions, including compound ones. For SafariMart Africa, Cres Dynamics built a custom-trained AI that turned 13 years of customer data into a product assistant.
+
+## Operations and approval agents
+
+Approvals stall when the right person does not see the request. An operations agent routes requests, reminds approvers, escalates when deadlines slip, and keeps an audit trail. At Sheraton Nairobi Westlands, an AI-powered operations and approvals platform cut department sign-offs from hours to minutes.
+
+## AI advisors for directors and executives
+
+The most valuable agent for leadership is an advisor. It reads forecasts and live numbers, predicts sales, cash, and demand 3 and 6 months ahead, and writes a weekly briefing for directors: what changed, why, and the three actions with the biggest impact. Directors can ask it questions in plain language and get answers grounded in company data.
+
+## How to start without risk
+
+Pick one agent tied to revenue or time lost. Define what it may and may not do, and when it must hand off to a person. Run it on one channel or one team, measure the result for a few weeks, then expand. Keep humans in control of money, hiring, and customer commitments.
+
+Cres Dynamics builds AI agents and AI systems for companies in Kenya and in more than 10 countries. See <a href="/ai-automation">AI agents and business automation</a>, <a href="/ai-forecasting">AI forecasting and executive advisor agents</a>, the <a href="/case-studies/optiohire">OptioHire case study</a>, or <a href="/contact">talk to Cres Dynamics about your first agent</a>.
 `,
   },
 ];
