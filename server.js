@@ -11,6 +11,13 @@ process.on('unhandledRejection', (err) => { console.error('Unhandled rejection:'
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+// Canonical host: send www.cresdynamics.com to the apex so Google indexes one copy
+app.use((req, res, next) => {
+  const host = req.headers.host || '';
+  if (/^www\./i.test(host)) return res.redirect(301, `https://${host.replace(/^www\./i, '')}${req.originalUrl}`);
+  next();
+});
+
 app.use(cors());
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true }));
@@ -26,6 +33,21 @@ const uploadStorage = multer.diskStorage({
   }
 });
 const upload = multer({ storage: uploadStorage, limits: { fileSize: 20 * 1024 * 1024 } });
+
+// Serve the WebP copy of /images/*.jpg|png when the browser accepts it
+// (built by scripts/optimize-images.py into public/_webp). Markup keeps original paths.
+const WEBP_DIR = path.join(__dirname, 'public', '_webp');
+app.get(/^\/images\/.+\.(?:jpe?g|png)$/i, (req, res, next) => {
+  if (!(req.headers.accept || '').includes('image/webp')) return next();
+  let rel;
+  try { rel = decodeURIComponent(req.path.slice('/images/'.length)); } catch { return next(); }
+  const file = path.join(WEBP_DIR, `${rel}.webp`);
+  if (!file.startsWith(WEBP_DIR + path.sep)) return next();
+  res.setHeader('Vary', 'Accept');
+  res.setHeader('Cache-Control', 'public, max-age=604800');
+  res.type('image/webp');
+  res.sendFile(file, (err) => { if (err && !res.headersSent) next(); });
+});
 
 app.use(express.static(path.join(__dirname, 'public'), {
   maxAge: process.env.NODE_ENV === 'production' ? '7d' : 0,
@@ -1266,8 +1288,9 @@ app.get('/api/admin/events/attendees-export', adminAuth, async (req, res) => {
 // ════════════════════════════════════════════════════════════════════
 
 const fs = require('fs');
+const { PAGE_META } = require('./lib/page-meta');
 
-function renderPage(res, pageFile, data = {}) {
+function renderPage(res, pageFile, data = {}, status = 200) {
   try {
     const layout = fs.readFileSync(path.join(__dirname, 'views', 'layout.html'), 'utf8');
     const page = fs.readFileSync(path.join(__dirname, 'views', pageFile), 'utf8');
@@ -1278,15 +1301,19 @@ function renderPage(res, pageFile, data = {}) {
       description: 'Intelligent Systems That Run Your Business. Custom operating systems, finance platforms, and websites that sell. Built in Nairobi for how your business actually works.',
       ogImage: `${base}/images/logo.png`,
       canonical: `${base}${res.req?.path || '/'}`,
+      schema: '',
+      robots: 'index, follow, max-image-preview:large',
+      siteVerification: process.env.GOOGLE_SITE_VERIFICATION
+        ? `<meta name="google-site-verification" content="${process.env.GOOGLE_SITE_VERIFICATION}">` : '',
     };
-    const merged = { ...defaults, ...data };
+    const merged = { ...defaults, ...(PAGE_META[res.req?.path] || {}), ...data };
     if (!data.canonical && res.req?.path) merged.canonical = `${base}${res.req.path === '/' ? '/' : res.req.path}`;
     for (const [key, val] of Object.entries(merged)) {
       html = html.replace(new RegExp(`{{${key}}}`, 'g'), val == null ? '' : String(val));
     }
     // Clear any leftover unmatched simple tokens
     html = html.replace(/\{\{[a-zA-Z0-9_]+\}\}/g, '');
-    res.send(html);
+    res.status(status).send(html);
   } catch (err) {
     console.error(`Render error for ${pageFile}:`, err);
     res.status(500).send('Page not found');
@@ -1304,10 +1331,10 @@ app.get('/websites', (req, res) => renderPage(res, 'services/websites.html'));
 app.get('/erp', (req, res) => renderPage(res, 'services/erp.html'));
 app.get('/e-commerce', (req, res) => renderPage(res, 'services/e-commerce.html'));
 app.get('/ai-automation', (req, res) => renderPage(res, 'services/ai-automation.html'));
-app.get('/ai-systems', (req, res) => renderPage(res, 'services/ai-systems.html', {
-  title: 'AI Systems & Systems Administration Kenya | CRES Dynamics',
-  description: 'AI systems for companies in Kenya and systems administration in Nairobi: audit to rollout, 18-engineer team, servers, access, backups, and monitoring.',
-}));
+app.get('/ai-systems', (req, res) => renderPage(res, 'services/ai-systems.html'));
+app.get('/ai-forecasting', (req, res) => renderPage(res, 'services/ai-forecasting.html'));
+app.get('/logistics-ai', (req, res) => renderPage(res, 'services/logistics-ai.html'));
+app.get('/school-management-system', (req, res) => renderPage(res, 'services/school-management-system.html'));
 app.get('/our-work', (req, res) => renderPage(res, 'our-work.html', {
   title: 'Our Work: Systems We Built for Companies | CRES Dynamics',
   description: 'Proof hub for CRES Dynamics: CresOS, OptioHire, hospitality, retail, property, and live client systems organised by industry.',
@@ -1315,10 +1342,7 @@ app.get('/our-work', (req, res) => renderPage(res, 'our-work.html', {
 app.get('/finance-platforms', (req, res) => renderPage(res, 'services/finance-platforms.html'));
 app.get('/operations-workflow', (req, res) => renderPage(res, 'services/operations-workflow.html'));
 app.get('/software', (req, res) => renderPage(res, 'services/software.html'));
-app.get('/services/business-operating-system', (req, res) => renderPage(res, 'services/business-operating-system.html', {
-  title: 'Business Operating System (BOS) | CRES Dynamics',
-  description: 'AI-powered business operating system for Kenyan companies: finance, CRM, HR, and multi-unit operations on one platform.',
-}));
+app.get('/services/business-operating-system', (req, res) => renderPage(res, 'services/business-operating-system.html'));
 app.get('/cresos', (req, res) => renderPage(res, 'cresos.html'));
 app.get('/contact', (req, res) => renderPage(res, 'contact.html'));
 app.get('/partners', (req, res) => renderPage(res, 'partners.html'));
@@ -1483,6 +1507,9 @@ app.get('/robots.txt', (req, res) => {
   const host = req.get('host') || 'cresdynamics.com';
   res.type('text/plain').send(`User-agent: *
 Allow: /
+Disallow: /admin
+Disallow: /api/
+
 Sitemap: https://${host}/sitemap.xml
 `);
 });
@@ -1503,6 +1530,9 @@ app.get('/sitemap.xml', async (req, res) => {
     'data-security.html': '/data-security', 'blog/index.html': '/blog',
     'our-work.html': '/our-work',
     'services/ai-systems.html': '/ai-systems',
+    'services/ai-forecasting.html': '/ai-forecasting',
+    'services/logistics-ai.html': '/logistics-ai',
+    'services/school-management-system.html': '/school-management-system',
     'services/business-operating-system.html': '/services/business-operating-system',
     'industries/index.html': '/industries',
     'industries/hospitality.html': '/industries/hospitality',
@@ -1538,8 +1568,12 @@ app.get('/sitemap.xml', async (req, res) => {
         .filter(f => f.startsWith('case-studies/') && f.endsWith('.html') && f !== 'case-studies/index.html')
         .map(f => `/case-studies/${f.split('/')[1].replace('.html', '')}`)
     );
-  const today = new Date().toISOString().split('T')[0];
-  let urls = staticPaths.map(p => `  <url>\n    <loc>${base}${p}</loc>\n    <lastmod>${today}</lastmod>\n  </url>`);
+  const fileFor = Object.fromEntries(pageFiles.map(f => [ROUTE_MAP[f] ?? `/${f.replace(/\.html$/, '')}`, f]));
+  const lastmodOf = (p) => {
+    try { return fs.statSync(path.join(VIEWS_DIR, fileFor[p])).mtime.toISOString().split('T')[0]; }
+    catch { return new Date().toISOString().split('T')[0]; }
+  };
+  let urls = staticPaths.map(p => `  <url>\n    <loc>${base}${p}</loc>\n    <lastmod>${lastmodOf(p)}</lastmod>\n  </url>`);
   try {
     const posts = await db.queryMany(
       "SELECT slug, COALESCE(updated_at, published_at, now()) AS lm FROM blog_posts WHERE status = 'published'"
@@ -1555,9 +1589,17 @@ app.get('/sitemap.xml', async (req, res) => {
   res.type('application/xml').send(xml);
 });
 
-app.use((req, res) => res.redirect('/'));
+// Unknown URLs get a real 404 (a redirect to / reads as a soft 404 to Google)
+app.use((req, res) => {
+  if (req.method !== 'GET' || req.path.startsWith('/api')) return res.status(404).json({ error: 'Not found' });
+  renderPage(res, '404.html', {
+    title: 'Page not found | Cres Dynamics',
+    description: 'This page does not exist. Explore AI systems, business operating systems, and websites by Cres Dynamics.',
+    robots: 'noindex',
+  }, 404);
+});
 
-app.listen(PORT, () => {
+app.listen(PORT, '127.0.0.1', () => {
   console.log(`CRES Dynamics server running on http://localhost:${PORT}`);
 });
 

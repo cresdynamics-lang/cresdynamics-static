@@ -63,6 +63,36 @@
   }
 
   // ─── DESKTOP DROPDOWNS ───
+  // Dropdown card images load on first approach to the nav, not with the page
+  const desktopNavEl = document.getElementById('desktop-nav');
+  const loadDropdownImages = () => {
+    document.querySelectorAll('img.dropdown-img[data-src]').forEach(img => {
+      img.src = img.dataset.src;
+      img.removeAttribute('data-src');
+    });
+  };
+  if (desktopNavEl) {
+    ['mouseenter', 'focusin', 'touchstart'].forEach(ev => desktopNavEl.addEventListener(ev, loadDropdownImages, { once: true, passive: true }));
+  }
+
+  // Browsers without speculation rules (Safari, Firefox): prefetch a page on hover/touch
+  if (!(HTMLScriptElement.supports && HTMLScriptElement.supports('speculationrules'))) {
+    const prefetched = new Set();
+    const prefetch = (e) => {
+      const a = e.target.closest && e.target.closest('a[href^="/"]');
+      if (!a || a.target === '_blank') return;
+      const url = a.getAttribute('href').split('#')[0];
+      if (!url || prefetched.has(url) || url.startsWith('/admin') || url.startsWith('/api')) return;
+      prefetched.add(url);
+      const link = document.createElement('link');
+      link.rel = 'prefetch';
+      link.href = url;
+      document.head.appendChild(link);
+    };
+    document.addEventListener('mouseover', prefetch, { passive: true });
+    document.addEventListener('touchstart', prefetch, { passive: true });
+  }
+
   let activeDropdown = null;
   document.querySelectorAll('.nav-item[data-dropdown]').forEach(item => {
     const key = item.dataset.dropdown;
@@ -117,32 +147,68 @@
   });
 
   // ─── MOBILE MENU ───
+  // Desktop vs mobile nav visibility is handled in CSS (no layout jump before JS runs).
   const mobileBtn = document.getElementById('mobile-menu-btn');
   const mobileMenu = document.getElementById('mobile-menu');
-  const desktopNav = document.getElementById('desktop-nav');
-
-  function checkMobile() {
-    const isMobile = window.innerWidth <= 1024;
-    if (mobileBtn) mobileBtn.style.display = isMobile ? 'block' : 'none';
-    if (desktopNav) desktopNav.style.display = isMobile ? 'none' : 'flex';
-  }
-  checkMobile();
-  window.addEventListener('resize', checkMobile);
+  const mobileBackdrop = document.getElementById('mobile-backdrop');
 
   if (mobileBtn && mobileMenu) {
-    mobileBtn.addEventListener('click', () => {
-      mobileMenu.classList.toggle('open');
+    const setMenu = (open) => {
+      mobileMenu.classList.toggle('open', open);
+      mobileMenu.setAttribute('aria-hidden', String(!open));
+      mobileBtn.classList.toggle('is-open', open);
+      mobileBtn.setAttribute('aria-expanded', String(open));
+      mobileBtn.setAttribute('aria-label', open ? 'Close menu' : 'Open menu');
+      document.documentElement.classList.toggle('menu-open', open);
+      if (mobileBackdrop) mobileBackdrop.hidden = !open;
+    };
+    mobileBtn.addEventListener('click', () => setMenu(!mobileMenu.classList.contains('open')));
+    if (mobileBackdrop) mobileBackdrop.addEventListener('click', () => setMenu(false));
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && mobileMenu.classList.contains('open')) { setMenu(false); mobileBtn.focus(); }
     });
-    document.querySelectorAll('.mobile-dropdown-btn').forEach(btn => {
+    // Close if the viewport grows past the mobile breakpoint (rotation, resize)
+    window.matchMedia('(min-width: 1025px)').addEventListener('change', (e) => { if (e.matches) setMenu(false); });
+
+    // Accordion sections: one open at a time
+    const accButtons = mobileMenu.querySelectorAll('.mobile-dropdown-btn');
+    accButtons.forEach(btn => {
       btn.addEventListener('click', () => {
-        const sub = document.getElementById('mobile-' + btn.dataset.mobile);
-        if (sub) sub.style.display = sub.style.display === 'none' ? 'flex' : 'none';
+        const open = btn.getAttribute('aria-expanded') !== 'true';
+        accButtons.forEach(other => {
+          other.setAttribute('aria-expanded', 'false');
+          const s = document.getElementById(other.getAttribute('aria-controls'));
+          if (s) s.hidden = true;
+        });
+        btn.setAttribute('aria-expanded', String(open));
+        const sub = document.getElementById(btn.getAttribute('aria-controls'));
+        if (sub) sub.hidden = !open;
       });
     });
     mobileMenu.querySelectorAll('a').forEach(link => {
-      link.addEventListener('click', () => mobileMenu.classList.remove('open'));
+      link.addEventListener('click', () => setMenu(false));
+    });
+    // Mark the current page in the mobile menu
+    mobileMenu.querySelectorAll('a[href^="/"]').forEach(link => {
+      if (link.getAttribute('href') === window.location.pathname) link.setAttribute('aria-current', 'page');
     });
   }
+
+  // Desktop dropdowns open on tap for touch screens wide enough to show the desktop nav
+  document.querySelectorAll('.nav-item[data-dropdown] > button').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      if (window.matchMedia('(hover: hover)').matches) return;
+      e.stopPropagation();
+      const dd = document.getElementById(btn.getAttribute('aria-controls'));
+      if (!dd) return;
+      const open = !dd.classList.contains('open');
+      document.querySelectorAll('.nav-dropdown.open').forEach(d => d.classList.remove('open'));
+      document.querySelectorAll('.nav-item button[aria-expanded="true"]').forEach(b => b.setAttribute('aria-expanded', 'false'));
+      dd.classList.toggle('open', open);
+      btn.setAttribute('aria-expanded', String(open));
+      activeDropdown = open ? dd : null;
+    });
+  });
 
   // ─── ACTIVE NAV LINK ───
   const path = window.location.pathname;

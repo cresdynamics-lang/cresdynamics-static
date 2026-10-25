@@ -6,12 +6,62 @@
   <meta name="robots" content="noindex, nofollow">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700&family=Outfit:wght@600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/css/admin.css">
-  <link rel="icon" type="image/png" href="/images/favicon.png">
+  <link rel="icon" type="image/png" href="/images/favicon-circular.png">
   <title>{{title}}</title>
 </head>
 <body>
 {{content}}
+<script>
+  // Shared admin chrome: logo in the sidebar, current-page highlight,
+  // a mobile top bar with a slide-out menu, and scrollable tables on small screens.
+  (function () {
+    var sidebar = document.querySelector('.admin-sidebar');
+    if (!sidebar) return;
+
+    var header = sidebar.querySelector('.sidebar-header');
+    if (header) header.innerHTML = '<img src="/images/logo.png" alt="" width="34" height="34"><h2>CRES <span>Admin</span></h2>';
+
+    var path = location.pathname.replace(/\/$/, '') || '/admin';
+    sidebar.querySelectorAll('.sidebar-link').forEach(function (a) {
+      var href = a.getAttribute('href');
+      var match = href === path || (href !== '/admin' && path.indexOf(href) === 0);
+      a.classList.toggle('active', match);
+      if (match) a.setAttribute('aria-current', 'page');
+    });
+
+    var main = document.querySelector('.admin-main');
+    var title = (main && main.querySelector('h1')) ? main.querySelector('h1').textContent.trim() : 'Admin';
+    var bar = document.createElement('div');
+    bar.className = 'admin-topbar';
+    bar.innerHTML = '<span class="admin-topbar__brand"><img src="/images/logo.png" alt="" width="28" height="28">' + title.replace(/</g, '&lt;') + '</span>' +
+      '<button type="button" class="admin-topbar__btn" aria-label="Open menu" aria-expanded="false">&#9776;</button>';
+    var backdrop = document.createElement('div');
+    backdrop.className = 'admin-drawer-backdrop';
+    document.body.insertBefore(bar, document.body.firstChild);
+    document.body.appendChild(backdrop);
+
+    var btn = bar.querySelector('button');
+    function setOpen(open) {
+      document.body.classList.toggle('drawer-open', open);
+      btn.setAttribute('aria-expanded', String(open));
+      btn.innerHTML = open ? '&times;' : '&#9776;';
+    }
+    btn.addEventListener('click', function () { setOpen(!document.body.classList.contains('drawer-open')); });
+    backdrop.addEventListener('click', function () { setOpen(false); });
+    document.addEventListener('keydown', function (e) { if (e.key === 'Escape') setOpen(false); });
+
+    // Tables scroll inside their own box instead of widening the page
+    document.querySelectorAll('.admin-table').forEach(function (t) {
+      if (t.parentElement && !t.parentElement.classList.contains('table-container')) {
+        var wrap = document.createElement('div');
+        wrap.className = 'table-container';
+        t.parentNode.insertBefore(wrap, t);
+        wrap.appendChild(t);
+      }
+    });
+  })();
+</script>
 </body>
 </html>
