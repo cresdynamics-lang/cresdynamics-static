@@ -452,6 +452,7 @@ app.post('/api/contact', enquiryLimiter, formLimiter, rate.spamGuard({ requireTi
       body.company ? `Company: ${String(body.company).slice(0, 120)}` : '',
       body.country ? `Country: ${String(body.country).slice(0, 80)}` : '',
       body.budget ? `Budget: ${String(body.budget).slice(0, 60)}` : '',
+      body.branches ? `Branches: ${String(body.branches).slice(0, 20)}` : '',
       body.timeline ? `Timeline: ${String(body.timeline).slice(0, 60)}` : '',
       body.sourcePage ? `Page: ${String(body.sourcePage).slice(0, 200)}` : '',
     ].filter(Boolean).join('\n');
