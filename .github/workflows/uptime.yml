@@ -1,0 +1,69 @@
+name: Uptime
+
+# External uptime check for cresdynamics.com, run from GitHub's servers so it
+# still alerts when the whole droplet is down (scripts/uptime-check.js on the
+# server covers app and database failures). On failure it opens a "site-down"
+# issue, which notifies repository watchers by email; on recovery it closes it.
+# Note: GitHub pauses scheduled workflows after 60 days with no repository activity.
+
+on:
+  schedule:
+    - cron: '*/15 * * * *'
+  workflow_dispatch:
+
+permissions:
+  issues: write
+
+concurrency:
+  group: uptime
+  cancel-in-progress: false
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Probe the site (3 attempts)
+        id: probe
+        run: |
+          fail=""
+          check() {
+            local url="$1" must="$2"
+            for i in 1 2 3; do
+              body=$(curl -s -L --max-time 20 -w '\n%{http_code}' -A 'Mozilla/5.0 (cres-uptime-github)' "$url") || body=$'\n000'
+              code="${body##*$'\n'}"
+              if [ "$code" = "200" ] && grep -q "$must" <<<"$body"; then return 0; fi
+              sleep 10
+            done
+            fail="$fail $url (HTTP $code)"
+          }
+          check "https://cresdynamics.com/health" '"status":"ok"'
+          check "https://cresdynamics.com/" "Cres Dynamics"
+          check "https://cresdynamics.com/contact" "data-enquiry"
+          echo "failures=$fail" >> "$GITHUB_OUTPUT"
+          if [ -n "$fail" ]; then echo "::error::Down:$fail"; else echo "All checks passed"; fi
+
+      - name: Open or close the site-down issue
+        uses: actions/github-script@v7
+        env:
+          FAILURES: ${{ steps.probe.outputs.failures }}
+        with:
+          script: |
+            const failures = (process.env.FAILURES || '').trim();
+            const { owner, repo } = context.repo;
+            const open = await github.rest.issues.listForRepo({ owner, repo, state: 'open', labels: 'site-down' });
+            const existing = open.data[0];
+            const now = new Date().toISOString();
+            if (failures) {
+              if (!existing) {
+                await github.rest.issues.create({
+                  owner, repo, labels: ['site-down'],
+                  title: 'cresdynamics.com is down',
+                  body: `Uptime check failed at ${now}.\n\nFailing: ${failures}\n\nRestart on the server:\n\`sudo -u site_cresdynamics env PM2_HOME=/var/www/sites/cresdynamics.com/.pm2 pm2 restart cresdynamics\`\n\nThis issue closes automatically when the site recovers.`,
+                });
+              }
+              core.setFailed(`Site down: ${failures}`);
+            } else if (existing) {
+              await github.rest.issues.createComment({ owner, repo, issue_number: existing.number, body: `Recovered: all checks passed at ${now}.` });
+              await github.rest.issues.update({ owner, repo, issue_number: existing.number, state: 'closed' });
+            }
