@@ -90,7 +90,7 @@ def card(name, eyebrow, headline):
     for ln in lines[:4]:
         d.text((72, y), ln, font=hf, fill=(255, 255, 255))
         y += int(hf.size * 1.15)
-    d.text((72, H - 66), 'cresdynamics.com  ·  Kivuli Tower, Westlands, Nairobi', font=font('Figtree.ttf', 24, b'SemiBold'), fill=MUTED)
+    d.text((72, H - 66), 'cresdynamics.com  ·  Westlands and Rongai, Nairobi', font=font('Figtree.ttf', 24, b'SemiBold'), fill=MUTED)
     img.save(os.path.join(OUT, f'{name}.png'), optimize=True)
 
 
