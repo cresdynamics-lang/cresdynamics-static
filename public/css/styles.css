@@ -1140,3 +1140,9 @@ html.menu-open .wa-float { display: none; }
 .case-glance__inner .btn { align-self: center; white-space: nowrap; }
 @media (max-width: 1024px) { .case-glance__inner { grid-template-columns: repeat(2, minmax(0, 1fr)); } .case-glance__inner .btn { grid-column: 1 / -1; justify-self: start; } }
 @media (max-width: 560px) { .case-glance__inner { grid-template-columns: 1fr; } .case-glance__inner .btn { white-space: normal; } }
+
+/* Further reading strip (service pages) */
+.reading-strip { padding-top: 40px; padding-bottom: 40px; border-top: 1px solid var(--line); }
+.reading-links { list-style: none; padding: 0; margin: 0 auto; display: flex; flex-wrap: wrap; justify-content: center; gap: 10px 28px; max-width: 980px; }
+.reading-links a { color: var(--ink); font-weight: 600; text-decoration: underline; text-decoration-color: var(--brand-orange); text-underline-offset: 4px; }
+.reading-links a:hover { color: var(--orange-text); }
