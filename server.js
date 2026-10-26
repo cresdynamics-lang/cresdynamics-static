@@ -67,7 +67,8 @@ app.get(/^\/images\/.+\.(?:jpe?g|png)$/i, (req, res, next) => {
   if (!(req.headers.accept || '').includes('image/webp')) return next();
   let rel;
   try { rel = decodeURIComponent(req.path.slice('/images/'.length)); } catch { return next(); }
-  const file = path.join(WEBP_DIR, `${rel}.webp`);
+  const small = req.query.w === '800' ? path.join(WEBP_DIR, `${rel}.800.webp`) : '';
+  const file = small && fs.existsSync(small) ? small : path.join(WEBP_DIR, `${rel}.webp`);
   if (!file.startsWith(WEBP_DIR + path.sep)) return next();
   res.setHeader('Vary', 'Accept');
   res.setHeader('Cache-Control', 'public, max-age=604800');

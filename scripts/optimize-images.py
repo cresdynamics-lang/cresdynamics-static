@@ -26,7 +26,9 @@ def main():
             src = os.path.join(dirpath, name)
             rel = os.path.relpath(src, SRC)
             dst = os.path.join(DST, rel) + '.webp'
-            if os.path.exists(dst) and os.path.getmtime(dst) >= os.path.getmtime(src):
+            small_dst = dst[:-5] + '.800.webp'
+            needs_small = rel.split(os.sep)[0] not in SMALL_DIRS or rel.startswith('cards')
+            if os.path.exists(dst) and os.path.getmtime(dst) >= os.path.getmtime(src) and (os.path.exists(small_dst) or not needs_small):
                 skipped += 1
                 continue
             os.makedirs(os.path.dirname(dst), exist_ok=True)
@@ -42,6 +44,10 @@ def main():
                 has_alpha = im.mode in ('RGBA', 'LA', 'P')
                 im = im.convert('RGBA' if has_alpha else 'RGB')
                 im.save(dst, 'WEBP', quality=78, method=6)
+                # 800px variant for phones (served for ?w=800 by server.js)
+                if im.width > 800:
+                    small = im.resize((800, round(im.height * 800 / im.width)), Image.LANCZOS)
+                    small.save(dst[:-5] + '.800.webp', 'WEBP', quality=60, method=6)
             before += os.path.getsize(src)
             after += os.path.getsize(dst)
             made += 1
