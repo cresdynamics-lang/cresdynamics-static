@@ -9,6 +9,7 @@
 set -euo pipefail
 
 APP_DIR="$(cd "$(dirname "$0")/.." && pwd)"
+cd "$APP_DIR"
 set -a; source "$APP_DIR/.env"; set +a
 
 BACKUP_DIR="${BACKUP_DIR:-$APP_DIR/backups}"

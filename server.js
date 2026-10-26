@@ -1406,8 +1406,12 @@ const ENQUIRY_PAGES = new Set([
   '/websites', '/e-commerce', '/erp', '/software', '/ai-automation', '/ai-systems', '/ai-forecasting',
   '/logistics-ai', '/school-management-system', '/finance-platforms', '/operations-workflow',
   '/services/business-operating-system', '/cresos', '/pricing', '/projects', '/our-work',
+  '/industries/logistics', '/industries/fmcg', '/industries/financial-services', '/industries/real-estate',
+  '/industries/education', '/industries/manufacturing', '/industries/hospitality', '/industries/retail', '/industries/multi-unit',
+  '/expand-into-east-africa', '/hire-kenyan-developers', '/multi-branch-business-system',
 ]);
-const WHATSAPP_BOOKING = 'https://wa.me/254708805496?text=Hi%2C%20I%27d%20like%20to%20book%20a%2030-minute%20call%20with%20Cres%20Dynamics.';
+// Call bookings go to the team inbox (set BOOKING_URL to use a calendar link instead)
+const EMAIL_BOOKING = 'mailto:info@cresdynamics.com?subject=Book%20a%2030-minute%20call&body=Hi%20Cres%20Dynamics%2C%0A%0AI%27d%20like%20to%20book%20a%2030-minute%20call.%0A%0ACompany%3A%0AWhat%20we%20need%3A%0ATimes%20that%20suit%20me%3A%0A';
 
 function enquiryFields(prefix) {
   return fs.readFileSync(path.join(__dirname, 'views', 'partials', 'enquiry-fields.html'), 'utf8').replace(/\{\{p\}\}/g, prefix);
@@ -1431,11 +1435,27 @@ function headTags() {
   return tags.join('\n  ');
 }
 
+// Branded share images (scripts/build-og-images.py) by path; everything else uses default.png
+const OG_IMAGES = {
+  '/ai-systems': 'ai-systems', '/ai-forecasting': 'ai-forecasting', '/logistics-ai': 'logistics-ai',
+  '/school-management-system': 'school-management-system', '/services/business-operating-system': 'business-operating-system',
+  '/cresos': 'cresos', '/websites': 'websites', '/e-commerce': 'e-commerce', '/erp': 'erp', '/ai-automation': 'ai-automation',
+  '/finance-platforms': 'finance-platforms', '/software': 'software', '/industries': 'industries',
+  '/expand-into-east-africa': 'expand-into-east-africa', '/hire-kenyan-developers': 'hire-kenyan-developers',
+  '/multi-branch-business-system': 'multi-branch-business-system', '/case-studies': 'case-studies',
+  '/projects': 'projects', '/blog': 'blog', '/contact': 'contact',
+};
+function ogImageFor(p) {
+  const name = OG_IMAGES[p] || (p.startsWith('/industries/') ? 'industries' : p.startsWith('/case-studies/') ? 'case-studies' : 'default');
+  return `/images/og/${name}.png`;
+}
+
 function renderPage(res, pageFile, data = {}, status = 200) {
   try {
     const layout = fs.readFileSync(path.join(__dirname, 'views', 'layout.html'), 'utf8');
     const page = fs.readFileSync(path.join(__dirname, 'views', pageFile), 'utf8');
-    let html = layout.replace('{{content}}', page);
+    const body = data.afterHero ? page.replace('</section>', `</section>\n${data.afterHero}`) : page;
+    let html = layout.replace('{{content}}', body);
     const base = (process.env.APP_BASE_URL || 'https://cresdynamics.com').replace(/\/$/, '');
     const reqPath = res.req?.path || '/';
     const siteKey = (process.env.TURNSTILE_SITE_KEY || '').replace(/[^\w-]/g, '');
@@ -1446,18 +1466,19 @@ function renderPage(res, pageFile, data = {}, status = 200) {
         : '',
       enquiryFields: enquiryFields('c'),
       turnstileWidget: siteKey ? `<div class="cf-turnstile" data-sitekey="${siteKey}" data-theme="light"></div>` : '',
-      bookingUrl: (process.env.BOOKING_URL || WHATSAPP_BOOKING).replace(/"/g, '%22'),
+      bookingUrl: (process.env.BOOKING_URL || EMAIL_BOOKING).replace(/"/g, '%22'),
       headTags: headTags(),
       title: 'Cres Dynamics - Intelligent Systems That Run Your Business',
       description: 'Intelligent Systems That Run Your Business. Custom operating systems, finance platforms, and websites that sell. Built in Nairobi for how your business actually works.',
-      ogImage: `${base}/images/logo.png`,
+      ogImage: `${base}${ogImageFor(reqPath)}`,
       canonical: `${base}${res.req?.path || '/'}`,
       schema: '',
       robots: 'index, follow, max-image-preview:large',
       siteVerification: process.env.GOOGLE_SITE_VERIFICATION
         ? `<meta name="google-site-verification" content="${process.env.GOOGLE_SITE_VERIFICATION}">` : '',
     };
-    const merged = { ...defaults, ...(PAGE_META[res.req?.path] || {}), ...data };
+    const { afterHero, ...rest } = data;
+    const merged = { ...defaults, ...(PAGE_META[res.req?.path] || {}), ...rest };
     if (!data.canonical && res.req?.path) merged.canonical = `${base}${res.req.path === '/' ? '/' : res.req.path}`;
     for (const [key, val] of Object.entries(merged)) {
       html = html.replace(new RegExp(`{{${key}}}`, 'g'), val == null ? '' : String(val));
@@ -1485,6 +1506,9 @@ app.get('/ai-automation', (req, res) => renderPage(res, 'services/ai-automation.
 app.get('/ai-systems', (req, res) => renderPage(res, 'services/ai-systems.html'));
 app.get('/ai-forecasting', (req, res) => renderPage(res, 'services/ai-forecasting.html'));
 app.get('/logistics-ai', (req, res) => renderPage(res, 'services/logistics-ai.html'));
+app.get('/expand-into-east-africa', (req, res) => renderPage(res, 'expand-into-east-africa.html'));
+app.get('/hire-kenyan-developers', (req, res) => renderPage(res, 'hire-kenyan-developers.html'));
+app.get('/multi-branch-business-system', (req, res) => renderPage(res, 'multi-branch-business-system.html'));
 app.get('/school-management-system', (req, res) => renderPage(res, 'services/school-management-system.html'));
 app.get('/our-work', (req, res) => renderPage(res, 'our-work.html', {
   title: 'Our Work: Systems We Built for Companies | Cres Dynamics',
@@ -1513,11 +1537,11 @@ app.get('/data-security', (req, res) => renderPage(res, 'data-security.html', {
 
 // Industries
 app.get('/industries', (req, res) => renderPage(res, 'industries/index.html', {
-  title: 'Industries - Hospitality, Retail & Multi-unit | Cres Dynamics',
-  description: 'Industry systems for hospitality ops, retail commerce, and multi-unit groups - built in Nairobi for how your sector runs.',
+  title: 'Industry Software in Kenya: Logistics, FMCG, SACCOs & More | Cres Dynamics',
+  description: 'Systems for logistics, FMCG, SACCOs and finance, real estate, education, manufacturing, hospitality, retail and multi-unit groups, built in Nairobi.',
 }));
 app.get('/industries/:slug', (req, res) => {
-  const valid = ['hospitality', 'retail', 'multi-unit'];
+  const valid = ['hospitality', 'retail', 'multi-unit', 'logistics', 'fmcg', 'financial-services', 'real-estate', 'education', 'manufacturing'];
   if (!valid.includes(req.params.slug)) return res.redirect('/industries');
   const meta = {
     hospitality: {
@@ -1591,6 +1615,8 @@ app.get('/blog/:slug', async (req, res) => {
       author,
       date: post.published_at ? new Date(post.published_at).toLocaleDateString('en-KE', { year: 'numeric', month: 'long', day: 'numeric' }) : '',
       dateIso: post.published_at ? new Date(post.published_at).toISOString() : '',
+      dateModifiedIso: new Date(post.updated_at || post.published_at || Date.now()).toISOString(),
+      ogImage: 'https://cresdynamics.com/images/og/blog.png',
       excerpt: post.excerpt || '',
       slug: post.slug,
       related: JSON.stringify(related).replace(/</g, '\\u003c'),
@@ -1612,11 +1638,51 @@ app.get(/^\/events\/.+/, (req, res) => res.redirect(301, '/events'));
 
 // Case studies
 app.get('/case-studies', (req, res) => renderPage(res, 'case-studies/index.html'));
+// "At a glance" facts for the strongest case studies (taken from each case study's own results)
+const CASE_FACTS = {
+  'sheraton-nairobi-westlands': { client: 'Sheraton Nairobi Westlands', industry: 'Hospitality', built: 'AI-powered operations and approvals platform', results: ['Approvals: hours to minutes', '100% audit trail capture', 'Zero lost decision records'], related: ['/industries/hospitality', 'Hospitality systems'] },
+  'smart-brands': { client: 'Smart Brands', industry: 'FMCG and distribution', built: 'Warehouse, POS, distributor portal and AI demand forecasting', results: ['95% stock visibility accuracy', '40% fewer stockouts', '30% faster reorder cycle', 'Demand forecast 6 months ahead'], related: ['/logistics-ai', 'Logistics and inventory AI'] },
+  'millenia-bos': { client: 'Millenia', industry: 'Multi-unit group', built: 'Business operating system across 6 business units', results: ['6 business units unified', '90% faster financial consolidation', '25% better resource utilisation'], related: ['/multi-branch-business-system', 'Multi-branch business system'] },
+  'optiohire': { client: 'OptioHire', industry: 'HR technology', built: 'AI hiring agent', results: ['90% faster screening', '3x more qualified candidates', '100% of applicants processed'], related: ['/ai-automation', 'AI agents and automation'] },
+  'safarimart': { client: 'SafariMart Africa', industry: 'Retail', built: 'Custom-trained AI product assistant', results: ['13 years of data made queryable', 'Instant product answers, 24/7', 'Stock-aware recommendations'], related: ['/ai-systems', 'AI systems for companies'] },
+};
+
+function caseGlance(f) {
+  const li = f.results.map((r) => `<li>${escapeHtml(r)}</li>`).join('');
+  return `<section class="case-glance" aria-label="At a glance"><div class="case-glance__inner">
+    <div><span>Client</span><strong>${escapeHtml(f.client)}</strong></div>
+    <div><span>Industry</span><strong>${escapeHtml(f.industry)}</strong></div>
+    <div><span>What we built</span><strong>${escapeHtml(f.built)}</strong></div>
+    <div class="case-glance__results"><span>Results</span><ul>${li}</ul></div>
+    <a class="btn btn-primary" href="${f.related[0]}">${escapeHtml(f.related[1])} →</a>
+  </div></section>`;
+}
+
 app.get('/case-studies/:slug', (req, res) => {
   const slug = req.params.slug;
   const file = path.join(__dirname, 'views', 'case-studies', `${slug}.html`);
   if (!fs.existsSync(file)) return res.redirect('/case-studies');
-  renderPage(res, `case-studies/${slug}.html`);
+  const meta = PAGE_META[`/case-studies/${slug}`] || {};
+  const facts = CASE_FACTS[slug];
+  const url = `https://cresdynamics.com/case-studies/${slug}`;
+  const name = facts ? facts.client : (meta.title || slug).split('|')[0].trim();
+  const schema = {
+    '@context': 'https://schema.org',
+    '@graph': [
+      { '@type': 'Article', headline: (meta.title || name).split('|')[0].trim(), description: meta.description || '', url,
+        author: { '@id': 'https://cresdynamics.com/#organization' }, publisher: { '@id': 'https://cresdynamics.com/#organization' },
+        ...(facts ? { about: { '@type': 'Organization', name: facts.client } } : {}) },
+      { '@type': 'BreadcrumbList', itemListElement: [
+        { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://cresdynamics.com/' },
+        { '@type': 'ListItem', position: 2, name: 'Case studies', item: 'https://cresdynamics.com/case-studies' },
+        { '@type': 'ListItem', position: 3, name, item: url },
+      ] },
+    ],
+  };
+  renderPage(res, `case-studies/${slug}.html`, {
+    afterHero: facts ? caseGlance(facts) : '',
+    schema: `<script type="application/ld+json">${JSON.stringify(schema).replace(/</g, '\\u003c')}</script>`,
+  });
 });
 
 // Solutions
@@ -1702,6 +1768,15 @@ app.get('/sitemap.xml', async (req, res) => {
     'industries/hospitality.html': '/industries/hospitality',
     'industries/retail.html': '/industries/retail',
     'industries/multi-unit.html': '/industries/multi-unit',
+    'industries/logistics.html': '/industries/logistics',
+    'industries/fmcg.html': '/industries/fmcg',
+    'industries/financial-services.html': '/industries/financial-services',
+    'industries/real-estate.html': '/industries/real-estate',
+    'industries/education.html': '/industries/education',
+    'industries/manufacturing.html': '/industries/manufacturing',
+    'expand-into-east-africa.html': '/expand-into-east-africa',
+    'hire-kenyan-developers.html': '/hire-kenyan-developers',
+    'multi-branch-business-system.html': '/multi-branch-business-system',
     'events/index.html': '/events',
 
     'case-studies/index.html': '/case-studies',

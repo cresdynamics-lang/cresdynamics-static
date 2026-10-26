@@ -56,7 +56,7 @@ ssh do-new 'for h in $(ls /var/www/sites); do echo "$(curl -sk -o /dev/null -w "
 | `GA4_ID` (`G-XXXX`) | Loads Google Analytics 4; WhatsApp clicks, phone taps and enquiries are sent as events |
 | `CLARITY_ID` | Loads Microsoft Clarity |
 | `TURNSTILE_SITE_KEY` + `TURNSTILE_SECRET_KEY` | Cloudflare Turnstile check on every enquiry form |
-| `BOOKING_URL` | "Book a 30-minute call" link (falls back to WhatsApp) |
+| `BOOKING_URL` | Calendar link for "book a call" buttons (default: email to info@cresdynamics.com) |
 | `BACKUP_RCLONE_REMOTE` | Copies each nightly DB dump off the server with rclone (e.g. `spaces:cres-backups`) |
 | `ALERT_EMAIL` | Where uptime and bot-spike alerts go (default info@cresdynamics.com) |
 
