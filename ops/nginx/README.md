@@ -36,3 +36,12 @@ Quick reads:
 
     sudo awk -F'"' '{print $6}' /var/log/nginx/cresdynamics.access.log | grep -E 'google|bing|chatgpt|perplexity' | sort | uniq -c | sort -rn
     sudo grep -E 'ChatGPT-User|Claude-User|Perplexity-User' /var/log/nginx/cresdynamics.access.log
+
+## Real visitor IP behind Cloudflare (added 2026-11-24)
+
+`/etc/nginx/snippets/cloudflare-realip.conf` (copy: `cloudflare-realip.conf`) trusts
+Cloudflare's published edge ranges and takes the visitor IP from `CF-Connecting-IP`.
+It is included only in the cresdynamics.com server block. Without it every visitor
+looked like a Cloudflare IP to the app: visit geography was wrong and per-IP form
+limits were shared by everyone on the same Cloudflare edge. Refresh the ranges from
+https://www.cloudflare.com/ips if Cloudflare announces changes.

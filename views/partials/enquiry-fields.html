@@ -9,29 +9,12 @@
               <input class="form-input" type="text" id="{{p}}-name" name="name" required placeholder="e.g. James Mwangi" autocomplete="name">
             </div>
             <div>
-              <label class="form-label" for="{{p}}-email">Work email *</label>
-              <input class="form-input" type="email" id="{{p}}-email" name="email" required placeholder="you@company.com" autocomplete="email">
-            </div>
-            <div>
               <label class="form-label" for="{{p}}-phone">Phone or WhatsApp</label>
               <input class="form-input" type="tel" id="{{p}}-phone" name="phone" placeholder="+254 7XX XXX XXX" autocomplete="tel">
             </div>
             <div>
-              <label class="form-label" for="{{p}}-company">Company</label>
-              <input class="form-input" type="text" id="{{p}}-company" name="company" placeholder="Company name" autocomplete="organization">
-            </div>
-            <div>
-              <label class="form-label" for="{{p}}-country">Country</label>
-              <select class="form-input" id="{{p}}-country" name="country">
-                <option value="Kenya">Kenya</option>
-                <option value="Uganda">Uganda</option>
-                <option value="Tanzania">Tanzania</option>
-                <option value="Rwanda">Rwanda</option>
-                <option value="Other Africa">Elsewhere in Africa</option>
-                <option value="United States">United States</option>
-                <option value="UK / Europe">UK / Europe</option>
-                <option value="Other">Other</option>
-              </select>
+              <label class="form-label" for="{{p}}-email">Email</label>
+              <input class="form-input" type="email" id="{{p}}-email" name="email" placeholder="you@company.com" autocomplete="email">
             </div>
             <div>
               <label class="form-label" for="{{p}}-service">What do you need? *</label>
@@ -49,31 +32,54 @@
                 <option value="Something else">Something else</option>
               </select>
             </div>
-            <div>
-              <label class="form-label" for="{{p}}-branches">Branches or locations</label>
-              <select class="form-input" id="{{p}}-branches" name="branches">
-                <option value="">Select…</option>
-                <option value="1">One location</option>
-                <option value="2–5">2 to 5</option>
-                <option value="6–20">6 to 20</option>
-                <option value="20+">More than 20</option>
-              </select>
-            </div>
-            <div>
-              <label class="form-label" for="{{p}}-timeline">When do you need it?</label>
-              <select class="form-input" id="{{p}}-timeline" name="timeline">
-                <option value="">Flexible</option>
-                <option value="As soon as possible">As soon as possible</option>
-                <option value="1–3 months">In 1–3 months</option>
-                <option value="3–6 months">In 3–6 months</option>
-                <option value="Exploring">Just exploring</option>
-              </select>
-            </div>
           </div>
+          <p class="enq-hint">Give a phone/WhatsApp number or an email (one is enough). We reply on whichever you give.</p>
           <div>
             <label class="form-label" for="{{p}}-message">What should the system do, or what is broken? *</label>
             <textarea class="form-input form-textarea" id="{{p}}-message" name="message" required rows="4" placeholder="e.g. We run 4 branches on spreadsheets and can't see stock or cash in one place."></textarea>
           </div>
+          <details class="enq-more">
+            <summary>Add company details (optional)</summary>
+            <div class="enq-grid">
+              <div>
+                <label class="form-label" for="{{p}}-company">Company</label>
+                <input class="form-input" type="text" id="{{p}}-company" name="company" placeholder="Company name" autocomplete="organization">
+              </div>
+              <div>
+                <label class="form-label" for="{{p}}-country">Country</label>
+                <select class="form-input" id="{{p}}-country" name="country">
+                  <option value="Kenya">Kenya</option>
+                  <option value="Uganda">Uganda</option>
+                  <option value="Tanzania">Tanzania</option>
+                  <option value="Rwanda">Rwanda</option>
+                  <option value="Other Africa">Elsewhere in Africa</option>
+                  <option value="United States">United States</option>
+                  <option value="UK / Europe">UK / Europe</option>
+                  <option value="Other">Other</option>
+                </select>
+              </div>
+              <div>
+                <label class="form-label" for="{{p}}-branches">Branches or locations</label>
+                <select class="form-input" id="{{p}}-branches" name="branches">
+                  <option value="">Select…</option>
+                  <option value="1">One location</option>
+                  <option value="2–5">2 to 5</option>
+                  <option value="6–20">6 to 20</option>
+                  <option value="20+">More than 20</option>
+                </select>
+              </div>
+              <div>
+                <label class="form-label" for="{{p}}-timeline">When do you need it?</label>
+                <select class="form-input" id="{{p}}-timeline" name="timeline">
+                  <option value="">Flexible</option>
+                  <option value="As soon as possible">As soon as possible</option>
+                  <option value="1–3 months">In 1–3 months</option>
+                  <option value="3–6 months">In 3–6 months</option>
+                  <option value="Exploring">Just exploring</option>
+                </select>
+              </div>
+            </div>
+          </details>
           {{turnstileWidget}}
           <button class="btn btn-primary" type="submit" style="width:100%;">Send enquiry</button>
           <p class="enq-status" role="status" hidden></p>

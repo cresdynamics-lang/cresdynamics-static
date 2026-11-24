@@ -1162,3 +1162,12 @@ html.menu-open .wa-float { display: none; }
 .faq-more { max-width: 780px; margin: 20px auto 0; text-align: center; font-size: 14px; color: var(--ink-muted); }
 .faq-more a { color: var(--orange-text); font-weight: 700; text-decoration: underline; text-underline-offset: 3px; }
 .section-dark .faq-more { color: #C9D3E0; }
+
+/* Enquiry form: short by default, optional details folded away */
+.enq-hint { margin: -4px 0 0; font-size: 0.85rem; color: var(--brand-navy); }
+.enq-more { border: 1px solid rgba(36, 48, 72, 0.18); border-radius: 10px; padding: 10px 14px; }
+.enq-more > summary { cursor: pointer; font-weight: 600; color: var(--brand-navy); list-style: none; }
+.enq-more > summary::-webkit-details-marker { display: none; }
+.enq-more > summary::before { content: '+ '; color: var(--brand-orange); }
+.enq-more[open] > summary::before { content: '– '; }
+.enq-more[open] > .enq-grid { margin-top: 12px; }

@@ -471,6 +471,13 @@
   function track(name, params) {
     try { if (typeof window.gtag === 'function') window.gtag('event', name, params || {}); } catch (_) {}
     try { if (typeof window.clarity === 'function') window.clarity('event', name); } catch (_) {}
+    // First-party record on our own server (works without GA4)
+    try {
+      const body = JSON.stringify({ e: name, p: location.pathname });
+      if (!(navigator.sendBeacon && navigator.sendBeacon('/api/track', new Blob([body], { type: 'application/json' })))) {
+        fetch('/api/track', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body, keepalive: true }).catch(() => {});
+      }
+    } catch (_) {}
   }
   document.addEventListener('click', (e) => {
     const a = e.target.closest && e.target.closest('a[href]');
@@ -491,6 +498,10 @@
       const status = form.querySelector('.enq-status');
       const say = (msg, ok) => { if (status) { status.hidden = false; status.textContent = msg; status.dataset.ok = ok ? '1' : '0'; } };
       if (!form.checkValidity()) { form.reportValidity(); return; }
+      const em = form.querySelector('input[name="email"]'), ph = form.querySelector('input[name="phone"]');
+      if (em && ph && !em.value.trim() && ph.value.replace(/\D/g, '').length < 9) {
+        say('Add an email or a phone/WhatsApp number so we can reply.', false); ph.focus(); return;
+      }
       const orig = btn && btn.textContent;
       if (btn) { btn.disabled = true; btn.textContent = 'Sending…'; }
       try {

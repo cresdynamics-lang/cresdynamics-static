@@ -463,13 +463,15 @@ app.post('/api/contact', enquiryLimiter, formLimiter, rate.spamGuard({ requireTi
     const message = String(body.projectDetail || body.message || '').slice(0, 5000);
     const projectDetail = qualifiers ? `${message}\n\n${qualifiers}` : message;
     const subscribe = body.subscribe || false;
-    if (!fullName || !email || !message.trim()) {
-      return res.status(400).json({ error: 'Please fill in your name, email and what you need.' });
+    // Name, a way to reply (email OR phone/WhatsApp), and what they need
+    const hasPhone = contactPhone !== 'n/a' && String(contactPhone).replace(/\D/g, '').length >= 9;
+    if (!fullName || (!email && !hasPhone) || !message.trim()) {
+      return res.status(400).json({ error: 'Please add your name, an email or phone number, and what you need.' });
     }
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(String(email).trim())) {
+    if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(String(email).trim())) {
       return res.status(400).json({ error: 'Please enter a valid email address.' });
     }
-    const repeat = enquiryRepeat(email, message);
+    const repeat = enquiryRepeat(email || contactPhone, message);
     if (repeat) {
       rate.recordAbuse('reject', repeat, req.path);
       return res.status(429).json({ error: 'We already have this message. We will respond within 2 hours during working hours.' });
@@ -480,7 +482,7 @@ app.post('/api/contact', enquiryLimiter, formLimiter, rate.spamGuard({ requireTi
     }
     await db.query(
       'INSERT INTO contact_leads (full_name, email, contact_phone, project_title, project_detail, subscribe) VALUES ($1,$2,$3,$4,$5,$6)',
-      [fullName, email, contactPhone, projectTitle, projectDetail || '', subscribe || false]
+      [fullName, email || '', contactPhone, projectTitle, projectDetail || '', subscribe || false]
     );
 
     // Send notification to inbox
@@ -496,7 +498,7 @@ app.post('/api/contact', enquiryLimiter, formLimiter, rate.spamGuard({ requireTi
           <p><strong>Project:</strong> ${escapeHtml(projectTitle)}</p>
           <p><strong>Details:</strong><br>${nlToBr(escapeHtml(projectDetail))}</p>
           <p><strong>Subscribe:</strong> ${subscribe ? 'Yes' : 'No'}</p>`,
-        replyTo: email,
+        ...(email ? { replyTo: email } : {}),
       }).catch(e => console.error('Email send failed:', e.message));
     }
 
@@ -505,6 +507,28 @@ app.post('/api/contact', enquiryLimiter, formLimiter, rate.spamGuard({ requireTi
     console.error('Contact form error:', err);
     res.status(500).json({ error: 'Failed to send message. Please try again.' });
   }
+});
+
+// ─── First-party conversion events (WhatsApp / call / email clicks, form sends) ───
+// Stored as site_visits rows with path /_event/<name> and referrer = page, so
+// contact intent is measurable without GA4. Whitelisted names only.
+const TRACK_EVENTS = new Set(['whatsapp_click', 'phone_click', 'email_click', 'generate_lead']);
+const trackLimiter = rate.limiter('track', 60 * 1000, 20);
+app.post('/api/track', trackLimiter, (req, res) => {
+  const name = String(req.body?.e || '');
+  const page = String(req.body?.p || '').slice(0, 300);
+  const ua = String(req.headers['user-agent'] || '').slice(0, 500);
+  if (TRACK_EVENTS.has(name) && page.startsWith('/') && /mozilla\//i.test(ua)) {
+    const ip = (req.ip || '').replace(/^::ffff:/, '');
+    const geo = ip ? geoip.lookup(ip) : null;
+    db.query(
+      'INSERT INTO site_visits (path, referrer, ip, country_code, city, device_type, user_agent, visitor_hash) VALUES ($1,$2,$3,$4,$5,$6,$7,$8)',
+      [`/_event/${name}`, page, ip || null, geo?.country || null, geo?.city || null,
+        /mobile|iphone|android/i.test(ua) ? 'mobile' : 'desktop', ua,
+        crypto.createHash('sha256').update(ip + '|' + ua.slice(0, 200)).digest('hex')]
+    ).catch((e) => console.error('[track] failed:', e.message));
+  }
+  res.status(204).end();
 });
 
 // Career application
