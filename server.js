@@ -240,12 +240,16 @@ async function checkBotSpikeAndAlert() {
     topReasons[r.reason || r.kind] = (topReasons[r.reason || r.kind] || 0) + 1;
   }
   const reasonLine = Object.entries(topReasons).map(([k, v]) => `${k}: ${v}`).join(', ') || 'n/a';
-  console.warn(`[abuse] BOT SPIKE: rejected=${snap.rejected} rateLimited=${snap.rateLimited} reasons=${reasonLine}`);
-  try {
-    if (hasResendConfigured()) {
+  console.warn(`[abuse] BOT SPIKE: rejected=${snap.rejected} rateLimited=${snap.rateLimited} reasons=${reasonLine} (email alerts disabled — not sent to info@)`);
+  // Abuse-spike emails to info@ removed: they were unconfirmed/noisy system noise.
+  // Re-enable only with ALERT_EMAIL set to a real ops inbox that is NOT info@.
+  const alertTo = String(process.env.ALERT_EMAIL || '').trim();
+  const blockedInbox = !alertTo || /^info@cresdynamics\.com$/i.test(alertTo);
+  if (!blockedInbox && hasResendConfigured()) {
+    try {
       await sendEmail({
         from: `CRES Alerts <${SENDER}>`,
-        to: process.env.ALERT_EMAIL || INBOX,
+        to: alertTo,
         subject: `[CRES] Bot / abuse spike - ${total} events`,
         html: `<p>Abuse window spike on cresdynamics.</p>
           <ul>
@@ -255,11 +259,11 @@ async function checkBotSpikeAndAlert() {
             <li>Window start: ${snap.windowStart}</li>
             <li>Reasons: ${escapeHtml(reasonLine)}</li>
           </ul>
-          <p>Check PM2 logs and /api/admin/abuse-stats. Event register remains locked down if still enabled.</p>`,
+          <p>Check PM2 logs and /api/admin/abuse-stats.</p>`,
       });
+    } catch (err) {
+      console.error('[abuse] alert email failed:', err.message);
     }
-  } catch (err) {
-    console.error('[abuse] alert email failed:', err.message);
   }
   rate.resetAbuseWindow();
 }
@@ -342,7 +346,7 @@ cron.schedule('0 20 * * *', () => {
   console.log('[daily-summary] Triggered');
   sendDailySummary();
 }, { timezone: 'Africa/Nairobi' });
-// Bot / abuse spike check every 15 minutes
+// Bot / abuse spike: log-only (no email to info@). Cron kept for ops stats in PM2 logs.
 cron.schedule('*/15 * * * *', () => {
   checkBotSpikeAndAlert().catch(err => console.error('[abuse] check failed:', err.message));
 }, { timezone: 'Africa/Nairobi' });
