@@ -68,6 +68,10 @@ gunzip -c backups/cresdynamics-db-YYYYMMDD-HHMMSS.sql.gz | psql "$DATABASE_URL"
 
 Restore into a fresh database first and check it before pointing the app at it.
 
+## Shared nginx
+
+Connection limits and the scraper rate limit are server-wide settings for all sites; see [ops/nginx/README.md](ops/nginx/README.md).
+
 ## Rules
 
 1. Commit and push to GitHub `main` before deploying, so the repo matches production.
