@@ -1406,6 +1406,7 @@ app.get('/api/admin/events/attendees-export', adminAuth, async (req, res) => {
 
 const fs = require('fs');
 const { PAGE_META } = require('./lib/page-meta');
+const { FAQS, faqSection, faqSchema, pageFaqItems } = require('./lib/faqs');
 
 // Service pages that end with the shared enquiry form
 const ENQUIRY_PAGES = new Set([
@@ -1460,10 +1461,16 @@ function renderPage(res, pageFile, data = {}, status = 200) {
   try {
     const layout = fs.readFileSync(path.join(__dirname, 'views', 'layout.html'), 'utf8');
     const page = fs.readFileSync(path.join(__dirname, 'views', pageFile), 'utf8');
-    const body = data.afterHero ? page.replace('</section>', `</section>\n${data.afterHero}`) : page;
+    const reqPath = res.req?.path || '/';
+    // Answer-engine FAQ: only where the page has no FAQ markup of its own
+    // and, if the page already shows its own <details> questions, mark those up
+    // instead of adding a second list.
+    const ownFaq = page.includes('FAQPage') ? [] : pageFaqItems(page);
+    const faqItems = ownFaq.length ? ownFaq : (FAQS[reqPath] && !page.includes('FAQPage') ? FAQS[reqPath] : null);
+    let body = data.afterHero ? page.replace('</section>', `</section>\n${data.afterHero}`) : page;
+    if (faqItems && !ownFaq.length) body += faqSection(faqItems);
     let html = layout.replace('{{content}}', body);
     const base = (process.env.APP_BASE_URL || 'https://cresdynamics.com').replace(/\/$/, '');
-    const reqPath = res.req?.path || '/';
     const siteKey = (process.env.TURNSTILE_SITE_KEY || '').replace(/[^\w-]/g, '');
     const defaults = {
       // Nested partials first: their own {{tokens}} are filled by the entries that follow
@@ -1485,6 +1492,7 @@ function renderPage(res, pageFile, data = {}, status = 200) {
     };
     const { afterHero, ...rest } = data;
     const merged = { ...defaults, ...(PAGE_META[res.req?.path] || {}), ...rest };
+    if (faqItems) merged.schema = `${merged.schema || ''}\n  ${faqSchema(faqItems)}`;
     if (!data.canonical && res.req?.path) merged.canonical = `${base}${res.req.path === '/' ? '/' : res.req.path}`;
     for (const [key, val] of Object.entries(merged)) {
       html = html.replace(new RegExp(`{{${key}}}`, 'g'), val == null ? '' : String(val));

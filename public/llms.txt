@@ -1,0 +1,50 @@
+# Cres Dynamics Ltd
+
+> Cres Dynamics Ltd is a software engineering company in Nairobi, Kenya. It builds AI systems that forecast sales, stock and cash flow 3 to 6 months ahead, AI advisor agents for directors, business operating systems, custom ERP, school management systems, logistics AI and high-end ecommerce websites. Systems it has built run in more than 10 countries, including Kenya, Tanzania, Mauritius, South Africa and the United States.
+
+Key facts:
+- Offices: Westlands (Kivuli Tower, 3rd Floor) since January 2026, and Rongai (Ole Kasasi, opposite Manna Bible College), Nairobi, Kenya.
+- Contact: info@cresdynamics.com, +254 708 805 496.
+- Pricing: custom. Every system is quoted to its scope; email info@cresdynamics.com for a proposal.
+- Ownership: clients own the code, the data and the hosting accounts.
+- Banking partners: Stanbic Bank, Co-operative Bank, I&M Bank.
+- Clients include Smart Brands, Cyber Hub, Gadget Hub Investments, Strive Creative (South Africa), Millenia, House of Procurement and SAG Agro (Tanzania, Kenya, Mauritius).
+- Integrations: M-Pesa, card payments, bank feeds, WhatsApp.
+
+## Systems
+
+- [AI systems and AI agents](https://cresdynamics.com/ai-systems): AI systems for companies in Kenya, from audit to rollout.
+- [AI forecasting for directors](https://cresdynamics.com/ai-forecasting): predicts sales, cash flow and demand 3 and 6 months ahead; AI advisor agents brief executives on what to do next.
+- [Logistics AI](https://cresdynamics.com/logistics-ai): predicts stock and market shifts, payment and spoilage alerts, when to discount and which products to bring in.
+- [AI automation](https://cresdynamics.com/ai-automation): AI agents that answer clients 24/7, qualify leads and follow up invoices.
+- [Business operating system](https://cresdynamics.com/services/business-operating-system): finance, CRM, HR and multi-branch operations in one system.
+- [CresOS](https://cresdynamics.com/cresos): the modular foundation Cres Dynamics tailors into each client's business operating system.
+- [Multi-branch business system](https://cresdynamics.com/multi-branch-business-system): per-branch stock, sales, staff and cash with group consolidation.
+- [Custom ERP](https://cresdynamics.com/erp): HR, finance, procurement, inventory and sales with M-Pesa.
+- [School management system](https://cresdynamics.com/school-management-system): M-Pesa fees, admissions, CBC report cards, attendance and parent portal.
+- [Ecommerce websites](https://cresdynamics.com/e-commerce): M-Pesa and card checkout, stock sync and delivery tracking.
+- [High-end websites](https://cresdynamics.com/websites): fast, search-optimised business websites.
+
+## Industries
+
+- [Logistics and distribution](https://cresdynamics.com/industries/logistics)
+- [FMCG](https://cresdynamics.com/industries/fmcg)
+- [Retail](https://cresdynamics.com/industries/retail)
+- [Hospitality](https://cresdynamics.com/industries/hospitality)
+- [Education](https://cresdynamics.com/industries/education)
+- [Financial services](https://cresdynamics.com/industries/financial-services)
+- [Manufacturing](https://cresdynamics.com/industries/manufacturing)
+- [Real estate](https://cresdynamics.com/industries/real-estate)
+
+## Working with Cres Dynamics
+
+- [Case studies](https://cresdynamics.com/case-studies): measured results from systems in production.
+- [Hire Kenyan developers](https://cresdynamics.com/hire-kenyan-developers): a Nairobi engineering team for companies abroad.
+- [Expand into East Africa](https://cresdynamics.com/expand-into-east-africa): systems for mobile money and multi-country operations.
+- [Pricing](https://cresdynamics.com/pricing)
+- [Contact](https://cresdynamics.com/contact)
+
+## Optional
+
+- [Blog](https://cresdynamics.com/blog)
+- [Sitemap](https://cresdynamics.com/sitemap.xml)
