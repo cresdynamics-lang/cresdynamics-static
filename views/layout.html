@@ -29,7 +29,7 @@
   <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700&family=Outfit:wght@500;600;700;800&display=swap" onload="this.onload=null;this.rel='stylesheet'">
   <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700&family=Outfit:wght@500;600;700;800&display=swap"></noscript>
   <link rel="preload" href="/images/logo.png" as="image">
-  <link rel="stylesheet" href="/css/styles.css?v=20261124">
+  <link rel="stylesheet" href="/css/styles.css?v=20261126">
   <link rel="icon" href="/images/favicon-circular.png" type="image/png">
   <link rel="apple-touch-icon" href="/images/apple-touch-icon.png">
   <script type="application/ld+json">
@@ -103,10 +103,12 @@
         <li><a href="/cresos" class="nav-link-glass">CresOS</a></li>
         <li class="nav-item" data-dropdown="systems"><button class="nav-link-glass" type="button" aria-expanded="false" aria-haspopup="true" aria-controls="dropdown-systems">Systems <svg style="width:14px;height:14px" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg></button></li>
         <li class="nav-item" data-dropdown="services"><button class="nav-link-glass" type="button" aria-expanded="false" aria-haspopup="true" aria-controls="dropdown-services">Services <svg style="width:14px;height:14px" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg></button></li>
+        <li class="nav-item" data-dropdown="marketing"><button class="nav-link-glass" type="button" aria-expanded="false" aria-haspopup="true" aria-controls="dropdown-marketing">Marketing <svg style="width:14px;height:14px" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg></button></li>
         <li><a href="/case-studies" class="nav-link-glass">Case Proof</a></li>
         <li><a href="/our-work" class="nav-link-glass">Our Work</a></li>
         <li><a href="/projects" class="nav-link-glass">Projects</a></li>
         <li><a href="/blog" class="nav-link-glass">Insights</a></li>
+        <li><a href="/pricing" class="nav-link-glass">Pricing</a></li>
       </ul>
 
       <!-- Mobile hamburger -->
@@ -166,6 +168,20 @@
       </div>
     </div>
 
+    <!-- MARKETING dropdown -->
+    <div id="dropdown-marketing" class="nav-dropdown" style="min-height:260px;">
+      <div style="max-width:1152px;margin:0 auto;padding:24px;">
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;">
+          <a href="/solutions/seo-visibility" class="dropdown-item"><img data-src="/images/tech-growth.jpg" alt="" class="dropdown-img" width="160" height="96" loading="lazy"><div class="dropdown-title">SEO &amp; Visibility</div><div class="dropdown-desc">Rank on Google where buyers search</div></a>
+          <a href="/solutions/digital-sales" class="dropdown-item"><img data-src="/images/sections/analytics-workspace.jpg" alt="" class="dropdown-img" width="160" height="96" loading="lazy"><div class="dropdown-title">Digital Sales</div><div class="dropdown-desc">Capture leads and automate the pipeline</div></a>
+          <a href="/solutions/web-growth" class="dropdown-item"><img data-src="/images/websites.jpg" alt="" class="dropdown-img" width="160" height="96" loading="lazy"><div class="dropdown-title">Web Growth</div><div class="dropdown-desc">Websites that turn traffic into revenue</div></a>
+          <a href="/solutions/content-brand" class="dropdown-item"><img data-src="/images/sections/team-collaboration-board.jpg" alt="" class="dropdown-img" width="160" height="96" loading="lazy"><div class="dropdown-title">Content &amp; Brand</div><div class="dropdown-desc">Consistent brand on every touchpoint</div></a>
+          <a href="/solutions/consulting-strategy" class="dropdown-item"><img data-src="/images/sections/tech-team-planning.jpg" alt="" class="dropdown-img" width="160" height="96" loading="lazy"><div class="dropdown-title">Consulting &amp; Strategy</div><div class="dropdown-desc">Map the business, then invest</div></a>
+          <a href="/pricing" class="dropdown-item"><img data-src="/images/sections/startup-team-office.jpg" alt="" class="dropdown-img" width="160" height="96" loading="lazy"><div class="dropdown-title">Pricing</div><div class="dropdown-desc">How we scope and quote</div></a>
+        </div>
+      </div>
+    </div>
+
     <!-- Mobile menu -->
     <div id="mobile-backdrop" class="mobile-backdrop" hidden></div>
     <nav id="mobile-menu" class="mobile-menu" aria-label="Mobile" aria-hidden="true">
@@ -193,6 +209,16 @@
         </div>
       </div>
       <div class="mobile-acc">
+        <button class="mobile-dropdown-btn" type="button" data-mobile="marketing" aria-expanded="false" aria-controls="mobile-marketing">Marketing <svg class="mobile-acc__chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg></button>
+        <div id="mobile-marketing" class="mobile-submenu" hidden>
+          <a href="/solutions/seo-visibility">SEO &amp; Visibility</a>
+          <a href="/solutions/digital-sales">Digital Sales</a>
+          <a href="/solutions/web-growth">Web Growth</a>
+          <a href="/solutions/content-brand">Content &amp; Brand</a>
+          <a href="/solutions/consulting-strategy">Consulting &amp; Strategy</a>
+        </div>
+      </div>
+      <div class="mobile-acc">
         <button class="mobile-dropdown-btn" type="button" data-mobile="who-we-are" aria-expanded="false" aria-controls="mobile-who-we-are">Who We Are <svg class="mobile-acc__chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg></button>
         <div id="mobile-who-we-are" class="mobile-submenu" hidden>
           <a href="/about">About Us</a>
@@ -208,6 +234,7 @@
       <a class="mobile-menu__link" href="/our-work">Our Work</a>
       <a class="mobile-menu__link" href="/projects">Projects</a>
       <a class="mobile-menu__link" href="/blog">Blog</a>
+      <a class="mobile-menu__link" href="/pricing">Pricing</a>
       <div class="mobile-menu__cta">
         <a class="btn btn-primary" href="https://wa.me/254708805496?text=Hi%2C%20I%27d%20like%20to%20book%20a%20strategy%20session%20with%20CRES%20Dynamics." target="_blank" rel="noopener noreferrer">Book Strategy Session</a>
         <a class="btn btn-secondary" href="tel:+254708805496">Call 0708 805 496</a>
@@ -238,6 +265,12 @@
           <a href="/contact" class="footer-link">Start the conversation</a>
           <a href="/how-we-work" class="footer-link">How We Work</a>
           <a href="/how-we-build" class="footer-link">How We Build</a>
+          <h3 class="footer-heading" style="margin-top:16px;">Marketing</h3>
+          <a href="/solutions/seo-visibility" class="footer-link">SEO &amp; Visibility</a>
+          <a href="/solutions/digital-sales" class="footer-link">Digital Sales</a>
+          <a href="/solutions/web-growth" class="footer-link">Web Growth</a>
+          <a href="/solutions/content-brand" class="footer-link">Content &amp; Brand</a>
+          <a href="/solutions/consulting-strategy" class="footer-link">Consulting &amp; Strategy</a>
         </div>
         <div>
           <h3 class="footer-heading">Services</h3>

@@ -1,9 +1,6 @@
 <!-- Blog index -->
 <section class="section-white" style="padding-top:calc(var(--header-h) + 64px);padding-bottom:48px;">
   <div class="section-container">
-    <nav class="breadcrumb" aria-label="Breadcrumb">
-      <a href="/">Home</a><span aria-hidden="true">/</span><span>Blog</span>
-    </nav>
     <span class="eyebrow">Insights</span>
     <h1 class="section-title" style="max-width:16ch;border:none;display:block;padding:0;">Building systems that scale.</h1>
     <p class="section-subtitle">Practical notes from production work, operations, AI, and growth for Nairobi businesses.</p>
@@ -12,8 +9,10 @@
 
 <section class="section-light">
   <div class="section-container">
-    <div id="blog-grid" class="blog-grid"></div>
-    <div id="no-posts" class="blog-empty" hidden>
+    <div id="blog-grid" class="blog-grid">
+{{postCards}}
+    </div>
+    <div id="no-posts" class="blog-empty" {{noPostsHidden}}>
       <p>No posts published yet. Check back soon, or <a href="/contact">tell us what you need</a>.</p>
     </div>
     <div class="blog-related" style="margin-top:56px;">
@@ -27,31 +26,3 @@
     </div>
   </div>
 </section>
-
-<script>
-(function () {
-  var postsData = [];
-  try { postsData = JSON.parse('{{posts}}'); } catch (e) { postsData = []; }
-  var grid = document.getElementById('blog-grid');
-  var noPosts = document.getElementById('no-posts');
-  if (!postsData || !postsData.length) {
-    noPosts.hidden = false;
-    return;
-  }
-  postsData.forEach(function (post, index) {
-    var date = post.published_at
-      ? new Date(post.published_at).toLocaleDateString('en-KE', { year: 'numeric', month: 'short', day: 'numeric' })
-      : '';
-    var a = document.createElement('a');
-    a.className = 'blog-card scroll-reveal';
-    a.href = '/blog/' + post.slug;
-    a.style.transitionDelay = (index % 6) * 40 + 'ms';
-    a.innerHTML =
-      '<div class="blog-card__meta"><span class="blog-card__cat">' + (post.category || 'Article') + '</span><time>' + date + '</time></div>' +
-      '<h2 class="blog-card__title">' + post.title + '</h2>' +
-      '<p class="blog-card__excerpt">' + (post.excerpt || 'Read more') + '</p>' +
-      '<span class="blog-card__cta">Read article →</span>';
-    grid.appendChild(a);
-  });
-})();
-</script>

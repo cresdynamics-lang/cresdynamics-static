@@ -22,12 +22,12 @@ app.use((req, res, next) => {
 // Security headers. Inline scripts stay allowed because page templates use them.
 const CSP = [
   "default-src 'self'",
-  "script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://www.clarity.ms https://*.clarity.ms https://challenges.cloudflare.com",
+  "script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://www.clarity.ms https://*.clarity.ms https://challenges.cloudflare.com https://static.cloudflareinsights.com",
   "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
   "font-src 'self' data: https://fonts.gstatic.com",
   "img-src 'self' data: blob: https:",
   "media-src 'self' https:",
-  "connect-src 'self' https://*.google-analytics.com https://*.analytics.google.com https://www.googletagmanager.com https://*.clarity.ms https://challenges.cloudflare.com",
+  "connect-src 'self' https://cloudflareinsights.com https://*.google-analytics.com https://*.analytics.google.com https://www.googletagmanager.com https://*.clarity.ms https://challenges.cloudflare.com https://static.cloudflareinsights.com",
   "frame-src https://challenges.cloudflare.com https://www.google.com https://www.youtube.com",
   "object-src 'none'",
   "base-uri 'self'",
@@ -1505,7 +1505,7 @@ function renderPage(res, pageFile, data = {}, status = 200) {
       turnstileWidget: siteKey ? `<div class="cf-turnstile" data-sitekey="${siteKey}" data-theme="light"></div>` : '',
       bookingUrl: (process.env.BOOKING_URL || EMAIL_BOOKING).replace(/"/g, '%22'),
       headTags: headTags(),
-      title: 'Cres Dynamics - Intelligent Systems That Run Your Business',
+      title: 'Cres Dynamics Ltd - Intelligent Systems That Run Your Business',
       description: 'Intelligent Systems That Run Your Business. Custom operating systems, finance platforms, and websites that sell. Built in Nairobi for how your business actually works.',
       ogImage: `${base}${ogImageFor(reqPath)}`,
       canonical: `${base}${res.req?.path || '/'}`,
@@ -1519,7 +1519,7 @@ function renderPage(res, pageFile, data = {}, status = 200) {
     if (faqItems) merged.schema = `${merged.schema || ''}\n  ${faqSchema(faqItems)}`;
     if (!data.canonical && res.req?.path) merged.canonical = `${base}${res.req.path === '/' ? '/' : res.req.path}`;
     for (const [key, val] of Object.entries(merged)) {
-      html = html.replace(new RegExp(`{{${key}}}`, 'g'), val == null ? '' : String(val));
+      html = html.replace(new RegExp(`{{${key}}}`, 'g'), () => (val == null ? '' : String(val)));
     }
     // Clear any leftover unmatched simple tokens
     html = html.replace(/\{\{[a-zA-Z0-9_]+\}\}/g, '');
@@ -1549,7 +1549,7 @@ app.get('/hire-kenyan-developers', (req, res) => renderPage(res, 'hire-kenyan-de
 app.get('/multi-branch-business-system', (req, res) => renderPage(res, 'multi-branch-business-system.html'));
 app.get('/school-management-system', (req, res) => renderPage(res, 'services/school-management-system.html'));
 app.get('/our-work', (req, res) => renderPage(res, 'our-work.html', {
-  title: 'Our Work: Systems We Built for Companies | Cres Dynamics',
+  title: 'Our Work: Systems We Built for Companies | Cres Dynamics Ltd',
   description: 'Proof hub for Cres Dynamics: CresOS, OptioHire, hospitality, retail, property, and live client systems organised by industry.',
 }));
 app.get('/finance-platforms', (req, res) => renderPage(res, 'services/finance-platforms.html'));
@@ -1569,13 +1569,13 @@ app.get('/insights', (req, res) => renderPage(res, 'insights.html'));
 app.get('/terms', (req, res) => renderPage(res, 'terms.html'));
 app.get('/privacy', (req, res) => renderPage(res, 'privacy.html'));
 app.get('/data-security', (req, res) => renderPage(res, 'data-security.html', {
-  title: 'Data & Security - Cres Dynamics',
+  title: 'Data & Security - Cres Dynamics Ltd',
   description: 'How Cres Dynamics protects client systems: encryption, access control, backups, and Kenya Data Protection Act alignment.',
 }));
 
 // Industries
 app.get('/industries', (req, res) => renderPage(res, 'industries/index.html', {
-  title: 'Industry Software in Kenya: Logistics, FMCG, SACCOs & More | Cres Dynamics',
+  title: 'Industry Software in Kenya: Logistics, FMCG, SACCOs & More | Cres Dynamics Ltd',
   description: 'Systems for logistics, FMCG, SACCOs and finance, real estate, education, manufacturing, hospitality, retail and multi-unit groups, built in Nairobi.',
 }));
 app.get('/industries/:slug', (req, res) => {
@@ -1583,15 +1583,15 @@ app.get('/industries/:slug', (req, res) => {
   if (!valid.includes(req.params.slug)) return res.redirect('/industries');
   const meta = {
     hospitality: {
-      title: 'Hospitality Systems - Ops & Approvals | Cres Dynamics',
+      title: 'Hospitality Systems - Ops & Approvals | Cres Dynamics Ltd',
       description: 'Hotel and hospitality operations platforms - HOD approvals, ownership, and audit trails that cut cycles from hours to minutes.',
     },
     retail: {
-      title: 'Retail Systems - Catalogue, M-Pesa & Discovery | Cres Dynamics',
+      title: 'Retail Systems - Catalogue, M-Pesa & Discovery | Cres Dynamics Ltd',
       description: 'Retail systems for Kenyan commerce - catalogue, WhatsApp demand, M-Pesa checkout, and organic discovery.',
     },
     'multi-unit': {
-      title: 'Multi-unit Business Systems | Cres Dynamics',
+      title: 'Multi-unit Business Systems | Cres Dynamics Ltd',
       description: 'Group operating systems for multi-unit companies - per-unit finance and HR with one director-level view.',
     },
   }[req.params.slug];
@@ -1599,21 +1599,38 @@ app.get('/industries/:slug', (req, res) => {
 });
 
 // Blog (dynamic from DB)
+// Blog list cards, rendered on the server so every post is a plain HTML link
+function blogCards(posts) {
+  return posts.map((post) => {
+    const d = post.published_at ? new Date(post.published_at) : null;
+    const date = d && !isNaN(d) ? d.toLocaleDateString('en-KE', { year: 'numeric', month: 'short', day: 'numeric', timeZone: 'Africa/Nairobi' }) : '';
+    const iso = d && !isNaN(d) ? d.toISOString().split('T')[0] : '';
+    return `<a class="blog-card" href="/blog/${encodeURIComponent(post.slug)}">` +
+      `<div class="blog-card__meta"><span class="blog-card__cat">${escapeHtml(post.category || 'Article')}</span><time datetime="${iso}">${escapeHtml(date)}</time></div>` +
+      `<h2 class="blog-card__title">${escapeHtml(post.title)}</h2>` +
+      `<p class="blog-card__excerpt">${escapeHtml(post.excerpt || 'Read more')}</p>` +
+      `<span class="blog-card__cta">Read article →</span></a>`;
+  }).join('\n');
+}
+
 app.get('/blog', async (req, res) => {
   try {
     const posts = await db.queryMany(
       "SELECT id, slug, title, excerpt, category, published_at FROM blog_posts WHERE status = 'published' ORDER BY published_at DESC"
     );
     renderPage(res, 'blog/index.html', {
-      title: 'Blog - Systems, AI & growth insights | Cres Dynamics',
-      description: 'Practical insights from Cres Dynamics - operations systems, AI, and growth for businesses in Nairobi and across Africa.',
-      posts: JSON.stringify(posts).replace(/</g, '\\u003c'),
+      title: 'Blog - Systems, AI & growth insights | Cres Dynamics Ltd',
+      description: 'Practical insights from Cres Dynamics Ltd - operations systems, AI, and growth for businesses in Nairobi and across Africa.',
+      postCards: blogCards(posts),
+      noPostsHidden: posts.length ? 'hidden' : '',
     });
   } catch (err) {
+    console.error('blog list error:', err.message);
     renderPage(res, 'blog/index.html', {
-      title: 'Blog - Cres Dynamics',
-      description: 'Insights from Cres Dynamics on systems, AI, and growth.',
-      posts: '[]',
+      title: 'Blog - Cres Dynamics Ltd',
+      description: 'Insights from Cres Dynamics Ltd on systems, AI, and growth.',
+      postCards: '',
+      noPostsHidden: '',
     });
   }
 });
@@ -1643,7 +1660,7 @@ app.get('/blog/:slug', async (req, res) => {
     const title = post.meta_title || post.title;
     const description = post.meta_description || post.excerpt || '';
     // Older posts store the author as 'CRES Dynamics'; show the one brand spelling
-    const author = (post.author || 'Cres Dynamics').replace(/^CRES Dynamics$/, 'Cres Dynamics');
+    const author = (post.author || 'Cres Dynamics Ltd').replace(/^(CRES|Cres) Dynamics$/, 'Cres Dynamics Ltd');
     renderPage(res, 'blog/post.html', {
       eventNotice: EVENT_POST_RE.test(post.slug) ? EVENT_NOTICE : '',
       title,
@@ -1657,19 +1674,21 @@ app.get('/blog/:slug', async (req, res) => {
       ogImage: 'https://cresdynamics.com/images/og/blog.png',
       excerpt: post.excerpt || '',
       slug: post.slug,
-      related: JSON.stringify(related).replace(/</g, '\\u003c'),
+      relatedLinks: related.map((p) => `<a class="path-link" href="/blog/${encodeURIComponent(p.slug)}"><span class="path-link__kicker">${escapeHtml(p.category || 'Article')}</span><div class="path-link__title">${escapeHtml(p.title)}</div></a>`).join('\n'),
+      relatedHidden: related.length ? '' : 'hidden',
       jsonTitle: JSON.stringify(title),
       jsonDescription: JSON.stringify(description),
       jsonAuthor: JSON.stringify(author),
     });
   } catch (err) {
+    console.error('blog post error:', err.message);
     res.redirect('/blog');
   }
 });
 
 // Events — closed / postponed (all deep links redirect; registration APIs return 410)
 app.get('/events', (req, res) => renderPage(res, 'events/index.html', {
-  title: 'Event Postponed - Cres Dynamics',
+  title: 'Event Postponed - Cres Dynamics Ltd',
   description: 'This event has been postponed to a later date. Registrations are closed. Contact the Cres Dynamics team if you need a system for your business.',
 }));
 app.get(/^\/events\/.+/, (req, res) => res.redirect(301, '/events'));
@@ -1747,7 +1766,7 @@ function renderAdminPage(res, pageFile, data = {}) {
     for (const [key, val] of Object.entries(data)) {
       html = html.replace(new RegExp(`{{${key}}}`, 'g'), val || '');
     }
-    html = html.replace(/\{\{title\}\}/g, data.title || 'Admin - Cres Dynamics');
+    html = html.replace(/\{\{title\}\}/g, data.title || 'Admin - Cres Dynamics Ltd');
     res.send(html);
   } catch (err) {
     console.error(`Render admin error for ${pageFile}:`, err);
@@ -1870,7 +1889,7 @@ app.get('/sitemap.xml', async (req, res) => {
 app.use((req, res) => {
   if (req.method !== 'GET' || req.path.startsWith('/api')) return res.status(404).json({ error: 'Not found' });
   renderPage(res, '404.html', {
-    title: 'Page not found | Cres Dynamics',
+    title: 'Page not found | Cres Dynamics Ltd',
     description: 'This page does not exist. Explore AI systems, business operating systems, and websites by Cres Dynamics.',
     robots: 'noindex',
   }, 404);

@@ -1,10 +1,5 @@
 <article class="blog-post">
   <div class="section-container blog-post__inner">
-    <nav class="breadcrumb" aria-label="Breadcrumb">
-      <a href="/">Home</a><span aria-hidden="true">/</span>
-      <a href="/blog">Blog</a><span aria-hidden="true">/</span>
-      <span>{{title}}</span>
-    </nav>
     <header class="blog-post__header">
       <span class="eyebrow">{{category}}</span>
       <h1 class="blog-post__title">{{title}}</h1>
@@ -36,9 +31,9 @@
       </div>
     </nav>
 
-    <div class="blog-post__related" id="related-posts" hidden>
+    <div class="blog-post__related" id="related-posts" {{relatedHidden}}>
       <span class="eyebrow">More from the blog</span>
-      <div class="path-grid" id="related-grid" style="margin-top:16px;"></div>
+      <div class="path-grid" id="related-grid" style="margin-top:16px;">{{relatedLinks}}</div>
     </div>
 
     <footer class="blog-post__footer">
@@ -78,24 +73,4 @@
     }
   ]
 }
-</script>
-
-<script>
-(function () {
-  var related = [];
-  try { related = JSON.parse('{{related}}'); } catch (e) { related = []; }
-  if (!related.length) return;
-  var wrap = document.getElementById('related-posts');
-  var grid = document.getElementById('related-grid');
-  related.forEach(function (p) {
-    var a = document.createElement('a');
-    a.className = 'path-link';
-    a.href = '/blog/' + p.slug;
-    var k = document.createElement('span'); k.className = 'path-link__kicker'; k.textContent = p.category || 'Article';
-    var t = document.createElement('div'); t.className = 'path-link__title'; t.textContent = p.title;
-    a.appendChild(k); a.appendChild(t);
-    grid.appendChild(a);
-  });
-  wrap.hidden = false;
-})();
 </script>
