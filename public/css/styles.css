@@ -1173,3 +1173,28 @@ html.menu-open .wa-float { display: none; }
 .enq-more > summary::before { content: '+ '; color: var(--brand-orange); }
 .enq-more[open] > summary::before { content: '– '; }
 .enq-more[open] > .enq-grid { margin-top: 12px; }
+
+/* Project screenshots: desktop in a browser frame, phone overlapping */
+.device-view { position: relative; padding: 0 18px 18px 0; margin-bottom: 1.25rem; cursor: zoom-in; outline-offset: 4px; }
+.device-view__desktop { border: 1px solid var(--line); border-radius: 10px; overflow: hidden; background: #fff; box-shadow: 0 6px 18px rgba(16,24,40,0.06); }
+.device-view__bar { display: flex; gap: 5px; padding: 7px 10px; background: #F3F4F6; border-bottom: 1px solid var(--line); }
+.device-view__bar i { width: 7px; height: 7px; border-radius: 50%; background: #D1D5DB; }
+.device-view__desktop img { display: block; width: 100%; aspect-ratio: 16 / 10; object-fit: cover; object-position: top; }
+.device-view__phone { position: absolute; right: 0; bottom: 0; width: 24%; min-width: 64px; border: 4px solid #111827; border-radius: 14px; overflow: hidden; background: #111827; box-shadow: 0 10px 24px rgba(16,24,40,0.22); }
+.device-view__phone img { display: block; width: 100%; aspect-ratio: 9 / 19.5; object-fit: cover; object-position: top; }
+.device-view:hover .device-view__desktop { border-color: var(--brand-orange); }
+.system-card .device-view { margin: 16px 16px 0; }
+.system-card .device-view img { aspect-ratio: auto; background: none; }
+.system-card .device-view__desktop img { aspect-ratio: 16 / 10; }
+.system-card .device-view__phone img { aspect-ratio: 9 / 19.5; }
+.system-card__link { font-size: 13px; font-weight: 700; color: var(--brand-orange); text-decoration: none; }
+.device-lightbox { position: fixed; inset: 0; z-index: 1000; background: rgba(10,15,25,0.88); display: flex; align-items: center; justify-content: center; padding: 24px; }
+.device-lightbox[hidden] { display: none; }
+.device-lightbox__inner { width: min(1200px, 100%); max-height: 100%; overflow: auto; }
+.device-lightbox__title { color: #fff; font-weight: 700; font-size: 1.1rem; margin: 0 0 12px; }
+.device-lightbox__views { display: grid; grid-template-columns: 3fr 1fr; gap: 20px; align-items: start; }
+.device-lightbox__views img { display: block; width: 100%; border-radius: 10px; background: #fff; }
+.device-lightbox__m img { border: 5px solid #111827; border-radius: 22px; }
+.device-lightbox__views figcaption { color: rgba(255,255,255,0.75); font-size: 12px; margin-top: 8px; text-align: center; }
+.device-lightbox__close { position: absolute; top: 12px; right: 16px; background: none; border: 0; color: #fff; font-size: 34px; line-height: 1; cursor: pointer; }
+@media (max-width: 720px) { .device-lightbox__views { grid-template-columns: 1fr; } .device-lightbox__m { max-width: 260px; margin: 0 auto; } }
